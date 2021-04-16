@@ -23,7 +23,7 @@
 			</div>
 			<div class="card shadow">
 				<div class="card-body">
-					<table id="table-registrars" class="table table-hover">
+					<table id="table-teachers" class="table table-hover">
 						<thead>
 							<tr>
 								<th>Teacher #</th>

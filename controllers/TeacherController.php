@@ -39,7 +39,7 @@ class TeacherController extends Controller
 
 		$password = Str::random(5);
 
-		$data['role'] = 'Registrar';
+		$data['role'] = 'Teacher';
 		$data['password'] = Hash::make($password);
 		$data['active'] = true;
 		$teacher = User::create($data);
@@ -78,7 +78,11 @@ class TeacherController extends Controller
 
 	public function edit()
 	{
-		return view('teachers.form', ['mode' => 'Edit']);
+		$id = input()->id;
+
+		$teacher = User::findOrFail($id);
+
+		return view('teachers.form', ['mode' => 'Edit'] + $teacher->toArray());
 	}
 
 	public function destroy()
