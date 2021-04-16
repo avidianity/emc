@@ -1,0 +1,21 @@
+<?php
+
+use Libraries\Hash;
+use Libraries\Str;
+use Models\User;
+
+require_once __DIR__ . '/bootstrap.php';
+
+$user = User::make([
+	'first_name' => 'admin',
+	'last_name' => 'admin',
+	'role' => 'Admin',
+	'password' => Hash::make('admin'),
+	'email' => 'admin@gmail.com',
+	'number' => '09123456789',
+	'active' => true,
+]);
+
+$user->uuid = Str::random(10);
+
+$user->save();

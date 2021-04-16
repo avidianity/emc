@@ -1,0 +1,91 @@
+<?php
+
+use Libraries\Hash;
+use Models\CMS;
+use Models\Model;
+use Models\User;
+
+require_once __DIR__ . '/bootstrap.php';
+
+$pdo = Model::getConnection();
+
+$pdo->query('SET FOREIGN_KEY_CHECKS=0');
+
+$env = config('app.env');
+
+$dbname = config("database.{$env}.name");
+
+$query  = "SELECT concat('DROP TABLE IF EXISTS {$dbname}.', TABLE_NAME,';') AS query from information_schema.TABLES where table_schema= :table_schema;";
+
+$statement = $pdo->prepare($query);
+
+$statement->execute([':table_schema' => $dbname]);
+
+$total = $statement->rowCount();
+
+foreach ($statement->fetchAll() as $index => $row) {
+    $i = $index + 1;
+    $query = $row->query;
+    echo "\nExecuting {$i}/{$total}: {$query}\n";
+    $pdo->query($query);
+}
+
+echo "\nDropped all tables successfully.\n";
+
+$sql = file_get_contents(__DIR__ . '/db.sql');
+
+$queries = array_filter(array_map(function ($query) {
+    return trim($query);
+}, explode(';', $sql)), function ($query) {
+    return !empty($query);
+});
+
+$total = count($queries);
+
+foreach ($queries as $index => $query) {
+    $i = $index + 1;
+    echo "\nExecuting {$i}/{$total}: {$query}\n";
+    $pdo->query($query);
+}
+
+echo "\nTables migrated successfully.\n";
+
+echo "\nImporting default CMS values\n";
+
+$cms = json_decode(file_get_contents(__DIR__ . '/cms.json'));
+
+$arrayed = [];
+
+foreach ($cms as $key => $value) {
+    $arrayed[] = [
+        'key' => $key,
+        'value' => $value,
+    ];
+}
+
+$total = count($arrayed);
+
+foreach ($arrayed as $index => $cms) {
+    $i = $index + 1;
+    echo "\nImporting {$i}/{$total}: Key: {$cms['key']} Value: {$cms['value']}\n";
+    CMS::create(['key' => $cms['key'], 'value' => $cms['value']]);
+}
+
+echo "\nCreating Administrator\n";
+
+User::create([
+    'name' => 'John Doe',
+    'email' => 'admin@admin.com',
+    'phone' => '639123456789',
+    'password' => Hash::make('admin'),
+    'role' => 'Admin',
+]);
+
+$pdo->query('SET FOREIGN_KEY_CHECKS=1');
+
+echo "\nAdministrator Credentials:\n";
+
+echo "\nEmail: admin@admin.com\n";
+echo "\nPassword: admin\n";
+
+echo "\nDone\n";
