@@ -7,6 +7,7 @@ class User extends Model
 	protected $fillable = [
 		'first_name',
 		'last_name',
+		'middle_name',
 		'role',
 		'email',
 		'number',
@@ -14,6 +15,8 @@ class User extends Model
 		'password',
 		'uuid',
 	];
+
+	protected $hidden = ['password'];
 
 	protected static function events()
 	{
@@ -24,5 +27,10 @@ class User extends Model
 		static::serializing(function (self $user) {
 			$user->active = $user->active ? true : false;
 		});
+	}
+
+	public function admissions()
+	{
+		return $this->hasMany(Admission::class);
 	}
 }

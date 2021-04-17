@@ -12,7 +12,7 @@ class PageController extends Controller
 	public function login()
 	{
 		if (session()->has('user')) {
-			return goBack();
+			return redirect('/dashboard');
 		}
 		return view('login');
 	}
@@ -20,7 +20,7 @@ class PageController extends Controller
 	public function forgotPassword()
 	{
 		if (session()->has('user')) {
-			return goBack();
+			return redirect('/dashboard');
 		}
 		return view('forgot-password');
 	}

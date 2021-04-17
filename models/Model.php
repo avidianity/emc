@@ -6,10 +6,8 @@ use Exceptions\NotFoundException;
 use Interfaces\Arrayable;
 use Interfaces\HasRelationships;
 use Interfaces\JSONable;
-use InvalidArgumentException;
 use Libraries\Collection;
 use Libraries\Database;
-use LogicException;
 use stdClass;
 use Traits\HasEvents;
 use Traits\HasRelations;
@@ -158,11 +156,7 @@ abstract class Model implements JSONable, Arrayable
 	 */
 	public function getTable()
 	{
-		if (static::$table !== null) {
-			return static::$table;
-		}
-		$split = explode('\\', get_class($this));
-		return strtolower($split[count($split) - 1]);
+		return static::table();
 	}
 
 	/**
@@ -172,7 +166,12 @@ abstract class Model implements JSONable, Arrayable
 	 */
 	public static function table()
 	{
-		return (new static())->getTable();
+		if (!static::$table) {
+			$split = explode('\\', get_class(new static()));
+			return strtolower($split[count($split) - 1]);
+		}
+
+		return static::$table;
 	}
 
 	/**
@@ -288,7 +287,7 @@ abstract class Model implements JSONable, Arrayable
 	 */
 	public static function justifyKey($key)
 	{
-		return (new static())->getTable() . '.' . $key;
+		return static::table() . '.' . $key;
 	}
 
 	/**
@@ -300,15 +299,15 @@ abstract class Model implements JSONable, Arrayable
 	 */
 	public static function create($data, $safe = true)
 	{
-		$instance = new static($data);
+		$instance = new static();
 		$instance
 			->fireEvent('creating')
 			->fireEvent('saving');
 
 		if ($safe === false) {
-			foreach ($data as $key => $value) {
-				$instance->{$key} = $value;
-			}
+			$instance->forceFill($data);
+		} else {
+			$instance->fill($data);
 		}
 
 		$data = $instance->getData();
@@ -353,7 +352,7 @@ abstract class Model implements JSONable, Arrayable
 	{
 		$pdo = static::getConnection();
 
-		$query  = 'SELECT COUNT(*) as count FROM ' . (new static())->getTable() . ';';
+		$query  = 'SELECT COUNT(*) as count FROM ' . static::table() . ';';
 
 		$statement = $pdo->prepare($query);
 
@@ -428,7 +427,7 @@ abstract class Model implements JSONable, Arrayable
 			->fireEvent('updated')
 			->fireEvent('saved');
 
-		return $instance;
+		return $this;
 	}
 
 	/**
@@ -487,7 +486,7 @@ abstract class Model implements JSONable, Arrayable
 			$instance->fireEvent('deleting');
 		}
 
-		$query = 'DELETE FROM ' . (new static())->getTable() . ' WHERE ' . static::justifyKey('id') . ' IN(' . collect($ids)->map(function () {
+		$query = 'DELETE FROM ' . static::table() . ' WHERE ' . static::justifyKey('id') . ' IN(' . collect($ids)->map(function () {
 			return '?';
 		})->join(',') . ');';
 		$statement = static::$pdo->prepare($query, [], $ids);
@@ -506,7 +505,7 @@ abstract class Model implements JSONable, Arrayable
 	 */
 	public static function getAll()
 	{
-		$statement = static::$pdo->query('SELECT * FROM ' . (new static())->getTable() . ';');
+		$statement = static::$pdo->query('SELECT * FROM ' . static::table() . ';');
 
 		return collect($statement->fetchAll())->map(function ($row) {
 			return static::from($row);
@@ -530,7 +529,7 @@ abstract class Model implements JSONable, Arrayable
 			$ids = [$ids];
 		}
 
-		$query  = 'SELECT * FROM ' . (new static())->getTable() . ' ';
+		$query  = 'SELECT * FROM ' . static::table() . ' ';
 		$query .= 'WHERE ' . static::justifyKey('id') . ' IN (' . collect($ids)->map(function () {
 			return '?';
 		})->join(',') . ');';
@@ -606,6 +605,7 @@ abstract class Model implements JSONable, Arrayable
 	/**
 	 * Indicate current freshness of instance
 	 * 
+	 * @param bool $fresh
 	 * @return static
 	 */
 	public function setFresh($fresh)

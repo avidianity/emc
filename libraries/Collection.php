@@ -8,6 +8,7 @@ use Countable;
 use Interfaces\Arrayable;
 use Iterator;
 use JsonSerializable;
+use Models\Model;
 
 /**
  * @property-read int $length
@@ -83,7 +84,24 @@ class Collection implements ArrayAccess, Countable, Iterator, JsonSerializable, 
 
 	public function all()
 	{
-		return (array)$this->items;
+		return $this->items;
+	}
+
+	/**
+	 * Load relationships of models in the collection
+	 *
+	 * @param string[] $relations
+	 * @return static
+	 */
+	public function load($relations = [])
+	{
+		return $this->map(function ($item) use ($relations) {
+			if ($item instanceof Model) {
+				return $item->load($relations);
+			}
+
+			return $item;
+		});
 	}
 
 	public function first()

@@ -39,7 +39,8 @@
 									</button>
 								</div>
 								<div class="modal-body text-left">
-									<p class="text-muted mt-3"><?= $exception->getMessage() ?></p>
+									<h3 class="text-center">Exception:</h3>
+									<h4 class="text-center mb-3"><?= $exception->getMessage() ?></h4>
 									<hr />
 									<h5>Trace:</h5>
 									<?php foreach ($exception->getTrace() as $trace) : ?>

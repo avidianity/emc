@@ -20,4 +20,9 @@ class Course extends Model
 			$course->open = $course->open ? true : false;
 		});
 	}
+
+	public function subjects()
+	{
+		return $this->hasMany(Subject::class, 'course_code', 'code');
+	}
 }

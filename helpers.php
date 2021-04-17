@@ -7,6 +7,7 @@ use Libraries\Collection;
 use Libraries\Input;
 use Libraries\Mailer;
 use Libraries\Message;
+use Libraries\Optional;
 use Libraries\Response;
 use Libraries\Str;
 use Libraries\View;
@@ -15,6 +16,7 @@ use Libraries\View;
  * Return a file from the views folder
  * 
  * @param string $path
+ * @param array $data
  * @return View
  */
 function view($path, $data = [])
@@ -407,6 +409,17 @@ function input()
 function collect($items = [])
 {
 	return new Collection($items);
+}
+
+/**
+ * Provide access to optional objects.
+ *
+ * @param  mixed  $value
+ * @return mixed
+ */
+function optional($value = null)
+{
+	return new Optional($value);
 }
 
 /**

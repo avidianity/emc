@@ -18,6 +18,15 @@ if (file_exists($env)) {
 	$dotenv->load($env);
 }
 
+if ($_ENV['APP_ENV'] === 'prod') {
+	$env = __DIR__ . '/.env.production';
+	if (file_exists($env)) {
+		$dotenv = new Dotenv();
+
+		$dotenv->load($env);
+	}
+}
+
 // store the configurations
 $_ENV['CONFIGS'] = require_once __DIR__ . '/config.php';
 

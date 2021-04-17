@@ -30,6 +30,11 @@ function sentencify(words) {
 	);
 }
 
+function user() {
+	const payload = localStorage.getItem("user");
+	return payload ? JSON.parse(payload) : null;
+}
+
 function fromNow(date) {
 	return dayjs(date).fromNow();
 }

@@ -91,12 +91,6 @@ class Input implements JSONable, Arrayable
 
 	protected function castToCorrectType($value)
 	{
-		if (is_numeric($value)) {
-			if (is_double($value + 0) || is_float($value + 0)) {
-				return (float)$value;
-			}
-			return (int)$value;
-		}
 		if (is_null($value)) {
 			return null;
 		}

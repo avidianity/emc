@@ -1,3 +1,7 @@
+<?php
+
+use Libraries\View;
+?>
 <aside class="sidebar-left border-right bg-white shadow" id="leftSidebar" data-simplebar>
 	<a href="#" class="btn collapseSidebar toggle-btn d-lg-none text-muted ml-2 mt-3" data-toggle="toggle">
 		<i class="fe fe-x"><span class="sr-only"></span></i>
@@ -17,43 +21,59 @@
 					<span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
 				</a>
 			</li>
-			<li class="nav-item w-100 ">
+			<li class="nav-item w-100">
 				<a class="nav-link" href="<?= url('dashboard/courses/all') ?>">
-					<i class="fe fe-box fe-16"></i>
+					<i class="fe fe-send fe-16"></i>
 					<span class="ml-3 item-text">Courses</span>
 				</a>
 			</li>
-			<li class="nav-item w-100 ">
+			<li class="nav-item w-100">
 				<a class="nav-link" href="<?= url('dashboard/students/all') ?>">
 					<i class="fe fe-users fe-16"></i>
 					<span class="ml-3 item-text">Students</span>
 				</a>
 			</li>
-			<li class="nav-item w-100 ">
+			<li class="nav-item w-100">
 				<a class="nav-link" href="<?= url('dashboard/teachers/all') ?>">
 					<i class="fe fe-users fe-16"></i>
 					<span class="ml-3 item-text">Teachers</span>
 				</a>
 			</li>
-			<li class="nav-item w-100 ">
-				<a class="nav-link" href="<?= url('dashboard/registrars/all') ?>">
-					<i class="fe fe-users fe-16"></i>
-					<span class="ml-3 item-text">Registrars</span>
-				</a>
-			</li>
-			<li class="nav-item w-100 ">
-				<a class="nav-link" href="<?= url('dashboard/users/all') ?>">
-					<i class="fe fe-users fe-16"></i>
-					<span class="ml-3 item-text">System Users</span>
-				</a>
-			</li>
-			<li class="nav-item w-100 ">
-				<a class="nav-link" href="<?= url('/dashboard/emails') ?>">
-					<i class="fe fe-mail fe-16"></i>
-					<span class="ml-3 item-text">Email Outbox</span>
-				</a>
-			</li>
-			<li class="nav-item w-100 ">
+			<?php if (session()->get('user')->role === 'Admin') : ?>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/registrars/all') ?>">
+						<i class="fe fe-users fe-16"></i>
+						<span class="ml-3 item-text">Registrars</span>
+					</a>
+				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/users/all') ?>">
+						<i class="fe fe-users fe-16"></i>
+						<span class="ml-3 item-text">System Users</span>
+					</a>
+				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('/dashboard/emails') ?>">
+						<i class="fe fe-mail fe-16"></i>
+						<span class="ml-3 item-text">Email Outbox</span>
+					</a>
+				</li>
+			<?php endif; ?>
+			<?php if (session()->get('user')->role === 'Registrar') : ?>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/subjects/all') ?>">
+						<i class="fe fe-book fe-16"></i>
+						<span class="ml-3 item-text">Subjects</span>
+					</a>
+				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/admissions/all') ?>">
+						<i class="fe fe-pen-tool fe-16"></i>
+						<span class="ml-3 item-text">Admissions</span>
+					</a>
+				</li>
+			<?php endif; ?>
+			<li class="nav-item w-100">
 				<a class="nav-link" href="<?= url('/dashboard/change-password') ?>">
 					<i class="fe fe-key fe-16"></i>
 					<span class="ml-3 item-text">Change Password</span>

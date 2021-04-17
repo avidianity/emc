@@ -1,10 +1,12 @@
 <?php
 
+use Controllers\AdmissionController;
 use Controllers\AuthController;
 use Controllers\CourseController;
 use Controllers\MailController;
 use Controllers\PageController;
 use Controllers\RegistrarController;
+use Controllers\SubjectController;
 use Controllers\TeacherController;
 use Controllers\UserController;
 use Libraries\Router;
@@ -22,6 +24,8 @@ $router->group('/dashboard', function (Router $router) {
 	$router->resource('/registrars', RegistrarController::class);
 	$router->resource('/teachers', TeacherController::class);
 	$router->resource('/courses', CourseController::class);
+	$router->resource('/subjects', SubjectController::class);
+	$router->resource('/admissions', AdmissionController::class);
 });
 
 $router->group('/api', function (Router $router) {
