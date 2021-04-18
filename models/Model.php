@@ -553,6 +553,38 @@ abstract class Model implements JSONable, Arrayable
 	}
 
 	/**
+	 * Get first row in the database.
+	 * 
+	 * @return static|null
+	 */
+	public static function first()
+	{
+		$statement = static::$pdo->query(sprintf('SELECT * FROM %s LIMIT 1;', static::table()));
+
+		if ($statement->rowCount() === 0) {
+			return null;
+		}
+
+		return static::from($statement->fetch());
+	}
+
+	/**
+	 * Get last row in the database.
+	 * 
+	 * @return static|null
+	 */
+	public static function last()
+	{
+		$statement = static::$pdo->query(sprintf('SELECT * FROM %s ORDER BY %s DESC LIMIT 1;', static::table(), static::justifyKey('id')));
+
+		if ($statement->rowCount() === 0) {
+			return null;
+		}
+
+		return static::from($statement->fetch());
+	}
+
+	/**
 	 * Finds an id or ids in the database
 	 * 
 	 * @param int|int[] $ids

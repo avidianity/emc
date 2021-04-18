@@ -10,9 +10,11 @@ $(document).ready(() => {
 		button.attr("disabled", true);
 
 		try {
-			const { data } = await axios.post(url, form.serialize());
+			const {
+				data: { user },
+			} = await axios.post(url, form.serialize());
 			toastr.success(
-				`Welcome back, ${data.first_name} ${data.last_name}!`
+				`Welcome back, ${user.first_name} ${user.last_name}!`
 			);
 			window.location.href = "/dashboard";
 		} catch (error) {

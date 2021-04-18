@@ -69,7 +69,7 @@ class TeacherController extends Controller
 		$teacher = User::findOrFail($id);
 
 		$data = input()->all();
-		$data['role'] = 'Registrar';
+		$data['role'] = 'Teacher';
 
 		$teacher->update($data);
 
