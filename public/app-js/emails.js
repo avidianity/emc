@@ -2,6 +2,8 @@ $(document).ready(async () => {
 	const table = $("#table-emails");
 	const refreshButton = $("#table-emails-refresh");
 
+	let datatable = null;
+
 	const fetchMails = async () => {
 		refreshButton.html(`Refreshing`);
 		refreshButton.attr("disabled", true);
@@ -75,6 +77,12 @@ $(document).ready(async () => {
 			});
 			tbody.html("");
 			tbody.append(...rows);
+
+			if (datatable) {
+				datatable.destroy();
+			}
+
+			datatable = table.DataTable();
 		} catch (error) {
 			handleError(error);
 		} finally {

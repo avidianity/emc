@@ -17,7 +17,7 @@ extend('dashboard.layouts.top') ?>
 						<div class="row">
 							<div class="form-group col-12 col-md-6">
 								<label for="code">Subject Code</label>
-								<input type="text" name="code" id="code" class="form-control" value="<?= $this->code ?>">
+								<input type="text" name="code" id="code" class="form-control" <?= $mode === 'Edit' ? 'disabled' : '' ?> value="<?= $this->code ?>">
 							</div>
 							<div class="form-group col-12 col-md-6">
 								<label for="description">Description</label>

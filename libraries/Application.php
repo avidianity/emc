@@ -73,13 +73,12 @@ class Application
 			$result = $this->router->run($this->url);
 
 			// handle the results accordingly
-
 			if ($result instanceof Response) {
 				$result->send();
 			} else if ($result instanceof View) {
 				$this->setView($result);
 				$result->render($this);
-			} else if (is_string($result) || $result instanceof Stringable) {
+			} else if (is_scalar($result) || $result instanceof Stringable) {
 				echo $result;
 				return;
 			} else if ($result instanceof Model) {
@@ -89,6 +88,8 @@ class Application
 				}
 				return $response->send();
 			} else if (is_object($result) || is_array($result) || $result instanceof JSONable || $result instanceof Collection) {
+				return response($result)->send();
+			} else {
 				return response($result)->send();
 			}
 		} catch (Exception $exception) {

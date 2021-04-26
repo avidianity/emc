@@ -26,13 +26,13 @@ class Input implements JSONable, Arrayable
 			}
 		}
 
-		$raw = file_get_contents('php://input');
+		$raw = urldecode(file_get_contents('php://input'));
 
 		if (strpos($raw, '&') !== false && strpos($raw, '=') !== false) {
 			foreach (explode('&', $raw) as $pair) {
 				$pair = explode('=', $pair);
 				$key = $pair[0];
-				$value = urldecode($pair[1]);
+				$value = $pair[1];
 				$this->data[$key] = $this->castToCorrectType($value);
 			}
 		}
@@ -125,7 +125,7 @@ class Input implements JSONable, Arrayable
 	/**
 	 * Get all inputs
 	 * 
-	 * @return array
+	 * @return array|\Libraries\File[]
 	 */
 	public function all()
 	{

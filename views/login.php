@@ -16,7 +16,7 @@
 		<form id="login-form" class="col-lg-4 col-md-4 col-12 col-sm-12 mx-auto text-center" action="<?= url('/api/auth/login') ?>" method="POST" accept-charset="utf-8" autocomplete="off">
 			<a class="navbar-brand mx-auto mt-2 flex-fill text-center">
 				<span class="avatar avatar-lg mt-2">
-					<img src="<?= asset('assets/images/logo.jpg') ?>" alt="..." class="avatar-img rounded-circle">
+					<img src="<?= asset('assets/images/logo.jpg') ?>" alt="..." class="avatar-img rounded-circle" style="height: 100px; width: 100px;">
 				</span>
 			</a>
 			<h1 class="h6 mb-3">Log In</h1>

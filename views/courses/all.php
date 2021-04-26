@@ -11,18 +11,20 @@
 							<button class="btn btn-info btn-sm d-flex align-items-center" id="table-courses-refresh">
 								Refresh
 							</button>
-							<a class="btn btn-primary btn-sm text-white ml-auto d-flex align-items-center" href="<?= url('dashboard/courses/create') ?>">
-								<i class="fe fe-plus fe-16 mr-1"></i>
-								<span class="mt-1">
-									Add Course
-								</span>
-							</a>
+							<?php if (session()->get('user')->role === 'Registrar') : ?>
+								<a class="btn btn-primary btn-sm text-white ml-auto d-flex align-items-center" href="<?= url('dashboard/courses/create') ?>">
+									<i class="fe fe-plus fe-16 mr-1"></i>
+									<span class="mt-1">
+										Add Course
+									</span>
+								</a>
+							<?php endif; ?>
 						</div>
 					</div>
 				</div>
 			</div>
 			<div class="card shadow">
-				<div class="card-body">
+				<div class="card-body table-responsive">
 					<table id="table-courses" class="table table-hover">
 						<thead>
 							<tr>

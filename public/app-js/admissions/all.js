@@ -2,6 +2,8 @@ $(document).ready(async () => {
 	const table = $("#table-admissions");
 	const refreshButton = $("#table-admissions-refresh");
 
+	let datatable = null;
+
 	const fetchAdmissions = async () => {
 		refreshButton.html(`Refreshing`);
 		refreshButton.attr("disabled", true);
@@ -29,6 +31,17 @@ $(document).ready(async () => {
 				const term = $("<td />");
 				term.text(admission.term);
 
+				const type = $("<td />");
+				type.text(admission.type);
+
+				const graduated = $("<td />");
+				graduated.text(admission.graduated ? "Yes" : "No");
+
+				const created = $("<td />");
+				created.text(
+					dayjs(admission.created).format("MMMM DD, YYYY hh:mm A")
+				);
+
 				const action = $("<td />");
 
 				const dropdown = $(`<div class='dropdown' />`);
@@ -47,12 +60,29 @@ $(document).ready(async () => {
 				dropdown.append(dropdownButton, dropdownMenu);
 				action.append(dropdown);
 
-				tr.append(student, course_code, level, status, term, action);
+				tr.append(
+					student,
+					course_code,
+					level,
+					status,
+					term,
+					type,
+					graduated,
+					created,
+					action
+				);
 
 				return tr;
 			});
+
+			if (datatable) {
+				datatable.destroy();
+			}
+
 			tbody.html("");
 			tbody.append(...rows);
+
+			datatable = table.DataTable();
 		} catch (error) {
 			handleError(error);
 		} finally {

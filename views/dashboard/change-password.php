@@ -13,7 +13,10 @@
 							</div>
 							<div class="form-group">
 								<label for="new_password">New Password:</label>
-								<input type="password" id="new_password" class="form-control" name="new_password" value="" required="">
+								<input type="password" pattern="^(?=\P{Ll}*\p{Ll})(?=\P{Lu}*\p{Lu})(?=\P{N}*\p{N})(?=[\p{L}\p{N}]*[^\p{L}\p{N}])[\s\S]{8,}$" id="new_password" class="form-control" name="new_password" value="" required="">
+								<small class="form-text text-muted">
+									Password must contain atleast uppercase and lowercase letters, numbers and special characters.
+								</small>
 							</div>
 							<button class="btn btn-lg btn-primary btn-block" type="submit">Change Password</button>
 						</div>

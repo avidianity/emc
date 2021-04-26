@@ -38,12 +38,12 @@ class Response
 
 		if ($result instanceof View) {
 			$result->render();
-			exit;
+			return;
 		}
 
 		if (is_string($result) || $result instanceof Stringable) {
 			echo $result;
-			exit;
+			return;
 		}
 
 		if ($this->expectsJson()) {
@@ -51,15 +51,15 @@ class Response
 				setHeader('Content-Type', 'application/json');
 			}
 			echo json_encode($result);
-			exit;
+			return;
 		}
 
-		if ($result instanceof Model || is_array($result) || $result instanceof Collection || $result instanceof Exception) {
+		if ($result instanceof Model || is_array($result) || $result instanceof Collection || $result instanceof Exception || is_object($result)) {
 			if (!in_array('Content-Type', array_keys($this->headers))) {
 				setHeader('Content-Type', 'application/json');
 			}
 			echo json_encode($result);
-			exit;
+			return;
 		}
 	}
 

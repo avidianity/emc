@@ -1,11 +1,15 @@
 <?php
 
 use Controllers\AdmissionController;
+use Controllers\AnalyticsController;
 use Controllers\AuthController;
 use Controllers\CourseController;
+use Controllers\GradeController;
 use Controllers\MailController;
 use Controllers\PageController;
 use Controllers\RegistrarController;
+use Controllers\ScheduleController;
+use Controllers\StudentController;
 use Controllers\SubjectController;
 use Controllers\TeacherController;
 use Controllers\UserController;
@@ -26,6 +30,8 @@ $router->group('/dashboard', function (Router $router) {
 	$router->resource('/courses', CourseController::class);
 	$router->resource('/subjects', SubjectController::class);
 	$router->resource('/admissions', AdmissionController::class);
+	$router->resource('/students', StudentController::class);
+	$router->resource('/schedules', ScheduleController::class);
 });
 
 $router->group('/api', function (Router $router) {
@@ -36,6 +42,18 @@ $router->group('/api', function (Router $router) {
 	});
 
 	$router->get('/emails', [MailController::class, 'index']);
+
+	$router->get('/grades/self', [GradeController::class, 'self']);
+
+	$router->group('/analytics', function (Router $router) {
+		$router->get('/students', [AnalyticsController::class, 'students']);
+		$router->get('/courses', [AnalyticsController::class, 'courses']);
+		$router->get('/genders', [AnalyticsController::class, 'genders']);
+		$router->get('/graduates', [AnalyticsController::class, 'graduates']);
+		$router->get('/enrollees', [AnalyticsController::class, 'enrollees']);
+	});
+
+	$router->apiResource('/grades', GradeController::class);
 });
 
 return $router;

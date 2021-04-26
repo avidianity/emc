@@ -4,7 +4,6 @@ namespace Libraries;
 
 use Exception;
 use Exceptions\MailerException;
-use Models\CMS;
 use Swift_Mailer as BaseMailer;
 use Swift_Message as Message;
 use Swift_SmtpTransport as SMTPTransport;

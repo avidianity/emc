@@ -10,19 +10,29 @@ class Course extends Model
 		'open',
 	];
 
+	protected $booleans = ['open'];
+
 	protected static function events()
 	{
-		static::saving(function (self $course) {
-			$course->open = $course->open ? 1 : 0;
-		});
-
-		static::serializing(function (self $course) {
-			$course->open = $course->open ? true : false;
+		static::deleting(function (self $course) {
+			$course->subjects()->delete();
+			$course->admissions()->delete();
+			$course->schedules()->delete();
 		});
 	}
 
 	public function subjects()
 	{
 		return $this->hasMany(Subject::class, 'course_code', 'code');
+	}
+
+	public function admissions()
+	{
+		return $this->hasMany(Admission::class, 'course_code', 'code');
+	}
+
+	public function schedules()
+	{
+		return $this->hasMany(Schedule::class);
 	}
 }

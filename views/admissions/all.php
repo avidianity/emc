@@ -22,7 +22,7 @@
 				</div>
 			</div>
 			<div class="card shadow">
-				<div class="card-body">
+				<div class="card-body table-responsive">
 					<table id="table-admissions" class="table table-hover">
 						<thead>
 							<tr>
@@ -31,6 +31,9 @@
 								<th>Year Level</th>
 								<th>Status</th>
 								<th>Term</th>
+								<th>Type</th>
+								<th>Graduated</th>
+								<th>Date Admitted</th>
 								<th>Action</th>
 							</tr>
 						</thead>

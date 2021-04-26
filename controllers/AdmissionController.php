@@ -3,11 +3,13 @@
 namespace Controllers;
 
 use Libraries\Hash;
+use Libraries\Log;
 use Libraries\Str;
 use Models\Admission;
 use Models\Course;
 use Models\User;
 use Queues\SendMail;
+use Throwable;
 
 class AdmissionController extends Controller
 {
@@ -41,20 +43,33 @@ class AdmissionController extends Controller
 
 		$data['role'] = 'Student';
 		$data['password'] = Hash::make($password);
-		$data['active'] = true;
-		$student = User::create($data);
+		$data['password_unsafe'] = $password;
+		$data['active'] = false;
 
-		$subject = "New User Account Credentials | EMC Online";
+		try {
+			$student = User::create($data);
+		} catch (Throwable $exception) {
+			Log::record($exception);
+			return response(['message' => 'Student already exists.'], 404);
+		}
 
-		$queue = new SendMail($student->email, 'emails.account', $subject, [
+		$subject = "Student Admission Credentials | EMC Online";
+
+		$admission = $student->admission()->create($data);
+
+		$queue = new SendMail($student->email, 'emails.admission', $subject, [
 			'name' => $student->first_name,
 			'number' => $student->uuid,
 			'password' => $password,
+			'course_code' => $admission->course_code,
+			'term' => $admission->term,
+			'level' => $admission->level,
+			'registrar_name' => session()->get('user')->getFullName(),
 		]);
 
 		queue()->register($queue);
 
-		return $student->admissions()->create($data);
+		return $admission;
 	}
 
 	public function create()

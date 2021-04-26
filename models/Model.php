@@ -64,6 +64,24 @@ abstract class Model implements JSONable, Arrayable
 	protected $fresh = false;
 
 	/**
+	 * Whether the model has timestamps.
+	 * @var bool
+	 */
+	protected $timestamps = true;
+
+	/**
+	 * Boolean attributes of the model
+	 * @var string[]
+	 */
+	protected $booleans = [];
+
+	/**
+	 * Attributes of the model that is cast in to JSON
+	 * @var string[]
+	 */
+	protected $jsons = [];
+
+	/**
 	 * Create a new instance of the model and fill any data if any
 	 * 
 	 * @param mixed $data
@@ -73,7 +91,44 @@ abstract class Model implements JSONable, Arrayable
 		if ($data !== null) {
 			$this->fill($data);
 		}
+		$this->boot();
 		$this->events();
+	}
+
+	/**
+	 * Boot the model
+	 * 
+	 * @return void
+	 */
+	protected function boot()
+	{
+		collect($this->booleans)->each(function (string $key) {
+			static::saving(function ($model) use ($key) {
+				$value = $model->{$key};
+				$model->{$key} = $value ? 1 : 0;
+			});
+
+			static::serializing(function ($model) use ($key) {
+				$value = $model->{$key};
+				$model->{$key} = $value ? true : false;
+			});
+		});
+
+		collect($this->jsons)->each(function (string $key) {
+			static::saving(function ($model) use ($key) {
+				$value = $model->{$key};
+				if (!is_string($value)) {
+					$model->{$key} = json_encode($value);
+				}
+			});
+
+			static::serializing(function ($model) use ($key) {
+				$value = $model->{$key};
+				if (is_string($value)) {
+					$model->{$key} = json_decode($value);
+				}
+			});
+		});
 	}
 
 	/**
@@ -97,7 +152,14 @@ abstract class Model implements JSONable, Arrayable
 	public function __get($key)
 	{
 		if (in_array($key, array_keys($this->data))) {
-			return $this->data[$key];
+			$value = $this->data[$key];
+			if (array_key_exists($key, $this->booleans)) {
+				return $value ? true : false;
+			}
+			if (array_key_exists($key, $this->jsons)) {
+				return json_decode($value);
+			}
+			return $value;
 		}
 		if (in_array($key, array_keys($this->relationships))) {
 			return $this->relationships[$key];
@@ -232,6 +294,17 @@ abstract class Model implements JSONable, Arrayable
 			$data[$relation] = $instance;
 		}
 
+		foreach ($data as $key => $value) {
+			if (in_array($key, $this->booleans)) {
+				$data[$key] = $value ? true : false;
+			}
+			if (in_array($key, $this->jsons)) {
+				if (is_string($value)) {
+					$data[$key] = json_decode($value);
+				}
+			}
+		}
+
 		return $data;
 	}
 
@@ -291,6 +364,16 @@ abstract class Model implements JSONable, Arrayable
 	}
 
 	/**
+	 * Determines if the model has timestamps
+	 * 
+	 * @return bool
+	 */
+	public function hasTimestamps()
+	{
+		return $this->timestamps;
+	}
+
+	/**
 	 * Create a new entry in the database
 	 * 
 	 * @param mixed $data
@@ -300,9 +383,6 @@ abstract class Model implements JSONable, Arrayable
 	public static function create($data, $safe = true)
 	{
 		$instance = new static();
-		$instance
-			->fireEvent('creating')
-			->fireEvent('saving');
 
 		if ($safe === false) {
 			$instance->forceFill($data);
@@ -310,10 +390,16 @@ abstract class Model implements JSONable, Arrayable
 			$instance->fill($data);
 		}
 
+		$instance
+			->fireEvent('creating')
+			->fireEvent('saving');
+
 		$data = $instance->getData();
 
-		$data['created_at'] = date('Y-m-d H:i:s');
-		$data['updated_at'] = date('Y-m-d H:i:s');
+		if ($instance->hasTimestamps()) {
+			$data['created_at'] = date('Y-m-d H:i:s');
+			$data['updated_at'] = date('Y-m-d H:i:s');
+		}
 
 		$table = $instance->getTable();
 
@@ -335,12 +421,19 @@ abstract class Model implements JSONable, Arrayable
 
 		$id = static::$pdo->lastInsertId();
 
+		$newInstance = static::find($id);
 
-		$instance
+		if (!$newInstance && isset($data['id'])) {
+			$newInstance = static::find($data['id']);
+		}
+
+		$newInstance->setFresh(true);
+
+		$newInstance
 			->fireEvent('created')
 			->fireEvent('saved');
 
-		return static::find($id)->setFresh(true);
+		return $newInstance;
 	}
 
 	/**
@@ -383,6 +476,7 @@ abstract class Model implements JSONable, Arrayable
 	public function update($data = [])
 	{
 		$this->fill($data);
+
 		$this
 			->fireEvent('updating')
 			->fireEvent('saving');
@@ -391,7 +485,10 @@ abstract class Model implements JSONable, Arrayable
 		$id = $data['id'];
 		unset($data['id']);
 		unset($data['created_at']);
-		$data['updated_at'] = date('Y-m-d H:i:s');
+
+		if ($this->hasTimestamps()) {
+			$data['updated_at'] = date('Y-m-d H:i:s');
+		}
 
 		$table = $this->getTable();
 

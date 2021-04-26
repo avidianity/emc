@@ -8,74 +8,79 @@ use Models\Model;
 
 class BelongsTo implements HasRelationships
 {
-    protected $parent;
-    protected $foreignKey;
-    protected $ownerKey;
+	protected $parent;
+	protected $foreignKey;
+	protected $ownerKey;
 
-    /**
-     * @var Model
-     */
-    protected $instance;
+	/**
+	 * @var Model
+	 */
+	protected $instance;
 
-    public function __construct($parent, $foreignKey = null, $ownerKey = 'id', Model &$instance = null)
-    {
-        $this->instance = $instance;
-        $this->parent = $parent;
-        $this->ownerKey = $ownerKey;
-        $this->foreignKey = $foreignKey !== null
-            ? $foreignKey
-            : $this->qualifyForeignKey();
-    }
+	public function __construct($parent, $foreignKey = null, $ownerKey = 'id', Model &$instance = null)
+	{
+		$this->instance = $instance;
+		$this->parent = $parent;
+		$this->ownerKey = $ownerKey;
+		$this->foreignKey = $foreignKey !== null
+			? $foreignKey
+			: $this->qualifyForeignKey();
+	}
 
-    protected function qualifyForeignKey()
-    {
-        return $this->getParentTable() . '_id';
-    }
+	protected function qualifyForeignKey()
+	{
+		return $this->getParentTable() . '_id';
+	}
 
-    protected function getParentTable()
-    {
-        $parent = $this->parent;
-        return (new $parent())->getTable();
-    }
+	protected function getParentTable()
+	{
+		$parent = $this->parent;
+		return (new $parent())->getTable();
+	}
 
-    public function get()
-    {
-        $pdo = Model::getConnection();
+	public function get()
+	{
+		$pdo = Model::getConnection();
 
-        $query  = 'SELECT * FROM ' . $this->getParentTable() . ' ';
-        $query .= 'WHERE ' . $this->ownerKey . ' = :' . $this->ownerKey . ' ';
-        $query .= 'LIMIT 1;';
+		$query  = 'SELECT * FROM ' . $this->getParentTable() . ' ';
+		$query .= 'WHERE ' . $this->ownerKey . ' = :' . $this->ownerKey . ' ';
+		$query .= 'LIMIT 1;';
 
-        $statement = $pdo->prepare($query);
+		$statement = $pdo->prepare($query);
 
-        $statement->execute([':' . $this->ownerKey => $this->instance->{$this->foreignKey}]);
+		$statement->execute([':' . $this->ownerKey => $this->instance->{$this->foreignKey}]);
 
-        if ($statement->rowCount() === 0) {
-            return null;
-        }
+		if ($statement->rowCount() === 0) {
+			return null;
+		}
 
-        $class = $this->parent;
+		$class = $this->parent;
 
-        return $class::from($statement->fetchObject());
-    }
+		return $class::from($statement->fetchObject());
+	}
 
-    public function create($data)
-    {
-        throw new LogicException('Child cannot create its parent.');
-    }
+	public function count()
+	{
+		return 1;
+	}
 
-    public function update($data)
-    {
-        return $this->get()->update($data);
-    }
+	public function create($data)
+	{
+		throw new LogicException('Child cannot create its parent.');
+	}
 
-    public function delete()
-    {
-        throw new LogicException('Child cannot delete its parent.');
-    }
+	public function update($data)
+	{
+		return $this->get()->update($data);
+	}
 
-    public function has(): bool
-    {
-        return true;
-    }
+	public function delete()
+	{
+		throw new LogicException('Child cannot delete its parent.');
+	}
+
+	public function has(): bool
+	{
+		return true;
+	}
 }

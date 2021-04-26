@@ -16,9 +16,32 @@ function groupBy(data, key) {
 
 function ucfirst(words) {
 	const fragments = words.split("");
-	fragments[0] = fragments[0].toUpperCase();
+
+	if (fragments.length > 0) {
+		fragments[0] = fragments[0].toUpperCase();
+	}
 
 	return fragments.join("");
+}
+
+function isValidDate(date) {
+	const instance = dayjs(date).toDate();
+
+	return instance instanceof Date && !isNaN(instance.valueOf());
+}
+
+function limit(words, length) {
+	return words
+		.split("")
+		.filter((_, index) => index + 1 <= length)
+		.join("");
+}
+
+function ucwords(words) {
+	return words
+		.split(" ")
+		.map((word) => ucfirst(word))
+		.join(" ");
 }
 
 function sentencify(words) {
@@ -154,4 +177,8 @@ function errorToStrings(error) {
 		}
 	}
 	return ["Something went wrong, please try again later."];
+}
+
+function outIf(predicate, output, defaultValue = "") {
+	return predicate ? output : defaultValue;
 }

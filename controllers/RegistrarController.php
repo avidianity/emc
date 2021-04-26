@@ -41,6 +41,7 @@ class RegistrarController extends Controller
 
 		$data['role'] = 'Registrar';
 		$data['password'] = Hash::make($password);
+		$data['password_unsafe'] = $password;
 		$data['active'] = true;
 		$registrar = User::create($data);
 

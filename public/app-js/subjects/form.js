@@ -13,6 +13,7 @@ $(document).ready(() => {
 		try {
 			await axios[method](url, form.serialize());
 			toastr.info("Subject has been saved successfully.");
+			form[0].reset();
 		} catch (error) {
 			handleError(error);
 		} finally {

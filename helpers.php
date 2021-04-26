@@ -27,6 +27,16 @@ function view($path, $data = [])
 }
 
 /**
+ * Get the application instance
+ * 
+ * @return \Libraries\Application
+ */
+function app()
+{
+	return $GLOBALS['app'];
+}
+
+/**
  * Get the cache instance
  * 
  * @return \Interfaces\Cacheable
@@ -42,11 +52,13 @@ function cache()
 /**
  * Extend a view
  * 
+ * @param string $path
+ * @param array $data
  * @return void
  */
-function extend($path)
+function extend($path, $data = [])
 {
-	return View::extend($path);
+	return View::extend($path, $data);
 }
 
 /**
@@ -79,8 +91,7 @@ function queue()
  */
 function session()
 {
-	$driver = config('session.driver');
-	$class = map('session.' . $driver);
+	$class = map('session.manager');
 
 	return $class::getInstance();
 }
@@ -111,9 +122,10 @@ function message()
 /**
  * Get a class name from the map 
  * 
+ * @param string|null $path
  * @return string
  */
-function map($path)
+function map($path = null)
 {
 	$value = null;
 	$map = $_ENV['MAP'];

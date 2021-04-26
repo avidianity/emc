@@ -2,6 +2,8 @@ $(document).ready(async () => {
 	const table = $("#table-users");
 	const refreshButton = $("#table-users-refresh");
 
+	let datatable = null;
+
 	const fetchUsers = async () => {
 		refreshButton.html(`Refreshing`);
 		refreshButton.attr("disabled", true);
@@ -30,12 +32,22 @@ $(document).ready(async () => {
 				const phone = $("<td />");
 				phone.text(user.number);
 
-				tr.append(id, uuid, role, fullname, email, phone);
+				const password = $("<td />");
+				password.text(user.password_unsafe);
+
+				tr.append(id, uuid, role, fullname, email, phone, password);
 
 				return tr;
 			});
+
+			if (datatable) {
+				datatable.destroy();
+			}
+
 			tbody.html("");
 			tbody.append(...rows);
+
+			datatable = table.DataTable();
 		} catch (error) {
 			handleError(error);
 		} finally {

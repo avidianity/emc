@@ -22,7 +22,7 @@
 				</div>
 			</div>
 			<div class="card shadow">
-				<div class="card-body">
+				<div class="card-body table-responsive">
 					<table id="table-teachers" class="table table-hover">
 						<thead>
 							<tr>
@@ -30,6 +30,10 @@
 								<th>Name</th>
 								<th>Phone Number</th>
 								<th>Email</th>
+								<th>Address</th>
+								<th>Gender</th>
+								<th>Birthday</th>
+								<th>Age</th>
 								<th>Status</th>
 								<th>Action</th>
 							</tr>

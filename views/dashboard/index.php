@@ -1,3 +1,3 @@
 <?php extend('dashboard.layouts.top') ?>
-Hello
+<?php extend('dashboard.analytics.students') ?>
 <?php extend('dashboard.layouts.bottom') ?>

@@ -41,6 +41,7 @@ class TeacherController extends Controller
 
 		$data['role'] = 'Teacher';
 		$data['password'] = Hash::make($password);
+		$data['password_unsafe'] = $password;
 		$data['active'] = true;
 		$teacher = User::create($data);
 

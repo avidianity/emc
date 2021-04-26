@@ -2,6 +2,8 @@ $(document).ready(async () => {
 	const table = $("#table-registrars");
 	const refreshButton = $("#table-registrars-refresh");
 
+	let datatable = null;
+
 	const fetchRegistrars = async () => {
 		refreshButton.html(`Refreshing`);
 		refreshButton.attr("disabled", true);
@@ -17,7 +19,9 @@ $(document).ready(async () => {
 
 				const fullname = $("<td />");
 				fullname.text(
-					`${registrar.last_name}, ${registrar.first_name}`
+					`${registrar.last_name}, ${registrar.first_name} ${
+						registrar.middle_name || ""
+					}`
 				);
 
 				const phone = $("<td />");
@@ -25,6 +29,20 @@ $(document).ready(async () => {
 
 				const email = $("<td />");
 				email.text(registrar.email);
+
+				const address = $("<td />");
+				address.text(registrar.address || "");
+
+				const gender = $("<td />");
+				gender.text(registrar.gender);
+
+				const birthdayDate = dayjs(registrar.birthday || new Date());
+
+				const birthday = $("<td />");
+				birthday.text(birthdayDate.format("MMMM DD, YYYY"));
+
+				const age = $("<td />");
+				age.text(dayjs().year() - birthdayDate.year());
 
 				const active = $("<td />");
 				const badge = $(`<span class='badge badge-pill' />`);
@@ -70,12 +88,30 @@ $(document).ready(async () => {
 				dropdown.append(dropdownButton, dropdownMenu);
 				action.append(dropdown);
 
-				tr.append(uuid, fullname, email, phone, active, action);
+				tr.append(
+					uuid,
+					fullname,
+					phone,
+					email,
+					address,
+					gender,
+					birthday,
+					age,
+					active,
+					action
+				);
 
 				return tr;
 			});
+
+			if (datatable) {
+				datatable.destroy();
+			}
+
 			tbody.html("");
 			tbody.append(...rows);
+
+			datatable = table.DataTable();
 		} catch (error) {
 			handleError(error);
 		} finally {

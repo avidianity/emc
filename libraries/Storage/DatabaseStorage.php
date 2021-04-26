@@ -10,93 +10,93 @@ use Traits\Singleton;
 
 class DatabaseStorage implements Storage
 {
-    use Singleton;
+	use Singleton;
 
-    public function put($path, $binary)
-    {
-        $fullPath = $this->getFullPath($path);
+	public function put($path, $binary)
+	{
+		$fullPath = $this->getFullPath($path);
 
-        try {
-            StorageModel::create(['path' => $fullPath, 'content' => base64_encode($binary)]);
+		try {
+			StorageModel::create(['path' => $fullPath, 'content' => base64_encode($binary)]);
 
-            return true;
-        } catch (Exception $e) {
-            Log::record($e);
-            return false;
-        }
-    }
+			return true;
+		} catch (Exception $e) {
+			Log::record($e);
+			return false;
+		}
+	}
 
-    public function get($path)
-    {
-        try {
-            $pdo = StorageModel::getConnection();
-            $path = $this->getFullPath($path);
-            $query  = 'SELECT * FROM ' . (new StorageModel())->getTable() . ' ';
-            $query .= 'WHERE ' . StorageModel::justifyKey('path') . ' = :path LIMIT 1;';
+	public function get($path)
+	{
+		try {
+			$pdo = StorageModel::getConnection();
+			$path = $this->getFullPath($path);
+			$query  = 'SELECT * FROM ' . (new StorageModel())->getTable() . ' ';
+			$query .= 'WHERE ' . StorageModel::justifyKey('path') . ' = :path LIMIT 1;';
 
-            $statement = $pdo->prepare($query);
+			$statement = $pdo->prepare($query);
 
-            $statement->execute([':path' => $path]);
+			$statement->execute([':path' => $path]);
 
-            if ($statement->rowCount() === 0) {
-                return false;
-            }
+			if ($statement->rowCount() === 0) {
+				return false;
+			}
 
-            return base64_decode(StorageModel::from($statement->fetch())->content);
-        } catch (Exception $e) {
-            Log::record($e);
-            return false;
-        }
-    }
+			return base64_decode(StorageModel::from($statement->fetch())->content);
+		} catch (Exception $e) {
+			Log::record($e);
+			return false;
+		}
+	}
 
-    public function delete($path)
-    {
-        try {
-            $pdo = StorageModel::getConnection();
-            $path = $this->getFullPath($path);
-            $query  = 'SELECT * FROM ' . (new StorageModel())->getTable() . ' ';
-            $query .= 'WHERE ' . StorageModel::justifyKey('path') . ' = :path LIMIT 1;';
+	public function delete($path)
+	{
+		try {
+			$pdo = StorageModel::getConnection();
+			$path = $this->getFullPath($path);
+			$query  = 'SELECT * FROM ' . (new StorageModel())->getTable() . ' ';
+			$query .= 'WHERE ' . StorageModel::justifyKey('path') . ' = :path LIMIT 1;';
 
-            $statement = $pdo->prepare($query);
+			$statement = $pdo->prepare($query);
 
-            $statement->execute([':path' => $path]);
+			$statement->execute([':path' => $path]);
 
-            if ($statement->rowCount() === 0) {
-                return false;
-            }
+			if ($statement->rowCount() === 0) {
+				return false;
+			}
 
-            StorageModel::from($statement->fetch())->delete();
+			StorageModel::from($statement->fetch())->delete();
 
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
+	}
 
-    public function getFullPath($path)
-    {
-        return $path;
-    }
+	public function getFullPath($path)
+	{
+		return $path;
+	}
 
-    public function exists($path)
-    {
-        try {
-            $pdo = StorageModel::getConnection();
-            $path = $this->getFullPath($path);
-            $query  = 'SELECT * FROM ' . (new StorageModel())->getTable() . ' ';
-            $query .= 'WHERE ' . StorageModel::justifyKey('path') . ' = :path LIMIT 1;';
+	public function exists($path)
+	{
+		try {
+			$pdo = StorageModel::getConnection();
+			$path = $this->getFullPath($path);
+			$query  = 'SELECT * FROM ' . (new StorageModel())->getTable() . ' ';
+			$query .= 'WHERE ' . StorageModel::justifyKey('path') . ' = :path LIMIT 1;';
 
-            $statement = $pdo->prepare($query);
+			$statement = $pdo->prepare($query);
 
-            $statement->execute([':path' => $path]);
+			$statement->execute([':path' => $path]);
 
-            if ($statement->rowCount() === 0) {
-                return false;
-            }
+			if ($statement->rowCount() === 0) {
+				return false;
+			}
 
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
+	}
 }

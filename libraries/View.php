@@ -8,116 +8,112 @@ use Traits\Singleton;
 
 class View
 {
-    use Singleton;
+	use Singleton;
 
-    protected $dir;
-    protected $path;
-    protected $data;
-    protected $status = 200;
+	protected $dir;
+	protected $path;
+	protected $data;
+	protected $status = 200;
 
-    public function __construct($path, $data = [])
-    {
-        $this->path = $path;
-        $this->data = [];
-        foreach ($data as $key => $value) {
-            $this->data[$key] = $value;
-        }
-        $this->dir = config('view.path');
-    }
+	public function __construct($path, $data = [])
+	{
+		$this->path = $path;
+		$this->data = [];
+		foreach ($data as $key => $value) {
+			$this->data[$key] = $value;
+		}
+		$this->dir = config('view.path');
+	}
 
-    public static function parse($path)
-    {
-        $view = new static($path);
+	public static function parse($path)
+	{
+		$view = new static($path);
 
-        $raw = @file_get_contents($view->getDir() . $view->getPath() . '.php');
+		$raw = @file_get_contents($view->getDir() . $view->getPath() . '.php');
 
-        if (!static::exists($path) || !$raw) {
-            throw new LogicException($path . ' does not exist in views.');
-        }
+		if (!static::exists($path) || !$raw) {
+			throw new LogicException($path . ' does not exist in views.');
+		}
 
-        return $raw;
-    }
+		return $raw;
+	}
 
-    public function getPath()
-    {
-        return (string)str_replace('.', '/', $this->path);
-    }
+	public function getPath()
+	{
+		return (string)str_replace('.', '/', $this->path);
+	}
 
-    public function setPath($path)
-    {
-        $this->path = $path;
-        return $this;
-    }
+	public function setPath($path)
+	{
+		$this->path = $path;
+		return $this;
+	}
 
-    public function setData($data)
-    {
-        $this->data = $data;
-        return $this;
-    }
+	public function setData($data)
+	{
+		$this->data = $data;
+		return $this;
+	}
 
-    public function getDir()
-    {
-        return $this->dir;
-    }
+	public function getDir()
+	{
+		return $this->dir;
+	}
 
-    public function setStatus($status)
-    {
-        $this->status = $status;
-        return $this;
-    }
+	public function setStatus($status)
+	{
+		$this->status = $status;
+		return $this;
+	}
 
-    public function render(Application $app)
-    {
-        $app->setView($this);
-        $path = $this->getPath();
-        if (!file_exists($this->dir . $path . '.php')) {
-            throw new LogicException($path . ' does not exist in views.');
-        }
+	public function render(Application $app)
+	{
+		$app->setView($this);
 
-        $app->setView($this);
+		$path = $this->getPath();
 
-        http_response_code($this->status);
-        $callable = (function () {
-            foreach ($this->getView()->getAllData() as $key => $value) {
-                $$key = $value;
-            }
+		if (!file_exists($this->dir . $path . '.php')) {
+			throw new LogicException($path . ' does not exist in views.');
+		}
 
-            require_once $this->getView()->getDir() . $this->getView()->getPath() . '.php';
-        })->bindTo($app, $app);
+		http_response_code($this->status);
+		$callable = (function () {
+			foreach ($this->getView()->getAllData() as $key => $value) {
+				$$key = $value;
+			}
 
-        $callable();
-        exit;
-    }
+			require_once $this->getView()->getDir() . $this->getView()->getPath() . '.php';
+		})->bindTo($app, $app);
 
-    public static function exists($path)
-    {
-        $instance = new static($path);
-        return file_exists($instance->getDir() . $instance->getPath() . '.php');
-    }
+		$callable();
+	}
 
-    public function hasData($key)
-    {
-        return in_array($key, array_keys($this->data));
-    }
+	public static function exists($path)
+	{
+		$instance = new static($path);
+		return file_exists($instance->getDir() . $instance->getPath() . '.php');
+	}
 
-    public function getAllData()
-    {
-        return $this->data;
-    }
+	public function hasData($key)
+	{
+		return in_array($key, array_keys($this->data));
+	}
 
-    public function getData($key)
-    {
-        return $this->data[$key];
-    }
+	public function getAllData()
+	{
+		return $this->data;
+	}
 
-    public static function extend($path)
-    {
-        if (!static::exists($path)) {
-            throw new RuntimeException("{$path} does not exist in views.");
-        }
+	public function getData($key)
+	{
+		return $this->data[$key];
+	}
 
-        $instance = new static($path);
+	public static function extend($path, $data = [])
+	{
+		$app = app();
+		$instance = new static($path, $data + $app->getView()->getAllData());
 
-        return require_once $instance->getDir() . $instance->getPath() . '.php';
-    }
+		return $instance->render($app);
+	}
 }

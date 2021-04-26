@@ -8,6 +8,8 @@ $router = require __DIR__ . '/routes.php';
 // create application instance
 $app = new Application();
 
+$GLOBALS['app'] = $app;
+
 // Store the router to the application
 $app->setRouter($router);
 

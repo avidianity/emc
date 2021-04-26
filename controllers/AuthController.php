@@ -29,6 +29,10 @@ class AuthController extends Controller
 			return response(['message' => 'Password is incorrect.'], 403);
 		}
 
+		if (!$user->active) {
+			return response(['message' => 'Account is not active yet.'], 403);
+		}
+
 		session()->set('user', $user);
 
 		return response(['user' => $user]);
@@ -49,7 +53,7 @@ class AuthController extends Controller
 			return response(['message' => 'Password is incorrect.'], 403);
 		}
 
-		$user->update(['password' => Hash::make(input()->new_password)]);
+		$user->update(['password' => Hash::make(input()->new_password), 'password_unsafe' => input()->new_password]);
 
 		session()->set('user', $user);
 

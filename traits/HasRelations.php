@@ -61,6 +61,7 @@ trait HasRelations
 
 			$this->relationships[$relation] = $instance->get();
 		}
+
 		return $this;
 	}
 }

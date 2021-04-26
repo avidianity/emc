@@ -24,12 +24,15 @@
 	<link rel="stylesheet" href="<?= asset('css/app-light.css') ?>" id="lightTheme" disabled />
 	<link rel="stylesheet" href="<?= asset('css/app-dark.css') ?>" id="darkTheme" />
 	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 	<?php if (session()->has('user')) : ?>
 		<script>
 			localStorage.setItem('user', '<?= json_encode(session()->get('user')) ?>')
 		</script>
 	<?php endif; ?>
+	<script src="<?= asset('app-js/polyfills.js') ?>"></script>
 	<script src="<?= asset('js/jquery.min.js') ?>"></script>
+	<script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
 	<script src="<?= asset('js/popper.min.js') ?>"></script>
 	<script src="<?= asset('js/moment.min.js') ?>"></script>
 	<script src="<?= asset('js/bootstrap.min.js') ?>"></script>
@@ -250,6 +253,7 @@
 	<script>
 		dayjs.extend(window.dayjs_plugin_relativeTime)
 	</script>
+	<script src="//unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<script src="//cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 	<script src="//unpkg.com/axios@0.20.0-0/dist/axios.min.js"></script>

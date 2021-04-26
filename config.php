@@ -10,7 +10,7 @@ return [
 		'debug' => env('APP_DEBUG', true),
 		'env' => env('APP_ENV', 'dev'),
 		'frontend' => [
-			'url' => env('FRONTEND_URL', 'http://localhost:3000'),
+			'url' => env('FRONTEND_URL', 'http://localhost:8000'),
 		],
 	],
 	'database' => [
@@ -65,6 +65,9 @@ return [
 		]
 	],
 	'session' => [
-		'driver' => env('SESSION_DRIVER', 'native')
+		'driver' => env('SESSION_DRIVER', 'file'),
+		'file' => [
+			'path' => __DIR__ . '/storage/sessions/'
+		],
 	]
 ];

@@ -19,22 +19,49 @@ extend('dashboard.layouts.top') ?>
 									<div class="form-row">
 										<div class="col-12 col-md-6 px-2">
 											<div class="form-group">
-												<label for="last_name">Last Name</label>
-												<input type="text" name="last_name" id="last_name" class="form-control" value="<?= $mode === 'Edit' ? $this->user->last_name : '' ?>" />
+												<label for="type">Student Type</label>
+												<select name="type" id="type" class="form-control">
+													<option> -- Select -- </option>
+													<option value="New" <?= $this->type === 'New' ? 'selected' : '' ?>>New</option>
+													<option value="Old" <?= $this->type === 'Old' ? 'selected' : '' ?>>Old</option>
+												</select>
 											</div>
 											<div class="form-group">
 												<label for="first_name">First Name</label>
-												<input type="text" name="first_name" id="first_name" class="form-control" value="<?= $mode === 'Edit' ? $this->user->first_name : '' ?>" />
+												<input data-uppercase type="text" name="first_name" id="first_name" class="form-control" value="<?= $mode === 'Edit' ? $this->user->first_name : '' ?>" />
 											</div>
 											<div class="form-group">
 												<label for="middle_name">Middle Name</label>
-												<input type="text" name="middle_name" id="middle_name" class="form-control" value="<?= $mode === 'Edit' ? $this->user->middle_name : '' ?>" />
+												<input data-uppercase type="text" name="middle_name" id="middle_name" class="form-control" value="<?= $mode === 'Edit' ? $this->user->middle_name : '' ?>" />
+											</div>
+											<div class="form-group">
+												<label for="last_name">Last Name</label>
+												<input data-uppercase type="text" name="last_name" id="last_name" class="form-control" value="<?= $mode === 'Edit' ? $this->user->last_name : '' ?>" />
+											</div>
+											<div class="form-group">
+												<label for="gender">Gender</label>
+												<select name="gender" id="gender" class="form-control">
+													<option> -- Select -- </option>
+													<option value="Male" <?= $this->gender === 'Male' ? 'selected' : '' ?>>Male</option>
+													<option value="Female" <?= $this->gender === 'Female' ? 'selected' : '' ?>>Female</option>
+												</select>
 											</div>
 										</div>
 										<div class="col-12 col-md-6 px-2">
 											<div class="form-group">
+												<label for="graduated">Graduated</label>
+												<select name="graduated" id="graduated" class="form-control">
+													<option value="0" <?= !$this->graduated ? 'selected' : '' ?>>No</option>
+													<option value="1" <?= $this->graduated ? 'selected' : '' ?>>Yes</option>
+												</select>
+											</div>
+											<div class="form-group">
 												<label for="uuid">Student Number</label>
-												<input type="text" name="uuid" id="uuid" class="form-control" value="<?= $mode === 'Edit' ? $this->user->uuid : '' ?>" />
+												<input type="text" name="uuid" id="uuid" class="form-control" value="<?= $mode === 'Edit' ? $this->user->uuid : 'student-' . str_pad(rand(0, 99999), 5, STR_PAD_LEFT) . '-' . date('Y') ?>" disabled />
+											</div>
+											<div class="form-group">
+												<label for="address">Address</label>
+												<input type="text" class="form-control" id="address" name="address" value="<?= $mode === 'Edit' ? $this->user->address : '' ?>" required="">
 											</div>
 											<div class="form-group">
 												<label for="email">Email Address</label>
@@ -42,12 +69,32 @@ extend('dashboard.layouts.top') ?>
 											</div>
 											<div class="form-group">
 												<label for="number">Phone Number</label>
-												<input type="text" name="number" id="number" class="form-control" value="<?= $mode === 'Edit' ? $this->user->number : '' ?>" />
+												<input data-phone-number type="text" name="number" id="number" class="form-control" value="<?= $mode === 'Edit' ? $this->user->number : '' ?>" />
 											</div>
 											<div class="form-group">
 												<small class="form-text text-muted">
 													Student user account credentials will be sent via email.
 												</small>
+											</div>
+										</div>
+										<div class="col-12 col-md-6">
+											<div class="form-group">
+												<label for="fathers_name">Name of Father</label>
+												<input type="text" name="fathers_name" id="fathers_name" class="form-control" value="<?= $this->fathers_name ?>" />
+											</div>
+											<div class="form-group">
+												<label for="fathers_occupation">Occupation of Father</label>
+												<input type="text" name="fathers_occupation" id="fathers_occupation" class="form-control" value="<?= $this->fathers_occupation ?>" />
+											</div>
+										</div>
+										<div class="col-12 col-md-6">
+											<div class="form-group">
+												<label for="mothers_name">Name of Mother</label>
+												<input type="text" name="mothers_name" id="mothers_name" class="form-control" value="<?= $this->fathers_name ?>" />
+											</div>
+											<div class="form-group">
+												<label for="mothers_occupation">Occupation of Mother</label>
+												<input type="text" name="mothers_occupation" id="mothers_occupation" class="form-control" value="<?= $this->mothers_occupation ?>" />
 											</div>
 										</div>
 										<div class="col-12">

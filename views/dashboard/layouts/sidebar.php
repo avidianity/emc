@@ -9,36 +9,40 @@ use Libraries\View;
 	<nav class="vertnav navbar navbar-light">
 		<div class="w-100 mb-4 d-flex">
 			<a class="navbar-brand mx-auto mt-2 flex-fill text-center" href="<?= url('dashboard') ?>">
-				<span class="avatar avatar-sm mt-2">
+				<span class="avatar avatar-md mt-2">
 					<img src="<?= asset('assets/images/logo.jpg') ?>" alt="..." class="avatar-img rounded-circle">
 				</span>
 			</a>
 		</div>
 		<ul class="navbar-nav flex-fill w-100 mb-2">
-			<li class="nav-item w-100">
-				<a class="nav-link" href="<?= url('dashboard') ?>">
-					<i class="fe fe-grid fe-16"></i>
-					<span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
-				</a>
-			</li>
-			<li class="nav-item w-100">
-				<a class="nav-link" href="<?= url('dashboard/courses/all') ?>">
-					<i class="fe fe-send fe-16"></i>
-					<span class="ml-3 item-text">Courses</span>
-				</a>
-			</li>
-			<li class="nav-item w-100">
-				<a class="nav-link" href="<?= url('dashboard/students/all') ?>">
-					<i class="fe fe-users fe-16"></i>
-					<span class="ml-3 item-text">Students</span>
-				</a>
-			</li>
-			<li class="nav-item w-100">
-				<a class="nav-link" href="<?= url('dashboard/teachers/all') ?>">
-					<i class="fe fe-users fe-16"></i>
-					<span class="ml-3 item-text">Teachers</span>
-				</a>
-			</li>
+			<?php if (session()->get('user')->role !== 'Student') : ?>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard') ?>">
+						<i class="fe fe-grid fe-16"></i>
+						<span class="ml-3 item-text">Dashboard</span><span class="sr-only">(current)</span>
+					</a>
+				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/courses/all') ?>">
+						<i class="fe fe-send fe-16"></i>
+						<span class="ml-3 item-text">Courses</span>
+					</a>
+				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/students/all') ?>">
+						<i class="fe fe-users fe-16"></i>
+						<span class="ml-3 item-text">Students</span>
+					</a>
+				</li>
+			<?php endif; ?>
+			<?php if (!in_array(session()->get('user')->role, ['Teacher', 'Student'])) : ?>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/teachers/all') ?>">
+						<i class="fe fe-users fe-16"></i>
+						<span class="ml-3 item-text">Teachers</span>
+					</a>
+				</li>
+			<?php endif; ?>
 			<?php if (session()->get('user')->role === 'Admin') : ?>
 				<li class="nav-item w-100">
 					<a class="nav-link" href="<?= url('dashboard/registrars/all') ?>">
@@ -59,13 +63,22 @@ use Libraries\View;
 					</a>
 				</li>
 			<?php endif; ?>
-			<?php if (session()->get('user')->role === 'Registrar') : ?>
+			<?php if (in_array(session()->get('user')->role, ['Registrar', 'Student'])) : ?>
 				<li class="nav-item w-100">
 					<a class="nav-link" href="<?= url('dashboard/subjects/all') ?>">
 						<i class="fe fe-book fe-16"></i>
 						<span class="ml-3 item-text">Subjects</span>
 					</a>
 				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/schedules/all') ?>">
+						<i class="fe fe-calendar fe-16"></i>
+						<span class="ml-3 item-text">Schedules</span>
+					</a>
+				</li>
+			<?php endif; ?>
+			<?php if (session()->get('user')->role === 'Registrar') : ?>
+
 				<li class="nav-item w-100">
 					<a class="nav-link" href="<?= url('dashboard/admissions/all') ?>">
 						<i class="fe fe-pen-tool fe-16"></i>

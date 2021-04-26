@@ -16,56 +16,67 @@ use stdClass;
  */
 class File implements JSONable, Arrayable
 {
-    protected $info = [];
+	protected $info = [];
+	/**
+	 * @var \Interfaces\Storage
+	 */
+	protected $storage;
 
-    public function __construct($data = [])
-    {
-        foreach ($data as $key => $value) {
-            $this->info[$key] = $value;
-        }
-    }
+	public function __construct($data = [])
+	{
+		foreach ($data as $key => $value) {
+			$this->info[$key] = $value;
+		}
 
-    public function __get($key)
-    {
-        if (in_array($key, array_keys($this->info))) {
-            return $this->info[$key];
-        }
-        return null;
-    }
+		$this->storage = storage();
+	}
 
-    public function __set($key, $value)
-    {
-        $this->info[$key] = $value;
-    }
+	public function __get($key)
+	{
+		if (in_array($key, array_keys($this->info))) {
+			return $this->info[$key];
+		}
+		return null;
+	}
 
-    public function fetch()
-    {
-        return @file_get_contents($this->tmp_name);
-    }
+	public function __set($key, $value)
+	{
+		$this->info[$key] = $value;
+	}
 
-    public function put($dir)
-    {
-        return move_uploaded_file($this->tmp_name, $dir . basename($this->name));
-    }
+	public function fetch()
+	{
+		return @file_get_contents($this->tmp_name);
+	}
 
-    public function toArray(): array
-    {
-        return $this->info;
-    }
+	public function put($dir)
+	{
+		return move_uploaded_file($this->tmp_name, $dir . basename($this->name));
+	}
 
-    public function toJSON(): object
-    {
-        $object = new stdClass();
+	public function toArray(): array
+	{
+		return $this->info;
+	}
 
-        foreach ($this->toArray() as $key => $value) {
-            $object->{$key} = $value;
-        }
+	public function toJSON(): object
+	{
+		$object = new stdClass();
 
-        return $object;
-    }
+		foreach ($this->toArray() as $key => $value) {
+			$object->{$key} = $value;
+		}
 
-    public function jsonSerialize()
-    {
-        return $this->toJSON();
-    }
+		return $object;
+	}
+
+	public function jsonSerialize()
+	{
+		return $this->toJSON();
+	}
+
+	public function store($path)
+	{
+		return $this->storage->put($path, $this->fetch());
+	}
 }

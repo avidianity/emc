@@ -9,7 +9,7 @@ interface SessionManager extends JsonSerializable
 	/**
 	 * @param string $key
 	 * @param mixed $default
-	 * @return mixed
+	 * @return mixed|null
 	 */
 	public function get($key, $default = null);
 
@@ -25,6 +25,12 @@ interface SessionManager extends JsonSerializable
 	 * @return bool
 	 */
 	public function has($key);
+
+	/**
+	 * @param string $key
+	 * @return static
+	 */
+	public function remove($key);
 
 	/**
 	 * @return static

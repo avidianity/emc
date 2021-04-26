@@ -2,6 +2,8 @@ $(document).ready(async () => {
 	const table = $("#table-courses");
 	const refreshButton = $("#table-courses-refresh");
 
+	let datatable = null;
+
 	const fetchCourses = async () => {
 		refreshButton.html(`Refreshing`);
 		refreshButton.attr("disabled", true);
@@ -30,7 +32,12 @@ $(document).ready(async () => {
 
 				const action = $("<td />");
 
-				const dropdown = $(`<div class='dropdown' />`);
+				const dropdown = $(
+					`<div class='dropdown ${outIf(
+						user()?.role !== "Registrar",
+						"d-none"
+					)}' />`
+				);
 				const dropdownButton = $(
 					`<button class='btn btn-sm dropdown-toggle' data-toggle='dropdown' />`
 				);
@@ -42,7 +49,17 @@ $(document).ready(async () => {
 				);
 				edit.append(`<span><i class='fe fe-edit-2'></i></span> Edit`);
 
-				dropdownMenu.append(edit);
+				const deleteAction = $(
+					`<button class='dropdown-item btn-action-delete ${outIf(
+						user()?.role !== "Registrar",
+						"d-none"
+					)}' data-id='${course.id}' />`
+				);
+				deleteAction.append(
+					`<span><i class='fe fe-trash-2'></i></span> Delete`
+				);
+
+				dropdownMenu.append(edit, deleteAction);
 				dropdown.append(dropdownButton, dropdownMenu);
 				action.append(dropdown);
 
@@ -50,8 +67,15 @@ $(document).ready(async () => {
 
 				return tr;
 			});
+
+			if (datatable) {
+				datatable.destroy();
+			}
+
 			tbody.html("");
 			tbody.append(...rows);
+
+			datatable = table.DataTable();
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -66,5 +90,29 @@ $(document).ready(async () => {
 		e.preventDefault();
 
 		fetchCourses();
+	});
+
+	table.on("click", ".btn-action-delete", async function () {
+		const id = $(this).attr("data-id");
+
+		const confirm = await swal({
+			text: "Are you sure you want to delete this course?",
+			icon: "warning",
+			buttons: ["Cancel", "Confirm"],
+			dangerMode: true,
+		});
+
+		if (!confirm) {
+			return;
+		}
+
+		try {
+			await axios.delete(`/dashboard/courses?id=${id}`);
+			toastr.info("Course deleted successfully.", "Notice");
+			fetchCourses();
+		} catch (error) {
+			console.log(error);
+			toastr.error("Unable to delete course.");
+		}
 	});
 });

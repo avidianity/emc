@@ -8,81 +8,93 @@ use Models\Model;
 
 class HasOne implements HasRelationships
 {
-    protected $child;
-    protected $foreignKey;
-    protected $ownerKey;
+	protected $child;
+	protected $foreignKey;
+	protected $ownerKey;
 
-    /**
-     * @var Model
-     */
-    protected $instance;
+	/**
+	 * @var Model
+	 */
+	protected $instance;
 
-    public function __construct($child, $foreignKey = null, $ownerKey = 'id', Model &$instance)
-    {
-        $this->instance = $instance;
-        $this->child = $child;
-        $this->ownerKey = $ownerKey;
-        $this->foreignKey = $foreignKey !== null
-            ? $foreignKey
-            : $this->qualifyForeignKey();
-    }
+	public function __construct($child, $foreignKey = null, $ownerKey = 'id', Model &$instance = null)
+	{
+		$this->instance = $instance;
+		$this->child = $child;
+		$this->ownerKey = $ownerKey;
+		$this->foreignKey = $foreignKey !== null
+			? $foreignKey
+			: $this->qualifyForeignKey();
+	}
 
-    protected function qualifyForeignKey()
-    {
-        return $this->instance->getTable() . '_id';
-    }
+	protected function qualifyForeignKey()
+	{
+		return $this->instance->getTable() . '_id';
+	}
 
-    protected function getChildTable()
-    {
-        $class = $this->child;
-        return (new $class())->getTable();
-    }
+	protected function getChildTable()
+	{
+		$class = $this->child;
+		return (new $class())->getTable();
+	}
 
-    public function get()
-    {
-        $pdo = Model::getConnection();
+	public function get()
+	{
+		$pdo = Model::getConnection();
 
-        $query  = 'SELECT * FROM ' . $this->getChildTable() . ' ';
-        $query .= 'WHERE ' . $this->foreignKey . ' = :' . $this->foreignKey . ' ';
-        $query .= 'LIMIT 1;';
+		$query  = 'SELECT * FROM ' . $this->getChildTable() . ' ';
+		$query .= 'WHERE ' . $this->foreignKey . ' = :' . $this->foreignKey . ' ';
+		$query .= 'LIMIT 1;';
 
-        $statement = $pdo->prepare($query);
-        $statement->execute([':' . $this->foreignKey => $this->instance->{$this->ownerKey}]);
+		$statement = $pdo->prepare($query);
+		$statement->execute([':' . $this->foreignKey => $this->instance->{$this->ownerKey}]);
 
-        if ($statement->rowCount() === 0) {
-            return null;
-        }
+		if ($statement->rowCount() === 0) {
+			return null;
+		}
 
-        $class = $this->child;
+		$class = $this->child;
 
-        return $class::from($statement->fetchObject());
-    }
+		return $class::from($statement->fetchObject());
+	}
 
-    public function create($data)
-    {
-        $child = $this->child;
-        $data[$this->foreignKey] = $this->instance->{$this->ownerKey};
-        return $child::create($data);
-    }
+	public function count()
+	{
+		if ($this->has()) {
+			return 1;
+		}
+		return 0;
+	}
 
-    public function update($data)
-    {
-        if (!$this->has()) {
-            throw new LogicException('Parent does not have a child to update.');
-        }
-        return $this->get()->update($data);
-    }
+	public function create($data)
+	{
+		if ($this->has()) {
+			return $this->update($data);
+		} else {
+			$child = $this->child;
+			$data[$this->foreignKey] = $this->instance->{$this->ownerKey};
+			return $child::create($data);
+		}
+	}
 
-    public function delete()
-    {
-        if (!$this->has()) {
-            throw new LogicException('Parent does not have a child to delete.');
-        }
-        return $this->get()->delete();
-    }
+	public function update($data)
+	{
+		if (!$this->has()) {
+			throw new LogicException('Parent does not have a child to update.');
+		}
+		return $this->get()->update($data);
+	}
 
-    public function has(): bool
-    {
-        return $this->get() !== null;
-    }
+	public function delete()
+	{
+		if (!$this->has()) {
+			throw new LogicException('Parent does not have a child to delete.');
+		}
+		return $this->get()->delete();
+	}
+
+	public function has(): bool
+	{
+		return $this->get() !== null;
+	}
 }

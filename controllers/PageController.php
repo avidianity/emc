@@ -27,6 +27,10 @@ class PageController extends Controller
 
 	public function dashboard()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
+
 		return view('dashboard.index');
 	}
 

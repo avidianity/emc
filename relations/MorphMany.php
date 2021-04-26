@@ -58,6 +58,27 @@ class MorphMany implements HasRelationships
 		});
 	}
 
+	public function count()
+	{
+		$pdo = Model::getConnection();
+
+		$type = $this->morphable . '_type';
+		$key = $this->morphable . '_id';
+
+		$query  = 'SELECT * FROM ' . $this->getChildTable() . ' ';
+		$query .= "WHERE {$type} = :{$type} ";
+		$query .= "AND {$key} = :{$key};";
+
+		$statement = $pdo->prepare($query);
+
+		$statement->execute([
+			":{$type}" => get_class($this->instance),
+			":{$key}" => $this->instance->id,
+		]);
+
+		return $statement->rowCount();
+	}
+
 	public function create($data)
 	{
 		$data[$this->morphable . '_type'] = get_class($this->instance);

@@ -60,6 +60,19 @@ class HasMany implements HasRelationships
 		});
 	}
 
+	public function count()
+	{
+		$pdo = Model::getConnection();
+
+		$query  = 'SELECT * FROM ' . $this->getChildTable() . ' ';
+		$query .= 'WHERE ' . $this->foreignKey . ' = :' . $this->foreignKey . ';';
+
+		$statement = $pdo->prepare($query);
+		$statement->execute([':' . $this->foreignKey => $this->instance->{$this->ownerKey}]);
+
+		return $statement->rowCount();
+	}
+
 	public function create($data)
 	{
 		$child = $this->child;
@@ -79,9 +92,6 @@ class HasMany implements HasRelationships
 
 	public function delete()
 	{
-		if (!$this->has()) {
-			throw new LogicException('Parent does not have a child to delete.');
-		}
 		return $this->get()->map(function ($row) {
 			return $row->delete();
 		});

@@ -2,6 +2,8 @@ $(document).ready(async () => {
 	const table = $("#table-teachers");
 	const refreshButton = $("#table-teachers-refresh");
 
+	let datatable = null;
+
 	const fetchTeachers = async () => {
 		refreshButton.html(`Refreshing`);
 		refreshButton.attr("disabled", true);
@@ -9,29 +11,45 @@ $(document).ready(async () => {
 			const { data } = await axios.get("/dashboard/teachers");
 			const tbody = table.find("tbody");
 
-			const rows = data.map((registrar) => {
+			const rows = data.map((teacher) => {
 				const tr = $("<tr />");
 
 				const uuid = $("<td />");
-				uuid.text(registrar.uuid);
+				uuid.text(teacher.uuid);
 
 				const fullname = $("<td />");
 				fullname.text(
-					`${registrar.last_name}, ${registrar.first_name}`
+					`${teacher.last_name}, ${teacher.first_name} ${
+						teacher.middle_name || ""
+					}`
 				);
 
 				const phone = $("<td />");
-				phone.text(registrar.number);
+				phone.text(teacher.number);
 
 				const email = $("<td />");
-				email.text(registrar.email);
+				email.text(teacher.email);
+
+				const address = $("<td />");
+				address.text(teacher.address || "");
+
+				const gender = $("<td />");
+				gender.text(teacher.gender);
+
+				const birthdayDate = dayjs(teacher.birthday || new Date());
+
+				const birthday = $("<td />");
+				birthday.text(birthdayDate.format("MMMM DD, YYYY"));
+
+				const age = $("<td />");
+				age.text(dayjs().year() - birthdayDate.year());
 
 				const active = $("<td />");
 				const badge = $(`<span class='badge badge-pill' />`);
 				badge.addClass(
-					`badge-${registrar.active ? "success" : "danger"}`
+					`badge-${teacher.active ? "success" : "danger"}`
 				);
-				badge.text(registrar.active ? "Active" : "Inactive");
+				badge.text(teacher.active ? "Active" : "Inactive");
 				active.append(badge);
 
 				const action = $("<td />");
@@ -44,14 +62,14 @@ $(document).ready(async () => {
 					`<div class='dropdown-menu dropdown-menu-right' />`
 				);
 				const edit = $(
-					`<a class='dropdown-item' href='/dashboard/teachers/edit?id=${registrar.id}' />`
+					`<a class='dropdown-item' href='/dashboard/teachers/edit?id=${teacher.id}' />`
 				);
 				edit.append(`<span><i class='fe fe-edit-2'></i></span> Edit`);
 
 				const disable = $(
 					`<button class='dropdown-item btn-action-disable ${
-						registrar.active ? "" : "d-none"
-					}' data-id='${registrar.id}' />`
+						teacher.active ? "" : "d-none"
+					}' data-id='${teacher.id}' />`
 				);
 				disable.append(
 					`<span><i class='fe fe-user-x'></i></span> Disable`
@@ -59,8 +77,8 @@ $(document).ready(async () => {
 
 				const enable = $(
 					`<button class='dropdown-item btn-action-enable ${
-						registrar.active ? "d-none" : ""
-					}' data-id='${registrar.id}' />`
+						teacher.active ? "d-none" : ""
+					}' data-id='${teacher.id}' />`
 				);
 				enable.append(
 					`<span><i class='fe fe-user-check'></i></span> Enable`
@@ -70,12 +88,30 @@ $(document).ready(async () => {
 				dropdown.append(dropdownButton, dropdownMenu);
 				action.append(dropdown);
 
-				tr.append(uuid, fullname, email, phone, active, action);
+				tr.append(
+					uuid,
+					fullname,
+					phone,
+					email,
+					address,
+					gender,
+					birthday,
+					age,
+					active,
+					action
+				);
 
 				return tr;
 			});
+
+			if (datatable) {
+				datatable.destroy();
+			}
+
 			tbody.html("");
 			tbody.append(...rows);
+
+			datatable = table.DataTable();
 		} catch (error) {
 			handleError(error);
 		} finally {
