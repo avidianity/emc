@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS `admission`;
 CREATE TABLE IF NOT EXISTS `admission` (
 	`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`course_code` varchar(255) NOT NULL,
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `admission` (
 	PRIMARY KEY (`id`),
 	KEY `user_id` (`user_id`)
 );
+DROP TABLE IF EXISTS `course`;
 CREATE TABLE IF NOT EXISTS `course` (
 	`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`code` varchar(255) NOT NULL,
@@ -21,6 +23,7 @@ CREATE TABLE IF NOT EXISTS `course` (
 	`updated_at` varchar(255) NOT NULL,
 	PRIMARY KEY (`id`)
 );
+DROP TABLE IF EXISTS `grade`;
 CREATE TABLE IF NOT EXISTS `grade` (
 	`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`student_id` bigint(20) unsigned NOT NULL,
@@ -34,6 +37,7 @@ CREATE TABLE IF NOT EXISTS `grade` (
 	KEY `subject_id` (`subject_id`),
 	KEY `teacher_id` (`teacher_id`)
 );
+DROP TABLE IF EXISTS `mail`;
 CREATE TABLE IF NOT EXISTS `mail` (
 	`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`uuid` varchar(255) NOT NULL,
@@ -46,6 +50,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
 	`updated_at` varchar(255) NOT NULL,
 	PRIMARY KEY (`id`)
 );
+DROP TABLE IF EXISTS `queue`;
 CREATE TABLE IF NOT EXISTS `queue` (
 	`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`payload` text NOT NULL,
@@ -53,24 +58,29 @@ CREATE TABLE IF NOT EXISTS `queue` (
 	`updated_at` varchar(255) NOT NULL,
 	PRIMARY KEY (`id`)
 );
+DROP TABLE IF EXISTS `schedule`;
 CREATE TABLE IF NOT EXISTS `schedule` (
 	`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`course_id` bigint(20) unsigned NOT NULL,
 	`teacher_id` bigint(20) unsigned NOT NULL,
+	`subject_id` bigint(20) unsigned NOT NULL,
 	`year` varchar(255) NOT NULL,
 	`payload` text NOT NULL,
 	`created_at` varchar(255) NOT NULL,
 	`updated_at` varchar(255) NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `course_id` (`course_id`),
-	KEY `user_id` (`teacher_id`) USING BTREE
+	KEY `user_id` (`teacher_id`) USING BTREE,
+	KEY `subject_id` (`subject_id`)
 );
+DROP TABLE IF EXISTS `session`;
 CREATE TABLE IF NOT EXISTS `session` (
 	`id` varchar(255) NOT NULL,
 	`payload` text NOT NULL,
 	`last_activity` bigint(20) unsigned NOT NULL,
 	PRIMARY KEY (`id`)
 );
+DROP TABLE IF EXISTS `subject`;
 CREATE TABLE IF NOT EXISTS `subject` (
 	`id` int(10) unsigned NOT NULL AUTO_INCREMENT,
 	`code` varchar(255) NOT NULL,
@@ -84,6 +94,7 @@ CREATE TABLE IF NOT EXISTS `subject` (
 	PRIMARY KEY (`id`),
 	KEY `course_code` (`course_code`)
 );
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE IF NOT EXISTS `user` (
 	`id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 	`uuid` varchar(255) NOT NULL,
