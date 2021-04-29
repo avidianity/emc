@@ -93,7 +93,22 @@ $(document).ready(() => {
 	dateInputs.each(function () {
 		const input = $(this);
 
-		const options = {};
+		let options = {};
+
+		if (input.attr("data-flatpickr-time") !== undefined) {
+			options = {
+				mode: "time",
+				altInput: true,
+				altFormat: "G:i K",
+				onChange: (dates) => {
+					if (dates.length > 0) {
+						setTimeout(() => {
+							input.val(dates[0].toJSON());
+						}, 1000);
+					}
+				},
+			};
+		}
 
 		if (input.attr("name") === "birthday") {
 			options.maxDate = dayjs(new Date()).subtract(15, "years").toDate();

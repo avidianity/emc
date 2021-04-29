@@ -31,6 +31,7 @@
 								<th>Course</th>
 								<th>Teacher</th>
 								<th>Year</th>
+								<th>Times</th>
 								<th>Action</th>
 							</tr>
 						</thead>

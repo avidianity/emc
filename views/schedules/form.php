@@ -1,6 +1,7 @@
 <?php
 
 use Models\Course;
+use Models\Subject;
 use Models\User;
 
 extend('dashboard.layouts.top') ?>
@@ -18,7 +19,7 @@ extend('dashboard.layouts.top') ?>
 						<div class="card shadow">
 							<div class="card-body">
 								<div class="form-row">
-									<div class="form-group col-12 col-md-6 col-xl-4">
+									<div class="form-group col-12 col-md-6 col-xl-3">
 										<label for="course_id">Course</label>
 										<select name="course_id" id="course_id" class="form-control">
 											<option> -- Select -- </option>
@@ -29,7 +30,7 @@ extend('dashboard.layouts.top') ?>
 											<?php }); ?>
 										</select>
 									</div>
-									<div class="form-group col-12 col-md-6 col-xl-4">
+									<div class="form-group col-12 col-md-6 col-xl-3">
 										<label for="teacher_id">Teacher</label>
 										<select name="teacher_id" id="teacher_id" class="form-control">
 											<option> -- Select -- </option>
@@ -40,7 +41,18 @@ extend('dashboard.layouts.top') ?>
 											<?php }); ?>
 										</select>
 									</div>
-									<div class="form-group col-12 col-xl-4">
+									<div class="form-group col-12 col-md-6 col-xl-3">
+										<label for="subject_id">Subject</label>
+										<select name="subject_id" id="subject_id" class="form-control">
+											<option> -- Select -- </option>
+											<?php $subjects->each(function (Subject $subject) { ?>
+												<option value="<?= $subject->id ?>" <?= $this->subject === $subject->id ? 'selected' : '' ?>>
+													<?= $subject->code ?>
+												</option>
+											<?php }); ?>
+										</select>
+									</div>
+									<div class="form-group col-12 col-xl-3">
 										<label for="year">Year Level</label>
 										<select name="year" id="year" class="form-control">
 											<option> -- Select -- </option>
@@ -51,37 +63,28 @@ extend('dashboard.layouts.top') ?>
 										</select>
 									</div>
 									<div class="col-12 pt-3 table-responsive">
-										<div class="d-flex mb-3">
-											<button id="schedule-add-row" class="btn btn-info btn-sm">
-												Add Row
-											</button>
-										</div>
 										<table id="schedules-table" class="table">
 											<thead>
 												<tr>
-													<th>Time</th>
-													<th>Monday</th>
-													<th>Tuesday</th>
-													<th>Wednesday</th>
-													<th>Thursday</th>
-													<th></th>
+													<th>Day</th>
+													<th>Start Time</th>
+													<th>End Time</th>
 												</tr>
 											</thead>
 											<tbody>
-												<?php if ($this->payload) : ?>
-													<?php collect($this->payload)->each(function ($row, $index) { ?>
-														<tr>
-															<?php foreach ($row as $key => $value) : ?>
-																<td>
-																	<input type="text" name="payload[<?= $index ?>][<?= $key ?>]" class="form-control" value="<?= $value ?>">
-																</td>
-															<?php endforeach; ?>
-															<td>
-																<button class='btn btn-danger btn-sm btn-row-remove'>Remove</button>
-															</td>
-														</tr>
-													<?php }); ?>
-												<?php endif; ?>
+												<?php foreach (['Monday', 'Tuesday', 'Wednesday', 'Thursday'] as $day) : ?>
+													<tr>
+														<td>
+															<input type="text" class="form-control" disabled value="<?= $day ?>">
+														</td>
+														<td>
+															<input data-flatpickr data-flatpickr-time type="text" class="form-control" name="payload[<?= $day ?>][start_time]" value="<?= $mode === 'Add' ? 'N/A' : $this->payload->{$day}->start_time ?>">
+														</td>
+														<td>
+															<input data-flatpickr data-flatpickr-time type="text" class="form-control" name="payload[<?= $day ?>][end_time]" value="<?= $mode === 'Add' ? 'N/A' : $this->payload->{$day}->end_time ?>">
+														</td>
+													</tr>
+												<?php endforeach; ?>
 											</tbody>
 										</table>
 									</div>

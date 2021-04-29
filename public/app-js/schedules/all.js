@@ -27,15 +27,36 @@ $(document).ready(async () => {
 				const year = $("<td />");
 				year.text(schedule.year);
 
+				const times = $("<td />");
+
+				Object.keys(schedule.payload).forEach((day) => {
+					const { start_time, end_time } = schedule.payload[day];
+
+					if (isValidDate(start_time) && isValidDate(end_time)) {
+						const div = $("<div class='my-1' />");
+						div.text(
+							`${day} ${dayjs(start_time).format(
+								"hh:mm A"
+							)} - ${dayjs(end_time).format("hh:mm A")}`
+						);
+
+						times.append(div);
+					}
+				});
+
 				const action = $("<td />");
 
 				const dropdown = $(`<div class='dropdown' />`);
 				const dropdownButton = $(
-					`<button class='btn btn-sm dropdown-toggle' data-toggle='dropdown' />`
+					`<button class='btn btn-sm dropdown-toggle ${outIf(
+						user()?.role === "Student",
+						"d-none"
+					)}' data-toggle='dropdown' />`
 				);
 				const dropdownMenu = $(
 					`<div class='dropdown-menu dropdown-menu-right' />`
 				);
+
 				const edit = $(
 					`<a class='dropdown-item ${outIf(
 						user()?.role !== "Registrar",
@@ -48,7 +69,7 @@ $(document).ready(async () => {
 				dropdown.append(dropdownButton, dropdownMenu);
 				action.append(dropdown);
 
-				tr.append(course, teacher, year, action);
+				tr.append(course, teacher, year, times, action);
 
 				return tr;
 			});

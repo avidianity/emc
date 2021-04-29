@@ -68,7 +68,7 @@ class AnalyticsController extends Controller
 	public function enrollees()
 	{
 		$students = User::getAll()->filter(function (User $user) {
-			return $user->role === 'Student' && $user->active;
+			return $user->role === 'Student' && !$user->active;
 		})->count();
 
 		return [

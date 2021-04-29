@@ -4,13 +4,14 @@ namespace Controllers;
 
 use Models\Course;
 use Models\Schedule;
+use Models\Subject;
 use Models\User;
 
 class ScheduleController extends Controller
 {
 	public function index()
 	{
-		return Schedule::getAll()->load(['course', 'teacher']);
+		return Schedule::getAll()->load(['course', 'teacher', 'subject']);
 	}
 
 	public function all()
@@ -22,7 +23,11 @@ class ScheduleController extends Controller
 	{
 		$id = input()->id;
 
-		return Schedule::findOrFail($id);
+		$schedule = Schedule::findOrFail($id);
+
+		$schedule->load(['course', 'teacher', 'subject']);
+
+		return $schedule;
 	}
 
 	public function view()
@@ -40,11 +45,17 @@ class ScheduleController extends Controller
 	public function create()
 	{
 		$courses = Course::getAll();
+		$subjects = Subject::getAll();
 		$teachers = User::getAll()->filter(function (User $user) {
 			return $user->role === 'Teacher';
 		});
 
-		return view('schedules.form', ['mode' => 'Add', 'courses' => $courses, 'teachers' => $teachers]);
+		return view('schedules.form', [
+			'mode' => 'Add',
+			'courses' => $courses,
+			'teachers' => $teachers,
+			'subjects' => $subjects
+		]);
 	}
 
 	public function update()
@@ -71,11 +82,17 @@ class ScheduleController extends Controller
 		$schedule = Schedule::findOrFail($id);
 
 		$courses = Course::getAll();
+		$subjects = Subject::getAll();
 		$teachers = User::getAll()->filter(function (User $user) {
 			return $user->role === 'Teacher';
 		});
 
-		return view('schedules.form', ['mode' => 'Edit', 'courses' => $courses, 'teachers' => $teachers] + $schedule->toArray());
+		return view('schedules.form', [
+			'mode' => 'Edit',
+			'courses' => $courses,
+			'teachers' => $teachers,
+			'subjects' => $subjects,
+		] + $schedule->toArray());
 	}
 
 	public function destroy()

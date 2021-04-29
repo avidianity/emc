@@ -3,7 +3,6 @@
 namespace Libraries;
 
 use LogicException;
-use RuntimeException;
 use Traits\Singleton;
 
 class View

@@ -57,7 +57,7 @@ extend('dashboard.layouts.top') ?>
 											</div>
 											<div class="form-group">
 												<label for="uuid">Student Number</label>
-												<input type="text" name="uuid" id="uuid" class="form-control" value="<?= $mode === 'Edit' ? $this->user->uuid : 'student-' . str_pad(rand(0, 99999), 5, STR_PAD_LEFT) . '-' . date('Y') ?>" disabled />
+												<input type="text" name="uuid" id="uuid" class="form-control" value="<?= $mode === 'Edit' ? $this->user->uuid : 'student-' . str_pad(rand(0, 99999), 5, STR_PAD_LEFT) . '-' . date('Y') ?>" readonly />
 											</div>
 											<div class="form-group">
 												<label for="address">Address</label>
