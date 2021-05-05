@@ -56,7 +56,10 @@ $(document).ready(async () => {
 
 				const dropdown = $(`<div class='dropdown' />`);
 				const dropdownButton = $(
-					`<button class='btn btn-sm dropdown-toggle' data-toggle='dropdown' />`
+					`<button class='btn btn-sm dropdown-toggle ${outIf(
+						user()?.role !== "Admin",
+						"d-none"
+					)}' data-toggle='dropdown' />`
 				);
 				const dropdownMenu = $(
 					`<div class='dropdown-menu dropdown-menu-right' />`

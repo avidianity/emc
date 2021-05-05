@@ -20,11 +20,13 @@ $router = Router::getInstance();
 $router->get('/', [PageController::class, 'home']);
 $router->get('/login', [PageController::class, 'login']);
 $router->get('/forgot-password', [PageController::class, 'forgotPassword']);
+$router->get('/registration-slip', [PageController::class, 'registrationSlip']);
 $router->group('/dashboard', function (Router $router) {
 	$router->get('/', [PageController::class, 'dashboard']);
 	$router->get('/emails', [PageController::class, 'emails']);
 	$router->get('/change-password', [PageController::class, 'changePassword']);
 	$router->get('/profile', [PageController::class, 'profile']);
+	$router->post('/admissions/increment', [AdmissionController::class, 'increment']);
 	$router->resource('/users', UserController::class);
 	$router->resource('/registrars', RegistrarController::class);
 	$router->resource('/teachers', TeacherController::class);

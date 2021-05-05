@@ -41,6 +41,25 @@ class SendMail implements Queueable
 			->setTo($this->to)
 			->view($this->view, $this->data)
 			->send();
+
+		$sent = date('Y-m-d H:i:s');
+
+		$pdo = Mail::getConnection();
+
+		$query  = sprintf('SELECT * FROM %s WHERE %s = :uuid LIMIT 1;', Mail::table(), Mail::justifyKey('uuid'));
+
+		$statement = $pdo->prepare($query);
+
+		$statement->execute([':uuid' => $this->uuid]);
+
+		if ($statement->rowCount() > 0) {
+			$mail = Mail::from($statement->fetch());
+
+			$mail->update([
+				'sent' => $sent,
+				'status' => 'Sent',
+			]);
+		}
 	}
 
 	public function parseView()

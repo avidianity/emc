@@ -14,21 +14,21 @@ return [
 		],
 	],
 	'database' => [
-		'dev' => [
-			'driver' => env('DB_DRIVER', 'mysql'),
-			'host' => env('DB_HOST', '127.0.0.1'),
-			'username' => env('DB_USERNAME', 'root'),
-			'password' => env('DB_PASSWORD'),
-			'name' => env('DB_NAME'),
-			'port' => env('DB_PORT', 3306),
+		'driver' => env('DB_DRIVER', 'mysql'),
+
+		'mysql' => [
+			'default' => [
+				'host' => env('DB_HOST', '127.0.0.1'),
+				'username' => env('DB_USERNAME', 'root'),
+				'password' => env('DB_PASSWORD'),
+				'name' => env('DB_NAME'),
+				'port' => env('DB_PORT', 3306),
+			]
 		],
-		'prod' => [
-			'driver' => env('DB_DRIVER', 'mysql'),
-			'host' => env('DB_HOST', '127.0.0.1'),
-			'username' => env('DB_USERNAME', 'root'),
-			'password' => env('DB_PASSWORD'),
-			'name' => env('DB_NAME'),
-			'port' => env('DB_PORT', 3306),
+		'sqlite' => [
+			'default' => [
+				'path' => env('DB_PATH', __DIR__ . '/storage/database/default.sqlite'),
+			],
 		]
 	],
 	'view' => [

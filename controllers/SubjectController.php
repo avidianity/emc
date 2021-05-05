@@ -12,7 +12,8 @@ class SubjectController extends Controller
 		$subjects = Subject::getAll();
 		if (session()->get('user')->role === 'Student') {
 			return $subjects->filter(function (Subject $subject) {
-				return session()->get('user')->admission->level === $subject->level;
+				return session()->get('user')->admission->level === $subject->level
+					&& session()->get('user')->admission->term === $subject->term;
 			});
 		}
 		return $subjects;

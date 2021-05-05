@@ -1,9 +1,6 @@
 <?php
 
-use Libraries\Hash;
-use Models\CMS;
 use Models\Model;
-use Models\User;
 
 require_once __DIR__ . '/bootstrap.php';
 
@@ -11,9 +8,9 @@ $pdo = Model::getConnection();
 
 $pdo->query('SET FOREIGN_KEY_CHECKS=0');
 
-$env = config('app.env');
+$driver = config('database.driver');
 
-$dbname = config("database.{$env}.name");
+$dbname = config("database.{$driver}.name");
 
 $query  = "SELECT concat('DROP TABLE IF EXISTS {$dbname}.', TABLE_NAME,';') AS query from information_schema.TABLES where table_schema= :table_schema;";
 

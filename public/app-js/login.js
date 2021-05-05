@@ -38,7 +38,7 @@ $(document).ready(() => {
 			if (attempts >= 3) {
 				localStorage.setItem(
 					"block-for",
-					dayjs(new Date()).add(1, "hours").toDate().toJSON()
+					dayjs(new Date()).add(1, "hour").toDate().toJSON()
 				);
 			}
 		} finally {

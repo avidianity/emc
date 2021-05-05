@@ -19,4 +19,8 @@ return [
 		'file' => \Libraries\Session\Drivers\FileHandler::class,
 		'database' => \Libraries\Session\Drivers\DatabaseHandler::class,
 	],
+	'database' => [
+		'mysql' => \Libraries\Database\Connection\MySQLConnection::class,
+		'sqlite' => \Libraries\Database\Connection\SQLiteConnection::class,
+	],
 ];

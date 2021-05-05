@@ -61,6 +61,50 @@ class Application
 		return $this->router;
 	}
 
+	public static function try(callable $callback)
+	{
+		try {
+			return $callback();
+		} catch (Exception $exception) {
+			// catch any error and display it properly
+
+			if ($exception instanceof HTTPException) {
+				$status = $exception->getStatus();
+
+				if (getHeader('Accept') === 'application/json') {
+					return response($exception, $status, $exception->getHeaders())->send();
+				}
+
+				if (View::exists('errors.' . $status)) {
+					return view('errors.' . $status, ['exception' => $exception])
+						->setStatus($status)
+						->render(new static());
+				}
+
+				return view('errors.500', ['exception' => $exception])
+					->setStatus($status)
+					->render(new static());
+			}
+
+			if (getHeader('Accept') === 'application/json') {
+				if ($exception instanceof Exception) {
+					$data = (array)json_decode(json_encode($exception));
+					$data['exception'] = get_class($exception);
+					$data['stacktrace'] = $exception->getTrace();
+					if (!in_array('message', array_keys($data))) {
+						$data['message'] = $exception->getMessage();
+					}
+					return response($data, 500)->send();
+				}
+				return response($exception, 500)->send();
+			}
+
+			return view('errors.500', ['exception' => $exception])
+				->setStatus(500)
+				->render(new static());
+		}
+	}
+
 	/**
 	 * Start the application
 	 *

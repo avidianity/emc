@@ -10,7 +10,6 @@ class Admission extends Model
 		'status',
 		'term',
 		'user_id',
-		'type',
 		'graduated',
 	];
 

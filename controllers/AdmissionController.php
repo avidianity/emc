@@ -13,6 +13,47 @@ use Throwable;
 
 class AdmissionController extends Controller
 {
+	public function increment()
+	{
+		$map = [
+			'1st Semester' => [
+				'1st' => ['1st', '2nd Semester'],
+				'2nd' => ['2nd', '2nd Semester'],
+				'3rd' => ['3rd', '2nd Semester'],
+				'4th' => ['4th', '2nd Semester'],
+				'5th' => ['5th', '2nd Semester'],
+			],
+			'2nd Semester' => [
+				'1st' => ['2nd', '1st Semester'],
+				'2nd' => ['3rd', '1st Semester'],
+				'3rd' => ['3rd', 'Summer'],
+				'4th' => ['5th', '1st Semester'],
+			],
+			'Summer' => [
+				'3rd' => ['4th', '1st Semester'],
+			]
+		];
+
+		/**
+		 * @var \Models\User
+		 */
+		$user = session()->get('user');
+
+		/**
+		 * @var \Models\Admission
+		 */
+		$admission = $user->admission;
+
+		if (isset($map[$admission->term]) && isset($map[$admission->term][$admission->level])) {
+			[$level, $term] = $map[$admission->term][$admission->level];
+
+			$admission->update(['level' => $level, 'term' => $term]);
+			$user->update(['active' => false]);
+			session()->clear();
+			return response('', 204);
+		}
+	}
+
 	public function index()
 	{
 		return Admission::getAll()->load(['user']);

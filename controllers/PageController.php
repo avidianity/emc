@@ -39,6 +39,11 @@ class PageController extends Controller
 		return view('dashboard.index');
 	}
 
+	public function registrationSlip()
+	{
+		return view('dashboard.registration-slip');
+	}
+
 	public function changePassword()
 	{
 		return view('dashboard.change-password');

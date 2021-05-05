@@ -4,6 +4,7 @@ use Exceptions\UnauthorizedHTTPException;
 use Interfaces\Arrayable;
 use Interfaces\JSONable;
 use Libraries\Collection;
+use Libraries\Database\Manager;
 use Libraries\Input;
 use Libraries\Mailer;
 use Libraries\Message;
@@ -69,6 +70,16 @@ function extend($path, $data = [])
 function mailer()
 {
 	return Mailer::getInstance(...func_get_args());
+}
+
+/**
+ * Get the database manager
+ * 
+ * @return \Interfaces\Database\Manager
+ */
+function database()
+{
+	return Manager::getInstance();
 }
 
 /**

@@ -1,5 +1,8 @@
 <?php extend('dashboard.layouts.top') ?>
 <div class="container">
+	<button id="increment-admission-btn" class="btn btn-info btn-sm">
+		Increment Admission
+	</button>
 	<form id="profile-form" action="<?= url('/dashboard/users?id=' . session()->get('user')->id) ?>" method="PUT" class="row">
 		<div class="col-12 col-md-6">
 			<div class="row">

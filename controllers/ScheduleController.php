@@ -15,7 +15,8 @@ class ScheduleController extends Controller
 
 		if (session()->get('user')->role === 'Student') {
 			return $schedules->filter(function (Schedule $schedule) {
-				return $schedule->subject->level === session()->get('user')->admission->level;
+				return $schedule->subject->level === session()->get('user')->admission->level
+					&& $schedule->subject->term === session()->get('user')->admission->term;
 			});
 		}
 

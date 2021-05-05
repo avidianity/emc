@@ -11,10 +11,11 @@ use Libraries\Database;
 use stdClass;
 use Traits\HasEvents;
 use Traits\HasRelations;
+use Traits\Macroable;
 
 abstract class Model implements JSONable, Arrayable
 {
-	use HasRelations, HasEvents;
+	use HasRelations, HasEvents, Macroable;
 
 	/**
 	 * Attributes that are serialized
@@ -53,7 +54,8 @@ abstract class Model implements JSONable, Arrayable
 
 	/**
 	 * Current database connection used
-	 * @var \Libraries\Database
+	 * 
+	 * @var \Interfaces\Database\Connection\Connection
 	 */
 	protected static $pdo = null;
 
@@ -311,7 +313,7 @@ abstract class Model implements JSONable, Arrayable
 	/**
 	 * Set the current connection
 	 * 
-	 * @param \Libraries\Database $pdo
+	 * @param \Interfaces\Database\Connection\Connection $pdo
 	 * @return void
 	 */
 	public static function setConnection($pdo)
@@ -322,9 +324,9 @@ abstract class Model implements JSONable, Arrayable
 	/**
 	 * Get the current connection
 	 * 
-	 * @return \Libraries\Database;
+	 * @return \Interfaces\Database\Connection\Connection
 	 */
-	public static function getConnection(): Database
+	public static function getConnection()
 	{
 		return static::$pdo;
 	}
@@ -409,7 +411,7 @@ abstract class Model implements JSONable, Arrayable
 			return ':' . $key;
 		})->join(',') . ');';
 
-		$statement = static::$pdo->prepare($query, [], $data);
+		$statement = static::$pdo->prepare($query);
 
 		$inputs = [];
 
@@ -504,7 +506,7 @@ abstract class Model implements JSONable, Arrayable
 
 		$query .= 'WHERE ' . static::justifyKey('id') . ' = :id;';
 
-		$statement = static::$pdo->prepare($query, [], $this->data);
+		$statement = static::$pdo->prepare($query);
 
 		$inputs = [
 			':id' => $id,
@@ -550,7 +552,7 @@ abstract class Model implements JSONable, Arrayable
 	{
 		$this->fireEvent('deleting');
 
-		$statement = static::$pdo->prepare('DELETE FROM ' . $this->getTable() . ' WHERE ' . static::justifyKey('id') . ' = :id;', [], $this);
+		$statement = static::$pdo->prepare('DELETE FROM ' . $this->getTable() . ' WHERE ' . static::justifyKey('id') . ' = :id;');
 
 		$statement->execute([':id' => $this->id]);
 
@@ -586,7 +588,7 @@ abstract class Model implements JSONable, Arrayable
 		$query = 'DELETE FROM ' . static::table() . ' WHERE ' . static::justifyKey('id') . ' IN(' . collect($ids)->map(function () {
 			return '?';
 		})->join(',') . ');';
-		$statement = static::$pdo->prepare($query, [], $ids);
+		$statement = static::$pdo->prepare($query);
 
 		$statement->execute($ids);
 
@@ -631,7 +633,7 @@ abstract class Model implements JSONable, Arrayable
 			return '?';
 		})->join(',') . ');';
 
-		$statement = static::$pdo->prepare($query, [], $ids);
+		$statement = static::$pdo->prepare($query);
 
 		$statement->execute($ids);
 

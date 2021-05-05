@@ -25,7 +25,7 @@ class Router
 	 * Registers a route
 	 * 
 	 * @param string $uri
-	 * @param \Closure|string $handle
+	 * @param \Closure|string|string[]|\Controllers\Controller $handle
 	 * @param string $method
 	 * @return static
 	 */
@@ -33,7 +33,7 @@ class Router
 	{
 		static::$routes[] = [
 			'uri' => $this->prefix . $uri,
-			'handle' => $handle,
+			'handle' => $handle instanceof Controller ? get_class($handle) : $handle,
 			'method' => $method,
 		];
 		return $this;
@@ -43,7 +43,7 @@ class Router
 	 * Registers a GET route
 	 * 
 	 * @param string $uri
-	 * @param \Closure|string $handle
+	 * @param \Closure|string|string[]|\Controllers\Controller $handle
 	 * @return static
 	 */
 	public function get($uri, $handle)
@@ -55,7 +55,7 @@ class Router
 	 * Registers a POST route
 	 * 
 	 * @param string $uri
-	 * @param \Closure|string $handle
+	 * @param \Closure|string|string[]|\Controllers\Controller $handle
 	 * @return static
 	 */
 	public function post($uri, $handle)
@@ -67,7 +67,7 @@ class Router
 	 * Registers a PUT route
 	 * 
 	 * @param string $uri
-	 * @param \Closure|string $handle
+	 * @param \Closure|string|string[]|\Controllers\Controller $handle
 	 * @return static
 	 */
 	public function put($uri, $handle)
@@ -79,7 +79,7 @@ class Router
 	 * Registers a PATCH route
 	 * 
 	 * @param string $uri
-	 * @param \Closure|string $handle
+	 * @param \Closure|string|string[]|\Controllers\Controller $handle
 	 * @return static
 	 */
 	public function patch($uri, $handle)
@@ -91,7 +91,7 @@ class Router
 	 * Registers a DELETE route
 	 * 
 	 * @param string $uri
-	 * @param \Closure|string $handle
+	 * @param \Closure|string|string[]|\Controllers\Controller $handle
 	 * @return static
 	 */
 	public function delete($uri, $handle)
