@@ -21,6 +21,14 @@ class AdmissionController extends Controller
 		 */
 		$user = session()->get('user');
 
+		if (!$user) {
+			return response('', 400);
+		}
+
+		if ($user->grades()->get()->count() === 0) {
+			return response(['message' => 'Subjects currently do not have grades.'], 400);
+		}
+
 		$isPassingGrades = true;
 
 		foreach ($user->grades as $grade) {

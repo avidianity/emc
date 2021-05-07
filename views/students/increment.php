@@ -32,10 +32,10 @@ extend('dashboard.layouts.top') ?>
 			return $subject->term === $term && $subject->level === $level;
 		})->each(function (Subject $subject, $index) {
 			$id = Str::random(); ?>
-			<div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
+			<div class="col-12 form-group">
 				<div class="custom-control custom-checkbox">
 					<input type="checkbox" class="custom-control-input" name="subjects[<?= $index ?>]" id="<?= $id ?>" value="<?= $subject->id ?>">
-					<label class="custom-control-label" for="<?= $id ?>"><?= $subject->code ?></label>
+					<label class="custom-control-label" for="<?= $id ?>"><?= $subject->code ?> - <?= $subject->description ?></label>
 				</div>
 			</div>
 		<?php }); ?>
