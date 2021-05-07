@@ -1,12 +1,11 @@
 <?php extend('dashboard.layouts.top') ?>
 <div class="container">
 	<div class="d-flex">
-		<a href="<?= url('dashboard/self/increment') ?>" class="btn btn-info btn-sm mx-1">
-			Increment Admission
-		</a>
-		<a href="<?= url('registration-slip') ?>" class="btn btn-primary btn-sm mx-1" target="_blank" rel="noreferrer">
-			Registration Slip
-		</a>
+		<?php if (session()->get('user')->subjects->count() > 0) : ?>
+			<a href="<?= url('registration-slip') ?>" class="btn btn-primary btn-sm" target="_blank" rel="noreferrer">
+				Registration Slip
+			</a>
+		<?php endif; ?>
 	</div>
 	<form id="profile-form" action="<?= url('/dashboard/users?id=' . session()->get('user')->id) ?>" method="PUT" class="row">
 		<div class="col-12 col-md-6">

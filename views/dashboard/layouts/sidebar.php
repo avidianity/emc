@@ -92,6 +92,12 @@ use Libraries\View;
 						<span class="ml-3 item-text">Profile</span>
 					</a>
 				</li>
+				<li class="nav-item w-100">
+					<a class="nav-link" href="<?= url('dashboard/self/increment') ?>">
+						<i class="fe fe-user fe-16"></i>
+						<span class="ml-3 item-text">Enrollment</span>
+					</a>
+				</li>
 			<?php endif; ?>
 			<li class="nav-item w-100">
 				<a class="nav-link" href="<?= url('/dashboard/change-password') ?>">

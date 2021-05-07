@@ -9,15 +9,27 @@ extend('dashboard.layouts.top') ?>
 	<form id="increment-form" action="<?= url('dashboard/admissions/increment') ?>" method="POST" class="form-row">
 		<?php session()->get('user')->admission->course->subjects->filter(function (Subject $subject) {
 			$map = [
-				'1st' => '2nd',
-				'2nd' => '3rd',
-				'3rd' => '4th',
-				'4th' => '5th',
+				'1st Semester' => [
+					'1st' => ['1st', '2nd Semester'],
+					'2nd' => ['2nd', '2nd Semester'],
+					'3rd' => ['3rd', '2nd Semester'],
+					'4th' => ['4th', '2nd Semester'],
+					'5th' => ['5th', '2nd Semester'],
+				],
+				'2nd Semester' => [
+					'1st' => ['2nd', '1st Semester'],
+					'2nd' => ['3rd', '1st Semester'],
+					'3rd' => ['3rd', 'Summer'],
+					'4th' => ['5th', '1st Semester'],
+				],
+				'Summer' => [
+					'3rd' => ['4th', '1st Semester'],
+				]
 			];
 
-			$level = session()->get('user')->admission->level;
+			[$level, $term] = $map[session()->get('user')->admission->term][session()->get('user')->admission->level];
 
-			return isset($map[$level]) && $subject->level === $map[$level];
+			return $subject->term === $term && $subject->level === $level;
 		})->each(function (Subject $subject, $index) {
 			$id = Str::random(); ?>
 			<div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
