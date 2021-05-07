@@ -38,10 +38,6 @@ class User extends Model
 			$user->schedules()->delete();
 			$user->grades()->delete();
 		});
-
-		static::creating(function (self $user) {
-			$user->password = Hash::make('admin');
-		});
 	}
 
 	public function getFullName()
