@@ -10,7 +10,7 @@ $(document).ready(async () => {
 		try {
 			const { data } = await axios.get("/dashboard/students");
 			const tbody = table.find("tbody");
-
+			console.log(data);
 			const rows = data.map((student) => {
 				const tr = $("<tr />");
 
@@ -140,7 +140,9 @@ $(document).ready(async () => {
 
 		addGradeForm.find("#student_id").val(id);
 
-		const { data: subjects } = await axios.get("/dashboard/subjects");
+		const subjects = student.subjects.map(
+			(studentSubject) => studentSubject.subject
+		);
 
 		addGradeForm
 			.find("#subject_id")
@@ -158,7 +160,9 @@ $(document).ready(async () => {
 		addGradeForm
 			.find("#student")
 			.val(
-				`${student.last_name}, ${student.first_name} ${student.middle_name}`
+				`${student.last_name}, ${student.first_name} ${
+					student.middle_name || ""
+				}`
 			);
 
 		addGradeModal.modal("show");

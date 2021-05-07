@@ -2,6 +2,8 @@
 
 namespace Models;
 
+use Libraries\Hash;
+
 class User extends Model
 {
 	protected $fillable = [
@@ -36,6 +38,10 @@ class User extends Model
 			$user->schedules()->delete();
 			$user->grades()->delete();
 		});
+
+		static::creating(function (self $user) {
+			$user->password = Hash::make('admin');
+		});
 	}
 
 	public function getFullName()
@@ -55,6 +61,11 @@ class User extends Model
 
 	public function grades()
 	{
-		return $this->hasMany(Grade::class);
+		return $this->hasMany(Grade::class, 'student_id');
+	}
+
+	public function subjects()
+	{
+		return $this->hasMany(StudentSubject::class);
 	}
 }

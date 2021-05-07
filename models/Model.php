@@ -104,12 +104,8 @@ abstract class Model implements JSONable, Arrayable
 	 */
 	protected function boot()
 	{
-		collect($this->booleans)->each(function (string $key) {
-			static::saving(function ($model) use ($key) {
-				$value = $model->{$key};
-				$model->{$key} = $value ? 1 : 0;
-			});
 
+		collect($this->booleans)->each(function (string $key) {
 			static::serializing(function ($model) use ($key) {
 				$value = $model->{$key};
 				$model->{$key} = $value ? true : false;
@@ -117,13 +113,6 @@ abstract class Model implements JSONable, Arrayable
 		});
 
 		collect($this->jsons)->each(function (string $key) {
-			static::saving(function ($model) use ($key) {
-				$value = $model->{$key};
-				if (!is_string($value)) {
-					$model->{$key} = json_encode($value);
-				}
-			});
-
 			static::serializing(function ($model) use ($key) {
 				$value = $model->{$key};
 				if (is_string($value)) {
@@ -133,6 +122,25 @@ abstract class Model implements JSONable, Arrayable
 		});
 	}
 
+	/**
+	 * Get boolean attributes
+	 * 
+	 * @return string[]
+	 */
+	public function getBooleans()
+	{
+		return $this->booleans;
+	}
+
+	/**
+	 * Get json attributes
+	 * 
+	 * @return string[]
+	 */
+	public function getJsons()
+	{
+		return $this->jsons;
+	}
 	/**
 	 * Magically set a value into the data
 	 * 
@@ -415,8 +423,19 @@ abstract class Model implements JSONable, Arrayable
 
 		$inputs = [];
 
+		$booleans = (new static())->getBooleans();
+		$jsons = (new static())->getJsons();
+
 		foreach ($data as $key => $value) {
-			$inputs[":{$key}"] = $value;
+			if (in_array($key, $booleans)) {
+				$inputs[":{$key}"] = $value ? 1 : 0;
+			} else if (in_array($key, $jsons)) {
+				if (!is_string($value)) {
+					$inputs[":{$key}"] = json_encode($value);
+				}
+			} else {
+				$inputs[":{$key}"] = $value;
+			}
 		}
 
 		$statement->execute($inputs);
@@ -513,7 +532,15 @@ abstract class Model implements JSONable, Arrayable
 		];
 
 		foreach ($data as $key => $value) {
-			$inputs[":{$key}"] = $value;
+			if (in_array($key, $this->booleans)) {
+				$inputs[":{$key}"] = $value ? 1 : 0;
+			} else if (in_array($key, $this->jsons)) {
+				if (!is_string($value)) {
+					$inputs[":{$key}"] = json_encode($value);
+				}
+			} else {
+				$inputs[":{$key}"] = $value;
+			}
 		}
 
 		$statement->execute($inputs);
@@ -600,7 +627,7 @@ abstract class Model implements JSONable, Arrayable
 	/**
 	 * Gets all rows from the database
 	 * 
-	 * @return \Libraries\Collection
+	 * @return \Libraries\Collection<int, static>
 	 */
 	public static function getAll()
 	{

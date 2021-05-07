@@ -4,6 +4,7 @@ namespace Controllers;
 
 use Models\Course;
 use Models\Schedule;
+use Models\StudentSubject;
 use Models\Subject;
 use Models\User;
 
@@ -11,16 +12,30 @@ class ScheduleController extends Controller
 {
 	public function index()
 	{
-		$schedules = Schedule::getAll()->load(['course', 'teacher', 'subject']);
-
 		if (session()->get('user')->role === 'Student') {
-			return $schedules->filter(function (Schedule $schedule) {
+			$schedules = session()->get('user')->subjects->map(function (StudentSubject $studentSubject) {
+				return $studentSubject->subject->schedules;
+			});
+
+			$payload = [];
+
+			foreach ($schedules as $scheduleSet) {
+				foreach ($scheduleSet as $schedule) {
+					$payload[] = $schedule;
+				}
+			}
+
+			return collect($payload)->filter(function (Schedule $schedule) {
 				return $schedule->subject->level === session()->get('user')->admission->level
 					&& $schedule->subject->term === session()->get('user')->admission->term;
-			});
+			})->load(['course', 'teacher', 'subject']);
 		}
 
-		return $schedules;
+		if (session()->get('user')->role === 'Teacher') {
+			return session()->get('user')->schedules->load(['course', 'teacher', 'subject']);
+		}
+
+		return Schedule::getAll()->load(['course', 'teacher', 'subject']);
 	}
 
 	public function all()
@@ -47,6 +62,20 @@ class ScheduleController extends Controller
 	public function store()
 	{
 		$data = input()->all();
+
+		if (!session()->has('schedule-save')) {
+			$schedules = find(
+				Schedule::class,
+				only($data, ['course_id', 'teacher_id', 'subject_id', 'year'])
+			);
+
+			if ($schedules->count() > 0) {
+				session()->set('schedule-save', true);
+				return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+			}
+		} else {
+			session()->remove('schedule-save');
+		}
 
 		return Schedule::create($data);
 	}

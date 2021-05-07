@@ -17,7 +17,9 @@ $(document).ready(() => {
 				attempts = 0;
 				localStorage.removeItem("block-for");
 			} else {
-				return toastr.info(`Login blocked. Please try again later.`);
+				return toastr.info(
+					`Login attempts: ${attempts}. Please try again after 60 minutes.`
+				);
 			}
 		}
 
@@ -35,7 +37,7 @@ $(document).ready(() => {
 			handleError(error);
 			attempts++;
 
-			if (attempts >= 3) {
+			if (attempts >= 4) {
 				localStorage.setItem(
 					"block-for",
 					dayjs(new Date()).add(1, "hour").toDate().toJSON()

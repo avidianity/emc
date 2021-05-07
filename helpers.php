@@ -590,6 +590,42 @@ function getHeader($key, $default = null)
 	return $default;
 }
 
+function find($model, $data)
+{
+	$query  = sprintf('SELECT * FROM %s ', $model::table());
+
+	$first = true;
+
+	foreach (array_keys($data) as $key) {
+		if ($first) {
+			$query .= sprintf('WHERE %s = %s ', $model::justifyKey($key), ":{$key}");
+			$first = false;
+		} else {
+			$query .= sprintf('AND %s = %s ', $model::justifyKey($key), ":{$key}");
+		}
+	}
+
+	$payload = [];
+
+	foreach ($data as $key => $value) {
+		$payload[":{$key}"] = $value;
+	}
+
+	$pdo = $model::getConnection();
+
+	$statement = $pdo->prepare($query);
+
+	$statement->execute($payload);
+
+	if ($statement->rowCount() > 0) {
+		return collect($statement->fetchAll())->map(function ($row) use ($model) {
+			return $model::from($row);
+		});
+	}
+
+	return collect();
+}
+
 /**
  * Fetches a value from the configuration file
  * 

@@ -59,7 +59,7 @@
 							</div>
 							<div class="form-group col-12">
 								<label for="grade">Grade</label>
-								<input type="text" name="grade" id="grade" class="form-control" required>
+								<input type="number" name="grade" min="0" max="100" id="grade" class="form-control" value="65" required>
 							</div>
 						</div>
 					</div>

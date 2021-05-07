@@ -30,6 +30,17 @@ function isValidDate(date) {
 	return instance instanceof Date && !isNaN(instance.valueOf());
 }
 
+function serialToObject(serial) {
+	const object = {};
+
+	serial.split("&").forEach((fragment) => {
+		const [key, value] = fragment.split("=");
+		object[key] = decodeURIComponent(value);
+	});
+
+	return object;
+}
+
 function limit(words, length) {
 	return words
 		.split("")
@@ -125,7 +136,7 @@ function handleError(error) {
 						})
 					);
 				} else if (_.isString(response.data.message)) {
-					return toastr.error(sentencify(response.data.message));
+					return toastr.error(response.data.message);
 				}
 			}
 		} else if (error.message) {

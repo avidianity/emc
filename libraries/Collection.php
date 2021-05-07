@@ -113,6 +113,17 @@ class Collection implements ArrayAccess, Countable, Iterator, JsonSerializable, 
 		return null;
 	}
 
+	public function find($callback)
+	{
+		foreach ($this as $key => $value) {
+			if ($callback($value, $key)) {
+				return $value;
+			}
+		}
+
+		return null;
+	}
+
 	public function last()
 	{
 		if ($this->count() > 0) {
@@ -246,5 +257,15 @@ class Collection implements ArrayAccess, Countable, Iterator, JsonSerializable, 
 	public function isAssociative()
 	{
 		return isAssociativeArray($this->toArray());
+	}
+
+	public function only($keys)
+	{
+		return only($this->all(), $keys);
+	}
+
+	public function except($keys)
+	{
+		return except($this->all(), $keys);
 	}
 }

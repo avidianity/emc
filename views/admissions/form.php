@@ -1,6 +1,9 @@
 <?php
 
+use Libraries\Str;
 use Models\Course;
+use Models\StudentSubject;
+use Models\Subject;
 
 extend('dashboard.layouts.top') ?>
 <div class="container-fluid">
@@ -32,17 +35,21 @@ extend('dashboard.layouts.top') ?>
 											</div>
 											<div class="form-group">
 												<label for="gender">Gender</label>
-												<select name="gender" id="gender" class="form-control required">
+												<select name="gender" id="gender" class="form-control">
 													<option> -- Select -- </option>
 													<option value="Male" <?= $this->gender === 'Male' ? 'selected' : '' ?>>Male</option>
 													<option value="Female" <?= $this->gender === 'Female' ? 'selected' : '' ?>>Female</option>
 												</select>
 											</div>
+											<div class="form-group">
+												<label for="birthday">Birthday</label>
+												<input data-flatpickr type="text" name="birthday" id="birthday" class="form-control" value="<?= $mode === 'Edit' ? $this->user->birthday : '' ?>" required="">
+											</div>
 										</div>
 										<div class="col-12 col-md-6 px-2">
 											<div class="form-group">
 												<label for="graduated">Graduated</label>
-												<select name="graduated" id="graduated" class="form-control required">
+												<select name="graduated" id="graduated" class="form-control">
 													<option value="0" <?= !$this->graduated ? 'selected' : '' ?>>No</option>
 													<option value="1" <?= $this->graduated ? 'selected' : '' ?>>Yes</option>
 												</select>
@@ -72,21 +79,21 @@ extend('dashboard.layouts.top') ?>
 										<div class="col-12 col-md-6">
 											<div class="form-group">
 												<label for="fathers_name">Name of Father</label>
-												<input type="text" name="fathers_name" id="fathers_name" class="form-control" value="<?= $this->fathers_name ?>" required />
+												<input type="text" name="fathers_name" id="fathers_name" class="form-control" value="<?= $mode === 'Edit' ? $this->user->fathers_name : '' ?>" required />
 											</div>
 											<div class="form-group">
 												<label for="fathers_occupation">Occupation of Father</label>
-												<input type="text" name="fathers_occupation" id="fathers_occupation" class="form-control" value="<?= $this->fathers_occupation ?>" required />
+												<input type="text" name="fathers_occupation" id="fathers_occupation" class="form-control" value="<?= $mode === 'Edit' ? $this->user->fathers_occupation : '' ?>" required />
 											</div>
 										</div>
 										<div class="col-12 col-md-6">
 											<div class="form-group">
 												<label for="mothers_name">Name of Mother</label>
-												<input type="text" name="mothers_name" id="mothers_name" class="form-control" value="<?= $this->fathers_name ?>" required />
+												<input type="text" name="mothers_name" id="mothers_name" class="form-control" value="<?= $mode === 'Edit' ? $this->user->fathers_name : '' ?>" required />
 											</div>
 											<div class="form-group">
 												<label for="mothers_occupation">Occupation of Mother</label>
-												<input type="text" name="mothers_occupation" id="mothers_occupation" class="form-control" value="<?= $this->mothers_occupation ?>" required />
+												<input type="text" name="mothers_occupation" id="mothers_occupation" class="form-control" value="<?= $mode === 'Edit' ? $this->user->mothers_occupation : '' ?>" required />
 											</div>
 										</div>
 										<div class="col-12">
@@ -142,6 +149,31 @@ extend('dashboard.layouts.top') ?>
 													<option value="Regular" <?= $this->status === 'Regular' ? 'selected' : '' ?>>Regular</option>
 													<option value="Irregular" <?= $this->status === 'Irregular' ? 'selected' : '' ?>>Irregular</option>
 												</select>
+											</div>
+										</div>
+										<div class="col-12">
+											<div id="subjects-pane" <?= $mode === 'Add' ? 'class="d-none"' : '' ?>>
+												<h4>Subjects</h4>
+												<div class="container row" id="container">
+													<?php if ($mode === 'Edit') : ?>
+														<?php $self = $this;
+														$courses->find(function (Course $course) use ($self) {
+															return $course->code === $self->course_code;
+														})
+															->subjects
+															->each(function (Subject $subject, $index) {
+																$id = Str::random(); ?>
+															<div class="col-12 col-md-6 col-lg-4 col-xl-3 form-group">
+																<div class="custom-control custom-checkbox">
+																	<input type="checkbox" class="custom-control-input" <?= $this->user->subjects->find(function (StudentSubject $studentSubject) use ($subject) {
+																															return $studentSubject->subject->id === $subject->id;
+																														}) !== null ? 'checked' : '' ?> name="subjects[<?= $index ?>]" id="<?= $id ?>" value="<?= $subject->id ?>">
+																	<label class="custom-control-label" for="<?= $id ?>"><?= $subject->code ?></label>
+																</div>
+															</div>
+														<?php }) ?>
+													<?php endif; ?>
+												</div>
 											</div>
 										</div>
 									</div>

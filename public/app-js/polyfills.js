@@ -71,3 +71,13 @@ Date.prototype.addHours = function (hours) {
 Date.prototype.toDayJS = function () {
 	return dayjs(this);
 };
+
+FormData.prototype.toObject = function () {
+	const object = {};
+
+	this.forEach((value, key) => {
+		object[key] = value;
+	});
+
+	return object;
+};

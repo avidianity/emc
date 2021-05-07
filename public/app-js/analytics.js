@@ -1,6 +1,8 @@
 $(document).ready(() => {
-	const table = $("#analytic-courses-table");
+	const table = $("#analytics-courses-table");
 	const tbody = table.find("tbody");
+
+	let datatable = null;
 
 	const fetchCourses = async () => {
 		try {
@@ -16,19 +18,9 @@ $(document).ready(() => {
 				description.text(course.description);
 
 				const students = $("<td />");
-				students.text(course.students);
+				students.text(course.students_count);
 
-				const status = $("<td />");
-				const badge = $(`<span class='badge badge-pill' />`);
-				badge.addClass(`badge-${course.open ? "success" : "danger"}`);
-				badge.text(
-					course.open
-						? "Open for Enrollment"
-						: "Not Open for Enrollment"
-				);
-				status.append(badge);
-
-				tr.append(code, description, students, status);
+				tr.append(code, description, students);
 
 				return tr;
 			});

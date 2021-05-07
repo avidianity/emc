@@ -1,8 +1,13 @@
 <?php extend('dashboard.layouts.top') ?>
 <div class="container">
-	<button id="increment-admission-btn" class="btn btn-info btn-sm">
-		Increment Admission
-	</button>
+	<div class="d-flex">
+		<a href="<?= url('dashboard/self/increment') ?>" class="btn btn-info btn-sm mx-1">
+			Increment Admission
+		</a>
+		<a href="<?= url('registration-slip') ?>" class="btn btn-primary btn-sm mx-1" target="_blank" rel="noreferrer">
+			Registration Slip
+		</a>
+	</div>
 	<form id="profile-form" action="<?= url('/dashboard/users?id=' . session()->get('user')->id) ?>" method="PUT" class="row">
 		<div class="col-12 col-md-6">
 			<div class="row">

@@ -37,6 +37,22 @@ class RegistrarController extends Controller
 	{
 		$data = input()->all();
 
+		if (!session()->has('registrar-save')) {
+			$registrars = find(
+				User::class,
+				only($data, ['first_name', 'last_name', 'email']) + [
+					'role' => 'Registrar'
+				]
+			);
+
+			if ($registrars->count() > 0) {
+				session()->set('registrar-save', true);
+				return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+			}
+		} else {
+			session()->remove('registrar-save');
+		}
+
 		$password = Str::random(5);
 
 		$data['role'] = 'Registrar';

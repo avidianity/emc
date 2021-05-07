@@ -26,6 +26,7 @@ $router->group('/dashboard', function (Router $router) {
 	$router->get('/emails', [PageController::class, 'emails']);
 	$router->get('/change-password', [PageController::class, 'changePassword']);
 	$router->get('/profile', [PageController::class, 'profile']);
+	$router->get('/self/increment', [PageController::class, 'studentIncrement']);
 	$router->post('/admissions/increment', [AdmissionController::class, 'increment']);
 	$router->resource('/users', UserController::class);
 	$router->resource('/registrars', RegistrarController::class);

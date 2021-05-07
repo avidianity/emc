@@ -253,6 +253,7 @@
 	<script>
 		dayjs.extend(window.dayjs_plugin_relativeTime)
 	</script>
+	<script src="//unpkg.com/html2canvas@1.0.0-rc.7/dist/html2canvas.js"></script>
 	<script src="//unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 	<script src="//cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>

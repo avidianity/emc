@@ -32,6 +32,20 @@ class CourseController extends Controller
 	{
 		$data = input()->all();
 
+		if (!session()->has('course-save')) {
+			$courses = find(
+				Course::class,
+				only($data, ['code', 'description'])
+			);
+
+			if ($courses->count() > 0) {
+				session()->set('course-save', true);
+				return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+			}
+		} else {
+			session()->remove('course-save');
+		}
+
 		$data['open'] = array_key_exists('open', $data) && $data['open'] === 'on' ? true : false;
 
 		return Course::create($data);

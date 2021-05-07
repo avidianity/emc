@@ -7,6 +7,7 @@ use Libraries\Log;
 use Libraries\Str;
 use Models\Admission;
 use Models\Course;
+use Models\Subject;
 use Models\User;
 use Queues\SendMail;
 use Throwable;
@@ -15,6 +16,23 @@ class AdmissionController extends Controller
 {
 	public function increment()
 	{
+		/**
+		 * @var \Models\User
+		 */
+		$user = session()->get('user');
+
+		$isPassingGrades = true;
+
+		foreach ($user->grades as $grade) {
+			if ($grade->grade < 65) {
+				$isPassingGrades = false;
+			}
+		}
+
+		if (!$isPassingGrades) {
+			return response(['message' => 'There are subjects that do not have passing grades.'], 400);
+		}
+
 		$map = [
 			'1st Semester' => [
 				'1st' => ['1st', '2nd Semester'],
@@ -35,11 +53,6 @@ class AdmissionController extends Controller
 		];
 
 		/**
-		 * @var \Models\User
-		 */
-		$user = session()->get('user');
-
-		/**
 		 * @var \Models\Admission
 		 */
 		$admission = $user->admission;
@@ -49,6 +62,10 @@ class AdmissionController extends Controller
 
 			$admission->update(['level' => $level, 'term' => $term]);
 			$user->update(['active' => false]);
+			$user->subjects()->delete();
+			foreach (input()->get('subjects', []) as $id) {
+				$user->subjects()->create(['subject_id' => $id]);
+			}
 			session()->clear();
 			return response('', 204);
 		}
@@ -80,6 +97,25 @@ class AdmissionController extends Controller
 	{
 		$data = input()->all();
 
+		if (!session()->has('schedule-save')) {
+			$students = find(User::class, only($data, ['first_name', 'last_name']) + ['role' => 'Student']);
+			if ($students->count() > 0) {
+				$admissions = find(
+					Admission::class,
+					only($data, ['level', 'course_code', 'term', 'status']) + [
+						'user_id' => $students->first()->id,
+					]
+				);
+
+				if ($admissions->count() > 0) {
+					session()->set('schedule-save', true);
+					return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+				}
+			}
+		} else {
+			session()->remove('schedule-save');
+		}
+
 		$password = Str::random(5);
 
 		$data['role'] = 'Student';
@@ -89,9 +125,19 @@ class AdmissionController extends Controller
 
 		try {
 			$student = User::create($data);
+
+			if ($data['level'] === '1st' && empty(input()->get('subjects', []))) {
+				foreach (find(Subject::class, only($data, ['course_code'])) as $subject) {
+					$student->subjects()->create(['subject_id' => $subject->id]);
+				}
+			} else {
+				foreach (input()->get('subjects', []) as $id) {
+					$student->subjects()->create(['subject_id' => $id]);
+				}
+			}
 		} catch (Throwable $exception) {
 			Log::record($exception);
-			return response(['message' => 'Student already exists.'], 404);
+			return response(['message' => 'Student already exists.', 'exception' => $exception], 404);
 		}
 
 		$subject = "Student Admission Credentials | EMC Online";
@@ -128,6 +174,15 @@ class AdmissionController extends Controller
 		$data = input()->all();
 
 		$admission->update($data);
+		$admission->user->update($data);
+
+		if (isset($data['subjects'])) {
+			$admission->user->subjects()->delete();
+
+			foreach ($data['subjects'] as $id) {
+				$admission->user->subjects()->create(['subject_id' => $id]);
+			}
+		}
 
 		return $admission;
 	}
@@ -139,6 +194,8 @@ class AdmissionController extends Controller
 		$admission = Admission::findOrFail($id);
 
 		$admission->load(['user']);
+
+		$admission->user->load(['subjects']);
 
 		$courses = Course::getAll();
 

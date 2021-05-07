@@ -3,6 +3,8 @@
 namespace Controllers;
 
 use Models\Course;
+use Models\Schedule;
+use Models\StudentSubject;
 use Models\Subject;
 
 class SubjectController extends Controller
@@ -11,11 +13,17 @@ class SubjectController extends Controller
 	{
 		$subjects = Subject::getAll();
 		if (session()->get('user')->role === 'Student') {
-			return $subjects->filter(function (Subject $subject) {
-				return session()->get('user')->admission->level === $subject->level
-					&& session()->get('user')->admission->term === $subject->term;
+			return session()->get('user')->subjects->map(function (StudentSubject $studentSubject) {
+				return $studentSubject->subject;
 			});
 		}
+
+		if (session()->get('user')->role === 'Teacher') {
+			return session()->get('user')->schedules->load(['subject'])->map(function (Schedule $schedule) {
+				return $schedule->subject;
+			});
+		}
+
 		return $subjects;
 	}
 
@@ -39,6 +47,20 @@ class SubjectController extends Controller
 	public function store()
 	{
 		$data = input()->all();
+
+		if (!session()->has('subject-save')) {
+			$subjects = find(
+				Subject::class,
+				only($data, ['code', 'description', 'course_code', 'level'])
+			);
+
+			if ($subjects->count() > 0) {
+				session()->set('subject-save', true);
+				return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+			}
+		} else {
+			session()->remove('subject-save');
+		}
 
 		return Subject::create($data);
 	}

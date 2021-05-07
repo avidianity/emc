@@ -25,6 +25,11 @@ class PageController extends Controller
 		return view('forgot-password');
 	}
 
+	public function studentIncrement()
+	{
+		return view('students.increment');
+	}
+
 	public function profile()
 	{
 		return view('dashboard.profile');

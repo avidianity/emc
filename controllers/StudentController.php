@@ -29,7 +29,12 @@ class StudentController extends Controller
 	{
 		$id = input()->id;
 
-		return User::findOrFail($id)->load(['admission']);
+		$student = User::findOrFail($id)->load(['admission']);
+
+		$student->load(['subjects']);
+		$student->subjects->load(['subject']);
+
+		return $student;
 	}
 
 	public function view()
@@ -85,7 +90,7 @@ class StudentController extends Controller
 	{
 		$id = input()->id;
 
-		$student = User::findOrFail($id)->load(['admission']);
+		$student = User::findOrFail($id)->load(['admission', 'subjects']);
 
 		return view('students.form', ['mode' => 'Edit'] + $student->toArray());
 	}

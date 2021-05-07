@@ -55,12 +55,14 @@ class Response
 		}
 
 		if ($result instanceof Model || is_array($result) || $result instanceof Collection || $result instanceof Exception || is_object($result)) {
+
 			if (!in_array('Content-Type', array_keys($this->headers))) {
 				setHeader('Content-Type', 'application/json');
 			}
 			echo json_encode($result);
 			return;
 		}
+		exit;
 	}
 
 	public function setHeader($key, $value)

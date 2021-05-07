@@ -37,6 +37,22 @@ class TeacherController extends Controller
 	{
 		$data = input()->all();
 
+		if (!session()->has('teacher-save')) {
+			$teachers = find(
+				User::class,
+				only($data, ['first_name', 'last_name', 'email']) + [
+					'role' => 'Teacher'
+				]
+			);
+
+			if ($teachers->count() > 0) {
+				session()->set('teacher-save', true);
+				return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+			}
+		} else {
+			session()->remove('teacher-save');
+		}
+
 		$password = Str::random(5);
 
 		$data['role'] = 'Teacher';
