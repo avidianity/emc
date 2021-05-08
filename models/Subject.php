@@ -13,6 +13,14 @@ class Subject extends Model
 		'units',
 	];
 
+	protected static function events()
+	{
+		static::deleting(function (self $subject) {
+			$subject->schedules()->delete();
+			$subject->studentSubjects()->delete();
+		});
+	}
+
 	public function course()
 	{
 		return $this->belongsTo(Course::class, 'course_code', 'code');
@@ -21,5 +29,10 @@ class Subject extends Model
 	public function schedules()
 	{
 		return $this->hasMany(Schedule::class);
+	}
+
+	public function studentSubjects()
+	{
+		return $this->hasMany(StudentSubject::class);
 	}
 }
