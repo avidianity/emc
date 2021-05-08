@@ -31,7 +31,7 @@ class ScheduleController extends Controller
 			})->load(['course', 'teacher', 'subject']);
 		}
 
-		if (session()->get('user')->role === 'Teacher') {
+		if (!session()->get('user')->role === 'Teacher') {
 			return session()->get('user')->schedules->load(['course', 'teacher', 'subject']);
 		}
 
@@ -115,6 +115,9 @@ class ScheduleController extends Controller
 
 	public function edit()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		$id = input()->id;
 
 		$schedule = Schedule::findOrFail($id);

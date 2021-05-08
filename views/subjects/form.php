@@ -17,11 +17,11 @@ extend('dashboard.layouts.top') ?>
 						<div class="row">
 							<div class="form-group col-12 col-md-6">
 								<label for="code">Subject Code</label>
-								<input type="text" name="code" id="code" class="form-control" <?= $mode === 'Edit' ? 'disabled' : '' ?> value="<?= $this->code ?>">
+								<input type="text" name="code" id="code" class="form-control" <?= $mode === 'Edit' ? 'disabled' : '' ?> value="<?= $this->code ?>" required>
 							</div>
 							<div class="form-group col-12 col-md-6">
 								<label for="description">Description</label>
-								<input type="text" name="description" id="description" class="form-control" value="<?= $this->course_code ?>">
+								<input type="text" name="description" id="description" class="form-control" value="<?= $this->course_code ?>" required>
 							</div>
 							<div class="form-group col-12 col-md-4">
 								<label for="course_code">Course Code</label>

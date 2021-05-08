@@ -1,12 +1,5 @@
 <?php extend('dashboard.layouts.top') ?>
 <div class="container">
-	<div class="d-flex">
-		<?php if (session()->get('user')->subjects->count() > 0) : ?>
-			<a href="<?= url('registration-slip') ?>" class="btn btn-primary btn-sm" target="_blank" rel="noreferrer">
-				Registration Slip
-			</a>
-		<?php endif; ?>
-	</div>
 	<form id="profile-form" action="<?= url('/dashboard/users?id=' . session()->get('user')->id) ?>" method="PUT" class="row">
 		<div class="col-12 col-md-6">
 			<div class="row">

@@ -22,6 +22,9 @@ class StudentController extends Controller
 
 	public function all()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('students.all');
 	}
 
@@ -39,6 +42,9 @@ class StudentController extends Controller
 
 	public function view()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('students.view');
 	}
 
@@ -69,6 +75,9 @@ class StudentController extends Controller
 
 	public function create()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('students.form', ['mode' => 'Add']);
 	}
 
@@ -88,6 +97,9 @@ class StudentController extends Controller
 
 	public function edit()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		$id = input()->id;
 
 		$student = User::findOrFail($id)->load(['admission', 'subjects']);

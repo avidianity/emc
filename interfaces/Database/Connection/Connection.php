@@ -69,7 +69,7 @@ interface Connection extends Singleton
 	 * @param string $statement
 	 * @return \PDOStatement
 	 */
-	public function query(string $statement);
+	public function query();
 
 	/**
 	 * @param string $string

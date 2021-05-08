@@ -27,11 +27,17 @@ class PageController extends Controller
 
 	public function studentIncrement()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('students.increment');
 	}
 
 	public function profile()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('dashboard.profile');
 	}
 
@@ -46,16 +52,25 @@ class PageController extends Controller
 
 	public function registrationSlip()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('dashboard.registration-slip');
 	}
 
 	public function changePassword()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('dashboard.change-password');
 	}
 
 	public function emails()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('dashboard.emails');
 	}
 }

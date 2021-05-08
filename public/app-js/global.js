@@ -78,14 +78,8 @@ $(document).ready(() => {
 
 	const phoneNumberInputs = $("[data-phone-number]");
 
-	phoneNumberInputs.on("input", function () {
-		const input = $(this);
-
-		const value = input.val();
-
-		if (value.length > 11) {
-			input.val(limit(value, 11));
-		}
+	phoneNumberInputs.each(function () {
+		$(this).attr("pattern", "09[0-9]{9}");
 	});
 
 	const dateInputs = $("[data-flatpickr]");

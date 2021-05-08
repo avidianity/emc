@@ -29,6 +29,9 @@ class SubjectController extends Controller
 
 	public function all()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('subjects.all');
 	}
 
@@ -41,6 +44,9 @@ class SubjectController extends Controller
 
 	public function view()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('subjects.view');
 	}
 
@@ -67,6 +73,9 @@ class SubjectController extends Controller
 
 	public function create()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		$courses = Course::getAll();
 
 		return view('subjects.form', ['mode' => 'Add', 'courses' => $courses]);
@@ -87,6 +96,9 @@ class SubjectController extends Controller
 
 	public function edit()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		$id = input()->id;
 
 		$subject = Subject::findOrFail($id);

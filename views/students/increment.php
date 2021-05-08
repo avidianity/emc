@@ -5,6 +5,13 @@ use Models\Subject;
 
 extend('dashboard.layouts.top') ?>
 <div class="container">
+	<div class="d-flex">
+		<?php if (session()->get('user')->subjects->count() > 0) : ?>
+			<a href="<?= url('registration-slip') ?>" class="btn btn-primary btn-sm" target="_blank" rel="noreferrer">
+				Registration Slip
+			</a>
+		<?php endif; ?>
+	</div>
 	<h4>Select Subjects</h4>
 	<form id="increment-form" action="<?= url('dashboard/admissions/increment') ?>" method="POST" class="form-row">
 		<?php session()->get('user')->admission->course->subjects->filter(function (Subject $subject) {

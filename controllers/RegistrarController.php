@@ -18,6 +18,9 @@ class RegistrarController extends Controller
 
 	public function all()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('registrars.all');
 	}
 
@@ -30,6 +33,9 @@ class RegistrarController extends Controller
 
 	public function view()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('registrars.view');
 	}
 
@@ -76,6 +82,9 @@ class RegistrarController extends Controller
 
 	public function create()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('registrars.form', ['mode' => 'Add']);
 	}
 
@@ -95,6 +104,9 @@ class RegistrarController extends Controller
 
 	public function edit()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		$id = input()->id;
 
 		$registrar = User::findOrFail($id);

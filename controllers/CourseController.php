@@ -13,6 +13,9 @@ class CourseController extends Controller
 
 	public function all()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('courses.all');
 	}
 
@@ -25,6 +28,9 @@ class CourseController extends Controller
 
 	public function view()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('courses.view');
 	}
 
@@ -53,6 +59,9 @@ class CourseController extends Controller
 
 	public function create()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('courses.form', ['mode' => 'Add']);
 	}
 
@@ -73,6 +82,9 @@ class CourseController extends Controller
 
 	public function edit()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		$id = input()->id;
 
 		$course = Course::findOrFail($id);

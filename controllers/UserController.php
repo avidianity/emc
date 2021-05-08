@@ -14,6 +14,9 @@ class UserController extends Controller
 
 	public function all()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('users.all');
 	}
 
@@ -26,6 +29,9 @@ class UserController extends Controller
 
 	public function view()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('users.view');
 	}
 
@@ -36,6 +42,9 @@ class UserController extends Controller
 
 	public function create()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('users.form', ['mode' => 'Add']);
 	}
 
@@ -58,6 +67,9 @@ class UserController extends Controller
 
 	public function edit()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('users.form', ['mode' => 'Edit']);
 	}
 

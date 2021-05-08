@@ -16,6 +16,9 @@ class AdmissionController extends Controller
 {
 	public function increment()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		/**
 		 * @var \Models\User
 		 */
@@ -86,6 +89,9 @@ class AdmissionController extends Controller
 
 	public function all()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('admissions.all');
 	}
 
@@ -98,6 +104,9 @@ class AdmissionController extends Controller
 
 	public function view()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		return view('admissions.view');
 	}
 
@@ -169,6 +178,9 @@ class AdmissionController extends Controller
 
 	public function create()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		$courses = Course::getAll();
 		return view('admissions.form', ['mode' => 'Add', 'courses' => $courses]);
 	}
@@ -197,6 +209,9 @@ class AdmissionController extends Controller
 
 	public function edit()
 	{
+		if (!session()->has('user')) {
+			return redirect('/login');
+		}
 		$id = input()->id;
 
 		$admission = Admission::findOrFail($id);

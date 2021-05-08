@@ -44,9 +44,14 @@ extend('layouts.header') ?>
 					</tr>
 				</thead>
 				<tbody>
-					<?php session()->get('user')->subjects->map(function (StudentSubject $studentSubject) {
-						return $studentSubject->subject;
-					})->each(function (Subject $subject, $index) { ?>
+					<?php session()->get('user')
+						->subjects
+						->filter(function ($item) {
+							return $item instanceof StudentSubject;
+						})
+						->map(function (StudentSubject $studentSubject) {
+							return $studentSubject->subject;
+						})->each(function (Subject $subject, $index) { ?>
 						<tr>
 							<td class="text-dark"><?= $index + 1 ?></td>
 							<td class="text-dark"><?= $subject->code ?></td>

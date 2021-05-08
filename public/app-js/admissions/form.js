@@ -4,6 +4,10 @@ $(document).ready(() => {
 	form.on("submit", async (e) => {
 		e.preventDefault();
 
+		await save();
+	});
+
+	const save = async () => {
 		const url = form.attr("action");
 		const method = form.attr("method");
 		const button = form.find(`button[type=submit]`);
@@ -17,11 +21,25 @@ $(document).ready(() => {
 			toastr.info("Admission has been saved successfully.");
 			form[0].reset();
 		} catch (error) {
-			handleError(error);
+			if (error.response?.status === 409) {
+				if (
+					await swal({
+						text:
+							"There is duplicate data. Do you want to continue?",
+						icon: "warning",
+						buttons: ["Cancel", "Confirm"],
+						dangerMode: true,
+					})
+				) {
+					await save();
+				}
+			} else {
+				handleError(error);
+			}
 		} finally {
 			button.attr("disabled", false);
 		}
-	});
+	};
 
 	form.on("change", "#course_code", async function () {
 		const select = $(this);
