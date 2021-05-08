@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `admission` (
 	PRIMARY KEY (`id`),
 	KEY `user_id` (`user_id`),
 	CONSTRAINT `FK_admission_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.admission: ~0 rows (approximately)
 /*!40000 ALTER TABLE `admission` DISABLE KEYS */
 ;
@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `course` (
 	`updated_at` varchar(255) NOT NULL,
 	PRIMARY KEY (`id`),
 	KEY `code` (`code`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.course: ~0 rows (approximately)
 /*!40000 ALTER TABLE `course` DISABLE KEYS */
 ;
@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS `grade` (
 	CONSTRAINT `FK_grade_subject` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
 	CONSTRAINT `FK_grade_user` FOREIGN KEY (`student_id`) REFERENCES `user` (`id`),
 	CONSTRAINT `FK_grade_user_2` FOREIGN KEY (`teacher_id`) REFERENCES `user` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.grade: ~0 rows (approximately)
 /*!40000 ALTER TABLE `grade` DISABLE KEYS */
 ;
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
 	`created_at` varchar(255) NOT NULL,
 	`updated_at` varchar(255) NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.mail: ~0 rows (approximately)
 /*!40000 ALTER TABLE `mail` DISABLE KEYS */
 ;
@@ -98,7 +98,7 @@ CREATE TABLE IF NOT EXISTS `queue` (
 	`created_at` varchar(255) NOT NULL,
 	`updated_at` varchar(255) NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 3 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.queue: ~0 rows (approximately)
 /*!40000 ALTER TABLE `queue` DISABLE KEYS */
 ;
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `schedule` (
 	CONSTRAINT `FK_schedule_course` FOREIGN KEY (`course_id`) REFERENCES `course` (`id`),
 	CONSTRAINT `FK_schedule_subject` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
 	CONSTRAINT `FK_schedule_user` FOREIGN KEY (`teacher_id`) REFERENCES `user` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.schedule: ~0 rows (approximately)
 /*!40000 ALTER TABLE `schedule` DISABLE KEYS */
 ;
@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS `session` (
 	`payload` text NOT NULL,
 	`last_activity` bigint unsigned NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.session: ~0 rows (approximately)
 /*!40000 ALTER TABLE `session` DISABLE KEYS */
 ;
@@ -154,7 +154,7 @@ CREATE TABLE IF NOT EXISTS `student_subject` (
 	KEY `FK_student_subject_user` (`user_id`),
 	CONSTRAINT `FK_student_subject_subject` FOREIGN KEY (`subject_id`) REFERENCES `subject` (`id`),
 	CONSTRAINT `FK_student_subject_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.student_subject: ~0 rows (approximately)
 /*!40000 ALTER TABLE `student_subject` DISABLE KEYS */
 ;
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS `subject` (
 	PRIMARY KEY (`id`),
 	KEY `course_code` (`course_code`),
 	CONSTRAINT `FK_subject_course` FOREIGN KEY (`course_code`) REFERENCES `course` (`code`)
-) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.subject: ~0 rows (approximately)
 /*!40000 ALTER TABLE `subject` DISABLE KEYS */
 ;
@@ -206,7 +206,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 	`created_at` varchar(255) NOT NULL,
 	`updated_at` varchar(255) NOT NULL,
 	PRIMARY KEY (`id`)
-) ENGINE = InnoDB AUTO_INCREMENT = 5 DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci;
+);
 -- Dumping data for table emc.user: ~1 rows (approximately)
 /*!40000 ALTER TABLE `user` DISABLE KEYS */
 ;
