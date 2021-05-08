@@ -15,11 +15,6 @@ class FileHandler implements SessionHandlerInterface
 
 	public function open($path, $name)
 	{
-		$directory = $this->path . $path;
-		if (!is_dir($directory)) {
-			mkdir($directory, 0777);
-		}
-
 		return true;
 	}
 

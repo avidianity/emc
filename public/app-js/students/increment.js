@@ -20,8 +20,7 @@ $(document).ready(() => {
 			localStorage.clear();
 			window.location.href = "/login";
 		} catch (error) {
-			console.log(error.toJSON());
-			toastr.error("Unable to increment.");
+			handleError(error);
 		}
 	});
 });

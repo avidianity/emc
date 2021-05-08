@@ -28,7 +28,7 @@ class AdmissionController extends Controller
 			return response('', 400);
 		}
 
-		if ($user->grades()->get()->count() === 0) {
+		if ($user->grades()->count() === 0) {
 			return response(['message' => 'Subjects currently do not have grades.'], 400);
 		}
 
