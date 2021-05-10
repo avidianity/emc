@@ -5,7 +5,7 @@ use Models\Subject;
 
 extend('dashboard.layouts.top') ?>
 <div class="container">
-	<div class="d-flex">
+	<div class="d-flex mb-3">
 		<?php if (session()->get('user')->subjects->count() > 0) : ?>
 			<a href="<?= url('registration-slip') ?>" class="btn btn-primary btn-sm" target="_blank" rel="noreferrer">
 				Registration Slip

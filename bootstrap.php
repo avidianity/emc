@@ -6,6 +6,11 @@ use Symfony\Component\Dotenv\Dotenv;
 // Load all necessary files from the vendor folder
 require_once __DIR__ . '/vendor/autoload.php';
 
+// set error handler
+set_error_handler(function ($errno, $errstr, $errfile, $errline) {
+	throw new ErrorException($errstr, $errno, 0, $errfile, $errline);
+});
+
 date_default_timezone_set('Asia/Manila');
 
 // The .env file path
