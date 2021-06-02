@@ -1,0 +1,17 @@
+export const routes = {
+	ADMISSIONS: '/admissions',
+	DASHBOARD: '/dashboard',
+	HOME: '/',
+	FORGOT_PASSWORD: '/forgot-password',
+	CHANGE_PASSWORD: '/change-password',
+	LOGIN: '/login',
+	PREREGISTRATION: '/pre-registration',
+	COURSES: '/courses',
+	STUDENTS: '/students',
+	TEACHERS: '/teachers',
+	REGISTRARS: '/registrars',
+	SCHEDULES: '/schedules',
+	SUBJECTS: '/subjects',
+	USERS: '/users',
+	MAILS: '/mails',
+};

@@ -1,0 +1,28 @@
+.badge {
+	padding-top: 4px;
+}
+
+.overflow-hidden {
+	overflow: hidden;
+}
+
+.overflow-x-hidden {
+	overflow-x: hidden;
+}
+
+.overflow-y-hidden {
+	overflow-y: hidden;
+}
+
+.text-shadow-dark {
+	text-shadow: 0 0 2px #000;
+}
+
+.dataTables_wrapper .paginate_button {
+	margin-left: 0.5rem;
+	margin-right: 0.5rem;
+}
+
+.nav-link.active {
+	color: #1b68ff !important;
+}
