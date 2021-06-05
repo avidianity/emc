@@ -3,6 +3,7 @@
 use App\Models\Course;
 use App\Models\Subject;
 use App\Models\User;
+use App\Models\Year;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -23,6 +24,7 @@ class CreateSchedulesTable extends Migration
             $table->foreignIdFor(new User(), 'teacher_id')->constrained((new User())->getTable());
             $table->string('year');
             $table->text('payload');
+            $table->foreignIdFor(new Year())->constrained();
             $table->timestamps();
         });
     }

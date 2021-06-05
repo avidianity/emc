@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subject;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
@@ -64,5 +65,14 @@ class SubjectController extends Controller
         $subject->delete();
 
         return response('', 204);
+    }
+
+    public function enroll(Request $request, User $user)
+    {
+        $data = $request->all();
+
+        $user->subjects()->sync($data['subjects']);
+        $user->load(['subjects']);
+        return $user;
     }
 }

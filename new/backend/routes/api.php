@@ -8,6 +8,7 @@ use App\Http\Controllers\MailController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\YearController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,11 +25,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/change-password', [AuthController::class, 'changePassword'])
-        ->middleware('auth:sanctum');
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
+        Route::get('/admissions', [AuthController::class, 'admissions']);
+        Route::get('/check', [AuthController::class, 'check']);
+    });
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/users/{user}/subjects', [SubjectController::class, 'enroll']);
     Route::apiResources([
         'admissions' => AdmissionController::class,
         'courses' => CourseController::class,
@@ -37,5 +42,6 @@ Route::middleware('auth:sanctum')->group(function () {
         'schedules' => ScheduleController::class,
         'subjects' => SubjectController::class,
         'users' => UserController::class,
+        'years' => YearController::class,
     ]);
 });

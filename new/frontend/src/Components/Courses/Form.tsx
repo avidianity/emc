@@ -11,7 +11,7 @@ type Props = {};
 const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
-	const { register, setValue, handleSubmit } = useForm<CourseContract>();
+	const { register, setValue, handleSubmit, reset } = useForm<CourseContract>();
 	const [id, setID] = useState(-1);
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
@@ -33,6 +33,7 @@ const Form: FC<Props> = (props) => {
 		try {
 			await (mode === 'Add' ? courseService.create(data) : courseService.update(id, data));
 			toastr.success('Course has been saved successfully.');
+			reset();
 		} catch (error) {
 			handleError(error);
 		} finally {

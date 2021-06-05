@@ -13,7 +13,7 @@ type Props = {};
 const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
-	const { register, setValue, handleSubmit } = useForm<SubjectContract>();
+	const { register, setValue, handleSubmit, reset } = useForm<SubjectContract>();
 	const [id, setID] = useState(-1);
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
@@ -36,6 +36,7 @@ const Form: FC<Props> = (props) => {
 		try {
 			await (mode === 'Add' ? subjectService.create(data) : subjectService.update(id, data));
 			toastr.success('Subject has been saved successfully.');
+			reset();
 		} catch (error) {
 			handleError(error);
 		} finally {

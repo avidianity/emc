@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMail;
+use App\Mail\Admission as MailAdmission;
 use App\Models\Admission;
+use App\Models\Mail;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AdmissionController extends Controller
 {
@@ -15,7 +19,7 @@ class AdmissionController extends Controller
      */
     public function index()
     {
-        return Admission::all();
+        return Admission::with('student', 'course')->get();
     }
 
     /**
@@ -28,9 +32,29 @@ class AdmissionController extends Controller
     {
         $data = $request->all();
 
-        $student = User::create($data);
+        $password = Str::random(5);
 
-        return $student->admissions()->create($data);
+        $data['student']['role'] = 'Student';
+        $data['student']['active'] = false;
+        $data['student']['password'] = $password;
+
+        $student = User::create($data['student']);
+
+        $admission = $student->admissions()->create($data);
+
+        $recipes = [$student, $request->user(), $admission, $password];
+
+        $mail = Mail::create([
+            'uuid' => $student->uuid,
+            'to' => $student->email,
+            'subject' => 'Student Admission',
+            'status' => 'Pending',
+            'body' => (new MailAdmission(...$recipes))->render(),
+        ]);
+
+        SendMail::dispatch($mail, $recipes, MailAdmission::class);
+
+        return $admission;
     }
 
     /**

@@ -27,17 +27,23 @@ const Navbar: FC<Props> = (props) => {
 
 	return (
 		<nav className='topnav navbar navbar-light'>
-			<button type='button' className='navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar'>
+			<button
+				type='button'
+				className='navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar'
+				onClick={(e) => {
+					e.preventDefault();
+					const bar = $('.vertical.dark');
+					const roleDisplay = $('#account-role-display');
+					if (bar.hasClass('collapsed')) {
+						roleDisplay.removeClass('d-none');
+						bar.removeClass('collapsed');
+					} else {
+						roleDisplay.addClass('d-none');
+						bar.addClass('collapsed');
+					}
+				}}>
 				<i className='fe fe-menu navbar-toggler-icon'></i>
 			</button>
-			<form className='form-inline mr-auto searchform text-muted'>
-				<input
-					className='form-control mr-sm-2 bg-transparent border-0 pl-4 text-muted'
-					type='search'
-					placeholder='Type something...'
-					aria-label='Search'
-				/>
-			</form>
 			<ul className='nav'>
 				<li className='nav-item'>
 					<a

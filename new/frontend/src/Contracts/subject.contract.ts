@@ -9,4 +9,5 @@ export interface SubjectContract extends ModelContract {
 	term: string;
 	units: string;
 	course?: CourseContract;
+	users_count?: number;
 }

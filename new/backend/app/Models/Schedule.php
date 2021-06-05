@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\JSON;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -15,6 +16,11 @@ class Schedule extends Model
         'teacher_id',
         'year',
         'payload',
+        'year_id',
+    ];
+
+    protected $casts = [
+        'payload' => JSON::class,
     ];
 
     public function course()
@@ -30,5 +36,10 @@ class Schedule extends Model
     public function teacher()
     {
         return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function schoolyear()
+    {
+        return $this->belongsTo(Year::class);
     }
 }

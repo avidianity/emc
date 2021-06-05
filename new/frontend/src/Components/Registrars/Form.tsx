@@ -1,7 +1,6 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory, useRouteMatch } from 'react-router';
-import { UserContract } from '../../Contracts/user.contract';
 import { handleError, setValues } from '../../helpers';
 import { useMode, useNullable } from '../../hooks';
 import { userService } from '../../Services/user.service';
@@ -10,10 +9,30 @@ import dayjs from 'dayjs';
 
 type Props = {};
 
+type Inputs = {
+	uuid: string;
+	first_name: string;
+	last_name: string;
+	middle_name?: string;
+	gender?: string;
+	address?: string;
+	place_of_birth?: string;
+	birthday?: string;
+	role: string;
+	email: string;
+	number: string;
+	active: boolean;
+	password: string;
+	fathers_name?: string;
+	mothers_name?: string;
+	fathers_occupation?: string;
+	mothers_occupation?: string;
+};
+
 const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
-	const { register, setValue, handleSubmit } = useForm<UserContract>();
+	const { register, setValue, handleSubmit, reset } = useForm<Inputs>();
 	const [birthday, setBirthday] = useNullable<Date>();
 	const [id, setID] = useState(-1);
 	const history = useHistory();
@@ -32,14 +51,16 @@ const Form: FC<Props> = (props) => {
 		}
 	};
 
-	const submit = async (data: UserContract) => {
+	const submit = async (data: Inputs) => {
 		setProcessing(true);
 		try {
 			data.role = 'Registrar';
 			data.active = true;
-			data.birthday = birthday?.toJSON() || '';
+			data.birthday = birthday?.toJSON();
 			await (mode === 'Add' ? userService.create(data) : userService.update(id, data));
 			toastr.success('Registrar has been saved successfully.');
+			reset();
+			setBirthday(null);
 		} catch (error) {
 			handleError(error);
 		} finally {

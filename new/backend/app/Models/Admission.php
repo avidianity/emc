@@ -16,10 +16,13 @@ class Admission extends Model
         'term',
         'graduated',
         'student_id',
+        'pre_registration',
+        'year_id',
     ];
 
     protected $casts = [
         'graduated' => 'boolean',
+        'pre_registration' => 'boolean',
     ];
 
     public function course()
@@ -30,5 +33,10 @@ class Admission extends Model
     public function student()
     {
         return $this->belongsTo(User::class, 'student_id');
+    }
+
+    public function year()
+    {
+        return $this->belongsTo(Year::class);
     }
 }

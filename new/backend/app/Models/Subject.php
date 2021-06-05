@@ -32,4 +32,9 @@ class Subject extends Model
     {
         return $this->hasMany(Schedule::class);
     }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(User::class, 'student_subjects')->using(StudentSubject::class);
+    }
 }

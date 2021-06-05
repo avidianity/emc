@@ -14,7 +14,10 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::with('admissions.course')->get();
+        return User::with([
+            'admissions.course',
+        ])
+            ->withCount('subjects')->get();
     }
 
     /**
@@ -38,6 +41,10 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        $user->load([
+            'subjects',
+            'admissions.year',
+        ]);
         return $user;
     }
 

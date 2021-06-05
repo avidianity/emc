@@ -2,6 +2,7 @@
 
 use App\Models\Subject;
 use App\Models\User;
+use App\Models\Year;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -22,6 +23,8 @@ class CreateGradesTable extends Migration
             $table->foreignIdFor(new Subject())->constrained();
             $table->foreignIdFor($user, 'teacher_id')->constrained($user->getTable());
             $table->unsignedTinyInteger('grade');
+            $table->string('status');
+            $table->foreignIdFor(new Year())->constrained();
             $table->timestamps();
         });
     }

@@ -14,6 +14,8 @@ class Grade extends Model
         'subject_id',
         'teacher_id',
         'grade',
+        'status',
+        'year_id',
     ];
 
     public function student()
@@ -29,5 +31,10 @@ class Grade extends Model
     public function teacher()
     {
         return $this->belongsTo(User::class, 'teacher_id');
+    }
+
+    public function year()
+    {
+        return $this->belongsTo(Year::class);
     }
 }

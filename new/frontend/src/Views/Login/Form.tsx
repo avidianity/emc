@@ -75,7 +75,7 @@ const Form: FC<Props> = (props) => {
 								</label>
 								<input
 									{...register('email')}
-									type='email'
+									type='text'
 									id='email'
 									className='form-control form-control-lg'
 									placeholder='Email Address'
@@ -102,7 +102,7 @@ const Form: FC<Props> = (props) => {
 								Return to Home Page
 							</Link>
 							<button className='btn btn-primary btn-block mt-5 btn-lg' type='submit' disabled={processing}>
-								{processing ? <i className='la la-circle-notch la-spin'></i> : 'Login'}
+								{processing ? <i className='fa fa-circle-notch fa-spin'></i> : 'Login'}
 							</button>
 						</div>
 					</div>

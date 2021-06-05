@@ -1,5 +1,7 @@
 import { AdmissionContract } from './admission.contract';
+import { GradeContract } from './grade.contract';
 import { ModelContract } from './model.contract';
+import { SubjectContract } from './subject.contract';
 
 export interface UserContract extends ModelContract {
 	uuid: string;
@@ -20,4 +22,7 @@ export interface UserContract extends ModelContract {
 	fathers_occupation?: string;
 	mothers_occupation?: string;
 	admissions?: AdmissionContract[];
+	grades?: GradeContract[];
+	subjects?: SubjectContract[];
+	subjects_count?: number;
 }

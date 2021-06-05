@@ -19,7 +19,6 @@ class CreateStudentSubjectsTable extends Migration
             $table->id();
             $table->foreignIdFor(new User())->constrained();
             $table->foreignIdFor(new Subject())->constrained();
-            $table->timestamps();
         });
     }
 

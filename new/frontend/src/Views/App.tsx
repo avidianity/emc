@@ -6,6 +6,8 @@ import Dashboard from './Dashboard';
 import Home from './Home';
 import Login from './Login';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import axios from 'axios';
+import { State } from '../Libraries/State';
 
 const urls = [
 	// '/js/jquery.min.js',
@@ -42,6 +44,7 @@ const urls = [
 ];
 
 export default function App() {
+	const state = State.getInstance();
 	const links = useMemo(
 		() => [
 			{
@@ -63,7 +66,18 @@ export default function App() {
 		[]
 	);
 
+	const check = async () => {
+		try {
+			await axios.get('/auth/check');
+		} catch (error) {
+			if (error.response?.status === 401) {
+				state.remove('user').remove('token');
+			}
+		}
+	};
+
 	useEffect(() => {
+		check();
 		const id = v4();
 
 		const scripts = urls.map((url) => {

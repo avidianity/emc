@@ -21,6 +21,9 @@ class SendMail implements ShouldQueue
     /**
      * Create a new job instance.
      *
+     * @param \App\Models\Mail $mail
+     * @param string[] $recipes
+     * @param string $mailable
      * @return void
      */
     public function __construct($mail, $recipes, $mailable)

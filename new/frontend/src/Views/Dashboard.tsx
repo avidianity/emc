@@ -1,5 +1,6 @@
 import React, { FC } from 'react';
 import { Route, RouteProps, Switch, useHistory } from 'react-router';
+import Admissions from '../Components/Admissions';
 import ChangePassword from '../Components/ChangePassword';
 import Courses from '../Components/Courses';
 import Analytics from '../Components/Dashboard/Analytics';
@@ -7,10 +8,12 @@ import Navbar from '../Components/Dashboard/Navbar';
 import Sidebar from '../Components/Dashboard/Sidebar';
 import Mails from '../Components/Mails';
 import Registrars from '../Components/Registrars';
+import Schedules from '../Components/Schedules';
 import Students from '../Components/Students';
 import Subjects from '../Components/Subjects';
 import Teachers from '../Components/Teachers';
 import Users from '../Components/Users';
+import Years from '../Components/Years';
 import { useURL } from '../hooks';
 import { State } from '../Libraries/State';
 import { routes } from '../routes';
@@ -59,6 +62,18 @@ const Dashboard: FC<Props> = (props) => {
 		{
 			path: url(routes.SUBJECTS),
 			component: Subjects,
+		},
+		{
+			path: url(routes.SCHEDULES),
+			component: Schedules,
+		},
+		{
+			path: url(routes.ADMISSIONS),
+			component: Admissions,
+		},
+		{
+			path: url(routes.YEARS),
+			component: Years,
 		},
 	];
 

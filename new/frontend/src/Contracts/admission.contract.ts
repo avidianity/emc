@@ -1,5 +1,7 @@
 import { CourseContract } from './course.contract';
 import { ModelContract } from './model.contract';
+import { UserContract } from './user.contract';
+import { YearContract } from './year.contract';
 
 export interface AdmissionContract extends ModelContract {
 	course_id: number;
@@ -7,6 +9,10 @@ export interface AdmissionContract extends ModelContract {
 	status: string;
 	term: string;
 	graduated: boolean;
+	pre_registration?: boolean;
 	student_id: number;
+	year_id: number;
 	course?: CourseContract;
+	student?: UserContract;
+	year?: YearContract;
 }

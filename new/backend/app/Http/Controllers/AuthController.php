@@ -54,4 +54,25 @@ class AuthController extends Controller
 
         return response('', 204);
     }
+
+    public function admissions(Request $request)
+    {
+        /**
+         * @var \App\Models\User
+         */
+        $user = $request->user();
+
+        return $user->admissions()
+            ->with([
+                'year',
+                'student.grades.subject',
+                'student.grades.teacher',
+            ])
+            ->get();
+    }
+
+    public function check()
+    {
+        return response('', 204);
+    }
 }

@@ -9,9 +9,18 @@ import 'datatables.net';
 import 'datatables.net-bs4';
 import { State } from './Libraries/State';
 import 'flatpickr/dist/themes/material_blue.css';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+
+dayjs.extend(relativeTime);
+dayjs.extend(customParseFormat);
+
+toastr.options.escapeHtml = true;
 
 window.toastr = toastr;
 window.$ = $;
+window.jQuery = $;
 
 const url = process.env.REACT_APP_SERVER_URL || 'http://localhost:8000';
 

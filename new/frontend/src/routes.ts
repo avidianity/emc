@@ -14,4 +14,5 @@ export const routes = {
 	SUBJECTS: '/subjects',
 	USERS: '/users',
 	MAILS: '/mails',
+	YEARS: '/school-years',
 };

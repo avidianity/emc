@@ -14,7 +14,8 @@ const Sidebar: FC<Props> = (props) => {
 
 	const roles: { [key: string]: string[] } = {
 		Admin: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.REGISTRARS, routes.USERS, routes.MAILS],
-		Registrar: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.SUBJECTS, routes.SCHEDULES, routes.ADMISSIONS],
+		Registrar: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.SUBJECTS, routes.SCHEDULES, routes.ADMISSIONS, routes.YEARS],
+		Teacher: [routes.COURSES, routes.STUDENTS, routes.SUBJECTS, routes.SCHEDULES],
 	};
 
 	if (!user) {
@@ -113,6 +114,14 @@ const Sidebar: FC<Props> = (props) => {
 							</Link>
 						</li>
 					) : null}
+					{roles[user.role].includes(routes.YEARS) ? (
+						<li className='nav-item'>
+							<Link to={url(routes.YEARS)} className='nav-link' activeClassName='active'>
+								<i className='fe fe-calendar fe-16'></i>
+								<span className='ml-3 item-text'>School Years</span>
+							</Link>
+						</li>
+					) : null}
 					<li className='nav-item'>
 						<Link to={url(routes.CHANGE_PASSWORD)} className='nav-link' activeClassName='active'>
 							<i className='fe fe-key fe-16'></i>
@@ -120,7 +129,7 @@ const Sidebar: FC<Props> = (props) => {
 						</Link>
 					</li>
 				</ul>
-				<p>
+				<p id='account-role-display'>
 					Signed in as: <b>{user?.role}</b>
 				</p>
 			</nav>

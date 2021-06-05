@@ -51,24 +51,16 @@ class User extends Authenticatable
             }
 
             if ($user->role !== 'Student') {
-                $mailable = AccountCreated::class;
-                $recipes = [$user];
-                $subject = 'Account Creation';
-            } else {
-                $mailable = Admission::class;
-                $recipes = [$user, auth('sanctum')->user()];
-                $subject = 'Admission';
+                $mail = Mail::create([
+                    'uuid' => $user->uuid,
+                    'to' => $user->email,
+                    'subject' => 'Account Creation',
+                    'status' => 'Pending',
+                    'body' => (new AccountCreated($user))->render(),
+                ]);
+
+                SendMail::dispatch($mail, [$user], AccountCreated::class);
             }
-
-            $mail = Mail::create([
-                'uuid' => $user->uuid,
-                'to' => $user->email,
-                'subject' => $subject,
-                'status' => 'Pending',
-                'body' => (new $mailable(...$recipes))->render(),
-            ]);
-
-            SendMail::dispatch($mail, $recipes, $mailable);
 
             $user->password = Hash::make($user->password);
         });
@@ -82,7 +74,7 @@ class User extends Authenticatable
 
     public function subjects()
     {
-        return $this->belongsToMany(Subject::class)->using(StudentSubject::class);
+        return $this->belongsToMany(Subject::class, 'student_subjects')->using(StudentSubject::class);
     }
 
     public function admissions()
