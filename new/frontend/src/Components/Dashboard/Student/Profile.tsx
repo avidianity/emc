@@ -1,10 +1,10 @@
+import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { UserContract } from '../../../Contracts/user.contract';
 import { handleError } from '../../../helpers';
 import { State } from '../../../Libraries/State';
-import { userService } from '../../../Services/user.service';
 
 type Props = {};
 
@@ -41,7 +41,7 @@ const Profile: FC<Props> = (props) => {
 	const submit = async (data: Inputs) => {
 		setProcessing(true);
 		try {
-			await userService.update(user?.id, data);
+			await axios.post('/auth/profile', data);
 			toastr.success('Profile updated successfully.');
 		} catch (error) {
 			handleError(error);

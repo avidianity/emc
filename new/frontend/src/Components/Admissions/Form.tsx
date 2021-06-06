@@ -102,17 +102,6 @@ const Form: FC<Props> = (props) => {
 					<h5 className='card-title'>{mode} Admission</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
-							<div className='form-group col-12'>
-								<label htmlFor='year_id'>School Year</label>
-								<select {...register('year_id')} id='year_id' className='form-control'>
-									<option> -- Select -- </option>
-									{years?.map((year, index) => (
-										<option value={year.id} key={index}>
-											{year.start} - {year.end}
-										</option>
-									))}
-								</select>
-							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='first_name'>First Name</label>
 								<input
@@ -124,10 +113,14 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='graduated'>Graduated</label>
-								<select {...register('graduated')} id='graduated' className='form-control' disabled={processing}>
-									<option value='0'>No</option>
-									<option value='1'>Yes</option>
+								<label htmlFor='year_id'>School Year</label>
+								<select {...register('year_id')} id='year_id' className='form-control'>
+									<option> -- Select -- </option>
+									{years?.map((year, index) => (
+										<option value={year.id} key={index}>
+											{year.start} - {year.end}
+										</option>
+									))}
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>

@@ -1,5 +1,6 @@
 import { CourseContract } from './course.contract';
 import { ModelContract } from './model.contract';
+import { ScheduleContract } from './schedule.contract';
 
 export interface SubjectContract extends ModelContract {
 	code: string;
@@ -9,5 +10,6 @@ export interface SubjectContract extends ModelContract {
 	term: string;
 	units: string;
 	course?: CourseContract;
+	schedules?: ScheduleContract[];
 	users_count?: number;
 }

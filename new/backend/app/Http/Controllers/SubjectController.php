@@ -20,7 +20,7 @@ class SubjectController extends Controller
          * @var \App\Models\User
          */
         $user = $request->user();
-        $builder = Subject::with('course');
+        $builder = Subject::with('course', 'schedules');
 
         if ($user->role === 'Teacher') {
             $builer = $builder->whereHas('schedules', function (Builder $builder) use ($user) {

@@ -34,7 +34,11 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 		}
 
 		if (table.DataTable) {
-			setDatatable(table.DataTable());
+			try {
+				setDatatable(table.DataTable());
+			} catch (error) {
+				console.error(error);
+			}
 		}
 
 		return () => {

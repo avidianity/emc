@@ -2,7 +2,6 @@ import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { useHistory, useRouteMatch } from 'react-router';
-import { SubjectContract } from '../../Contracts/subject.contract';
 import { handleError, setValues } from '../../helpers';
 import { useMode } from '../../hooks';
 import { courseService } from '../../Services/course.service';
@@ -10,10 +9,19 @@ import { subjectService } from '../../Services/subject.service';
 
 type Props = {};
 
+type Inputs = {
+	code: string;
+	description: string;
+	course_id: number;
+	level: string;
+	term: string;
+	units: string;
+};
+
 const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
-	const { register, setValue, handleSubmit, reset } = useForm<SubjectContract>();
+	const { register, setValue, handleSubmit, reset } = useForm<Inputs>();
 	const [id, setID] = useState(-1);
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
@@ -31,7 +39,7 @@ const Form: FC<Props> = (props) => {
 		}
 	};
 
-	const submit = async (data: SubjectContract) => {
+	const submit = async (data: Inputs) => {
 		setProcessing(true);
 		try {
 			await (mode === 'Add' ? subjectService.create(data) : subjectService.update(id, data));

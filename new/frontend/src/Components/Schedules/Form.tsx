@@ -143,11 +143,13 @@ const Form: FC<Props> = (props) => {
 								<label htmlFor='subject_id'>Subject</label>
 								<select {...register('subject_id')} id='subject_id' className='form-control'>
 									<option> -- Select -- </option>
-									{subjects?.map((subject, index) => (
-										<option value={subject.id} key={index}>
-											{subject.code}
-										</option>
-									))}
+									{subjects
+										?.filter((subject) => subject.schedules?.length === 0)
+										.map((subject, index) => (
+											<option value={subject.id} key={index}>
+												{subject.code}
+											</option>
+										))}
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>

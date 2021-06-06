@@ -43,6 +43,10 @@ const List: FC<Props> = (props) => {
 			accessor: 'description',
 		},
 		{
+			title: 'Majors',
+			accessor: 'majors',
+		},
+		{
 			title: 'Status',
 			accessor: 'open',
 		},

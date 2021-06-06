@@ -3,8 +3,8 @@ import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { UserContract } from '../../Contracts/user.contract';
-import { handleError, Asker } from '../../helpers';
-import { useURL } from '../../hooks';
+import { handleError, Asker, toJSON } from '../../helpers';
+import { useArray, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { userService } from '../../Services/user.service';
 
@@ -14,6 +14,7 @@ type Props = {};
 
 const List: FC<Props> = (props) => {
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('users', () => userService.fetch());
+	const [selected, setSelected] = useArray<number>();
 
 	const url = useURL();
 
@@ -46,6 +47,10 @@ const List: FC<Props> = (props) => {
 	const user = State.getInstance().get<UserContract>('user');
 
 	const columns = [
+		{
+			title: '#',
+			accessor: 'toggle',
+		},
 		{
 			title: 'Teacher #',
 			accessor: 'uuid',
@@ -98,6 +103,30 @@ const List: FC<Props> = (props) => {
 					?.filter((user) => user.role === 'Teacher')
 					.map((teacher) => ({
 						...teacher,
+						toggle: (
+							<>
+								<div className='custom-control custom-checkbox'>
+									<input
+										type='checkbox'
+										className='custom-control-input'
+										id={toJSON(teacher)}
+										onChange={(e) => {
+											const id = e.target.value.toNumber();
+											if (selected.includes(id)) {
+												const index = selected.findIndex((number) => number === id);
+												selected.splice(index, 1);
+											} else {
+												selected.push(id);
+											}
+											setSelected([...selected]);
+										}}
+										value={teacher.id}
+										checked={selected.includes(teacher.id!)}
+									/>
+									<label className='custom-control-label' htmlFor={toJSON(teacher)}></label>
+								</div>
+							</>
+						),
 						name: (
 							<>
 								{teacher.last_name}, {teacher.first_name} {teacher.middle_name || ''}
@@ -146,9 +175,42 @@ const List: FC<Props> = (props) => {
 			buttons={
 				<>
 					{user?.role === 'Admin' ? (
-						<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
-							<i className='fas fa-plus'></i>
-						</Link>
+						<>
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
+								<i className='fas fa-plus'></i>
+							</Link>
+							<button
+								className='btn btn-danger btn-sm ml-2'
+								title='Disable Selected'
+								onClick={async (e) => {
+									e.preventDefault();
+									if (selected.length > 0) {
+										if (
+											await Asker.danger(
+												`Are you sure you want to disable ${selected.length} ${
+													selected.length === 1 ? 'teacher' : 'teachers'
+												}?`
+											)
+										) {
+											try {
+												await Promise.all(selected.map((id) => userService.update(id, { active: false })));
+												toastr.success(
+													`${selected.length} ${
+														selected.length === 1 ? 'teacher' : 'teachers'
+													} disabled successfully.`
+												);
+												setSelected([]);
+												refetch();
+											} catch (error) {
+												console.log(error);
+												toastr.error('Unable to disable teachers.');
+											}
+										}
+									}
+								}}>
+								<i className={`fas fa-user-times`}></i>
+							</button>
+						</>
 					) : null}
 				</>
 			}

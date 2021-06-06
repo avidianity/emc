@@ -4,6 +4,7 @@ use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\GradeController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SubjectController;
@@ -29,6 +30,7 @@ Route::prefix('/auth')->group(function () {
         Route::post('/change-password', [AuthController::class, 'changePassword']);
         Route::get('/admissions', [AuthController::class, 'admissions']);
         Route::get('/check', [AuthController::class, 'check']);
+        Route::post('/profile', [AuthController::class, 'profile']);
     });
 });
 
@@ -43,5 +45,6 @@ Route::middleware('auth:sanctum')->group(function () {
         'subjects' => SubjectController::class,
         'users' => UserController::class,
         'years' => YearController::class,
+        'logs' => LogController::class,
     ]);
 });

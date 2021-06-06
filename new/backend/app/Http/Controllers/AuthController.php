@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Log;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -74,5 +75,22 @@ class AuthController extends Controller
     public function check()
     {
         return response('', 204);
+    }
+
+    public function profile(Request $request)
+    {
+        /**
+         * @var \App\Models\User
+         */
+        $user = $request->user();
+
+        $user->update($request->all());
+
+        Log::create([
+            'payload' => $user,
+            'message' => 'User has updated their profile.',
+        ]);
+
+        return $user;
     }
 }

@@ -59,26 +59,6 @@ const List: FC<Props> = (props) => {
 			accessor: 'number',
 		},
 		{
-			title: 'Email',
-			accessor: 'email',
-		},
-		{
-			title: 'Address',
-			accessor: 'address',
-		},
-		{
-			title: 'Gender',
-			accessor: 'gender',
-		},
-		{
-			title: 'Birthday',
-			accessor: 'birthday',
-		},
-		{
-			title: 'Age',
-			accessor: 'age',
-		},
-		{
 			title: 'Status',
 			accessor: 'status',
 		},

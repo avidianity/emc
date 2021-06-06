@@ -72,6 +72,16 @@ const Form: FC<Props> = (props) => {
 								disabled={processing}></textarea>
 						</div>
 						<div className='form-group'>
+							<label htmlFor='majors'>Majors</label>
+							<textarea
+								{...register('majors')}
+								id='majors'
+								cols={30}
+								rows={4}
+								className='form-control'
+								disabled={processing}></textarea>
+						</div>
+						<div className='form-group'>
 							<div className='custom-control custom-checkbox'>
 								<input
 									{...register('open')}

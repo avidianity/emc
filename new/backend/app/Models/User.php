@@ -68,6 +68,10 @@ class User extends Authenticatable
         static::updating(function (self $user) {
             if ($user->isDirty(['password'])) {
                 $user->password = Hash::make($user->password);
+                Log::create([
+                    'payload' => $user,
+                    'message' => 'User has updated their password.',
+                ]);
             }
         });
     }
