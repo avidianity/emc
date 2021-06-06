@@ -35,6 +35,7 @@ Route::prefix('/auth')->group(function () {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/users/change', [UserController::class, 'change']);
     Route::post('/users/{user}/subjects', [SubjectController::class, 'enroll']);
     Route::apiResources([
         'admissions' => AdmissionController::class,

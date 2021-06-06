@@ -33,6 +33,7 @@ class CreateUsersTable extends Migration
             $table->string('mothers_name')->nullable();
             $table->string('fathers_occupation')->nullable();
             $table->string('mothers_occupation')->nullable();
+            $table->unsignedInteger('allowed_units')->default(0);
             $table->timestamps();
         });
     }

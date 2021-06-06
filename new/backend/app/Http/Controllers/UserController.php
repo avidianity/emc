@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -74,6 +75,21 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
+
+        return response('', 204);
+    }
+
+    public function change(Request $request)
+    {
+        $user = $request->user();
+
+        $data = $request->all();
+
+        if (!Hash::check($data['password'], $user->password)) {
+            return response(['message' => 'Password is incorrect.'], 403);
+        }
+
+        User::findOrFail($data['user_id'])->update(['password' => $data['new_password']]);
 
         return response('', 204);
     }

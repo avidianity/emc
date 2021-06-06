@@ -199,7 +199,7 @@ const List: FC<Props> = (props) => {
 				<div className='modal-dialog modal-dialog-centered modal-lg'>
 					<div className='modal-content'>
 						<div className='modal-header'>
-							<h5 className='modal-title'>View Mail</h5>
+							<h5 className='modal-title'>Add Grade</h5>
 							<button type='button' className='close' data-dismiss='modal'>
 								<span aria-hidden='true'>&times;</span>
 							</button>

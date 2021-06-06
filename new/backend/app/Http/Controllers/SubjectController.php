@@ -84,6 +84,17 @@ class SubjectController extends Controller
     {
         $data = $request->all();
 
+        $subjects = Subject::find($data['subjects']);
+
+        $units = $subjects->reduce(function ($previous, Subject $subject) {
+            $units = (int)$subject->units;
+            return $previous + $units;
+        }, 0);
+
+        if ($units > $user->allowed_units) {
+            return response(['message' => 'Number of subjects exceed student\'s maximum allowed units.']);
+        }
+
         $user->subjects()->sync($data['subjects']);
         $user->load(['subjects']);
         return $user;

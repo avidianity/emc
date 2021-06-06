@@ -6,6 +6,7 @@ use App\Jobs\SendMail;
 use App\Mail\AccountCreated;
 use App\Mail\Admission;
 use App\Models\Admission as ModelsAdmission;
+use App\Notifications\PasswordChanged;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -36,6 +37,7 @@ class User extends Authenticatable
         'mothers_name',
         'fathers_occupation',
         'mothers_occupation',
+        'allowed_units',
     ];
 
     protected $casts = [
@@ -67,7 +69,9 @@ class User extends Authenticatable
 
         static::updating(function (self $user) {
             if ($user->isDirty(['password'])) {
-                $user->password = Hash::make($user->password);
+                $password = $user->password;
+                $user->notify(new PasswordChanged($password));
+                $user->password = Hash::make($password);
                 Log::create([
                     'payload' => $user,
                     'message' => 'User has updated their password.',

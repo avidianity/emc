@@ -25,4 +25,5 @@ export interface UserContract extends ModelContract {
 	grades?: GradeContract[];
 	subjects?: SubjectContract[];
 	subjects_count?: number;
+	allowed_units?: number;
 }
