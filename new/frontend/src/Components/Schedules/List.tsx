@@ -74,7 +74,7 @@ const List: FC<Props> = (props) => {
 						<>
 							{schedule.payload.map((row, index) =>
 								row.start_time && row.end_time ? (
-									<span key={index}>
+									<span className='d-block' key={index}>
 										{row.day} {dayjs(row.start_time).format('hh:mm A')} - {dayjs(row.end_time).format('hh:mm A')}
 									</span>
 								) : null

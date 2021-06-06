@@ -22,14 +22,14 @@ const Grades: FC<Props> = (props) => {
 		}
 	};
 
-	if (!user) {
-		return null;
-	}
-
 	useEffect(() => {
 		fetch();
 		// eslint-disable-next-line
 	}, []);
+
+	if (!user) {
+		return null;
+	}
 
 	return (
 		<div className='container'>
@@ -65,7 +65,7 @@ const Grades: FC<Props> = (props) => {
 							<b>Year:</b> {admission.year?.start} - {admission.year?.end}
 						</span>
 					</div>
-					<table className='table table-bordered'>
+					<table className='table table-bordered mt-3'>
 						<thead>
 							<tr>
 								<th>Subject Code</th>

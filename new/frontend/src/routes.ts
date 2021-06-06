@@ -15,4 +15,7 @@ export const routes = {
 	USERS: '/users',
 	MAILS: '/mails',
 	YEARS: '/school-years',
+	GRADES: '/grades',
+	ENROLLMENT: '/enrollment',
+	PROFILE: '/profile',
 };

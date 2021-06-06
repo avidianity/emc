@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import { useQuery } from 'react-query';
 import { courseService } from '../../Services/course.service';
 import { yearService } from '../../Services/year.service';
+import { userService } from '../../Services/user.service';
 
 type Props = {};
 
@@ -84,7 +85,12 @@ const Form: FC<Props> = (props) => {
 		if (match.path.includes('edit')) {
 			fetch(match.params.id);
 		} else {
-			setValue('student.uuid', `student-${String.random(5)}-${new Date().getFullYear()}`);
+			userService.fetch().then((users) => {
+				setValue(
+					'student.uuid',
+					`student-${`${users.filter((user) => user.role === 'Student').length}`.padStart(5, '0')}-${new Date().getFullYear()}`
+				);
+			});
 		}
 		// eslint-disable-next-line
 	}, []);

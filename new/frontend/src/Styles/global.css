@@ -26,3 +26,33 @@
 .nav-link.active {
 	color: #1b68ff !important;
 }
+
+.table th {
+	color: rgb(90, 90, 90) !important;
+}
+
+.dark .table th {
+	color: rgb(240, 240, 240) !important;
+}
+
+.table-bordered {
+	border: 1px solid rgb(160, 160, 160) !important;
+}
+
+.table-bordered th,
+.table-bordered td {
+	border: 1px solid rgb(160, 160, 160) !important;
+}
+
+.dark .table-bordered {
+	border: 1px solid rgb(240, 240, 240) !important;
+}
+
+.dark .border {
+	border: 1px solid rgb(240, 240, 240) !important;
+}
+
+.dark .table-bordered th,
+.dark .table-bordered td {
+	border: 1px solid rgb(240, 240, 240) !important;
+}

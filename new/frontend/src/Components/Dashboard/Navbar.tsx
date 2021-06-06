@@ -17,9 +17,11 @@ const Navbar: FC<Props> = (props) => {
 
 	useEffect(() => {
 		if (mode === 'dark') {
+			$('.vertical').addClass('dark');
 			light.disable(true);
 			dark.disable(false);
 		} else {
+			$('.vertical').removeClass('dark');
 			dark.disable(true);
 			light.disable(false);
 		}
@@ -29,10 +31,10 @@ const Navbar: FC<Props> = (props) => {
 		<nav className='topnav navbar navbar-light'>
 			<button
 				type='button'
-				className='navbar-toggler text-muted mt-2 p-0 mr-3 collapseSidebar'
+				className='navbar-toggler text-muted mt-2 p-0 mr-3'
 				onClick={(e) => {
 					e.preventDefault();
-					const bar = $('.vertical.dark');
+					const bar = $('.vertical');
 					const roleDisplay = $('#account-role-display');
 					if (bar.hasClass('collapsed')) {
 						roleDisplay.removeClass('d-none');

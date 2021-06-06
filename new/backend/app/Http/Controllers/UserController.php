@@ -44,6 +44,7 @@ class UserController extends Controller
         $user->load([
             'subjects',
             'admissions.year',
+            'admissions.course',
         ]);
         return $user;
     }

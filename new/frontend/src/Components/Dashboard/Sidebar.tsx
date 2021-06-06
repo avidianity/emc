@@ -16,6 +16,7 @@ const Sidebar: FC<Props> = (props) => {
 		Admin: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.REGISTRARS, routes.USERS, routes.MAILS],
 		Registrar: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.SUBJECTS, routes.SCHEDULES, routes.ADMISSIONS, routes.YEARS],
 		Teacher: [routes.COURSES, routes.STUDENTS, routes.SUBJECTS, routes.SCHEDULES],
+		Student: [routes.GRADES, routes.SCHEDULES, routes.PROFILE, routes.ENROLLMENT],
 	};
 
 	if (!user) {
@@ -119,6 +120,30 @@ const Sidebar: FC<Props> = (props) => {
 							<Link to={url(routes.YEARS)} className='nav-link' activeClassName='active'>
 								<i className='fe fe-calendar fe-16'></i>
 								<span className='ml-3 item-text'>School Years</span>
+							</Link>
+						</li>
+					) : null}
+					{roles[user.role].includes(routes.GRADES) ? (
+						<li className='nav-item'>
+							<Link to={url(routes.GRADES)} className='nav-link' activeClassName='active'>
+								<i className='fe fe-bookmark fe-16'></i>
+								<span className='ml-3 item-text'>Grades</span>
+							</Link>
+						</li>
+					) : null}
+					{roles[user.role].includes(routes.ENROLLMENT) ? (
+						<li className='nav-item'>
+							<Link to={url(routes.ENROLLMENT)} className='nav-link' activeClassName='active'>
+								<i className='fe fe-book-open fe-16'></i>
+								<span className='ml-3 item-text'>Enrollment</span>
+							</Link>
+						</li>
+					) : null}
+					{roles[user.role].includes(routes.PROFILE) ? (
+						<li className='nav-item'>
+							<Link to={url(routes.PROFILE)} className='nav-link' activeClassName='active'>
+								<i className='fe fe-user fe-16'></i>
+								<span className='ml-3 item-text'>Profile</span>
 							</Link>
 						</li>
 					) : null}

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Schedule;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
@@ -12,9 +13,30 @@ class ScheduleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Schedule::with('course', 'teacher')->get();
+        $builder = Schedule::with('course', 'teacher', 'subject');
+        /**
+         * @var \App\Models\User
+         */
+        $user = $request->user();
+        $admission = $user->admissions->last();
+
+        if ($user->role === 'Student') {
+            $subjects = $user->subjects->map(function (Subject $subject) {
+                return $subject->id;
+            });
+
+            if ($admission) {
+                $builder = $builder->where('year', $admission->level);
+            }
+
+            $builder = $builder->whereIn('subject_id', $subjects->toArray());
+        } else if ($user->role === 'Teacher') {
+            $builder = $builder->where('teacher_id', $user->id);
+        }
+
+        return $builder->get();
     }
 
     /**

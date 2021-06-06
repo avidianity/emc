@@ -6,6 +6,9 @@ import Courses from '../Components/Courses';
 import Analytics from '../Components/Dashboard/Analytics';
 import Navbar from '../Components/Dashboard/Navbar';
 import Sidebar from '../Components/Dashboard/Sidebar';
+import Enrollment from '../Components/Dashboard/Student/Enrollment';
+import Grades from '../Components/Dashboard/Student/Grades';
+import Profile from '../Components/Dashboard/Student/Profile';
 import Mails from '../Components/Mails';
 import Registrars from '../Components/Registrars';
 import Schedules from '../Components/Schedules';
@@ -74,6 +77,18 @@ const Dashboard: FC<Props> = (props) => {
 		{
 			path: url(routes.YEARS),
 			component: Years,
+		},
+		{
+			path: url(routes.GRADES),
+			component: Grades,
+		},
+		{
+			path: url(routes.ENROLLMENT),
+			component: Enrollment,
+		},
+		{
+			path: url(routes.PROFILE),
+			component: Profile,
 		},
 	];
 

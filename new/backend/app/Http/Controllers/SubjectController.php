@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Subject;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
@@ -13,9 +14,21 @@ class SubjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Subject::with('course')->get();
+        /**
+         * @var \App\Models\User
+         */
+        $user = $request->user();
+        $builder = Subject::with('course');
+
+        if ($user->role === 'Teacher') {
+            $builer = $builder->whereHas('schedules', function (Builder $builder) use ($user) {
+                return $builder->where('teacher_id', $user->id);
+            });
+        }
+
+        return $builder->get();
     }
 
     /**

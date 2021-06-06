@@ -84,7 +84,7 @@ class User extends Authenticatable
 
     public function grades()
     {
-        return $this->hasMany(Grade::class);
+        return $this->hasMany(Grade::class, 'student_id');
     }
 
     public function schedules()

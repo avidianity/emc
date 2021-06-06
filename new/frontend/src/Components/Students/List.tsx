@@ -142,9 +142,6 @@ const List: FC<Props> = (props) => {
 								<div style={{ minWidth: '100px' }}>
 									{user?.role === 'Registrar' ? (
 										<>
-											<Link to={url(`${student.id}/edit`)} className='btn btn-warning btn-sm mx-1' title='Edit'>
-												<i className='fas fa-edit'></i>
-											</Link>
 											<button
 												className={`btn btn-${student.active ? 'danger' : 'info'} btn-sm mx-1`}
 												onClick={async (e) => {
@@ -181,7 +178,7 @@ const List: FC<Props> = (props) => {
 													$(modalRef.current).modal('toggle');
 												}
 											}}>
-											<i className='fas fa-bar-chart-2'></i>
+											<i className='fas fa-chart-bar'></i>
 										</button>
 									) : null}
 									<button
@@ -197,15 +194,6 @@ const List: FC<Props> = (props) => {
 						})) || []
 				}
 				columns={columns}
-				buttons={
-					<>
-						{user?.role === 'Admin' ? (
-							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
-								<i className='fas fa-plus'></i>
-							</Link>
-						) : null}
-					</>
-				}
 			/>
 			<div ref={modalRef} className='modal fade' tabIndex={-1}>
 				<div className='modal-dialog modal-dialog-centered modal-lg'>

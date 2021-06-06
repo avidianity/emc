@@ -66,7 +66,8 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 									onClick={(e) => {
 										e.preventDefault();
 										onRefresh();
-									}}>
+									}}
+									title='Refresh'>
 									<i className={`fas fa-sync-alt ${outIf(loading, 'fa-spin')}`}></i>
 								</button>
 								{buttons}

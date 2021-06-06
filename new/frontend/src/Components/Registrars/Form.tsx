@@ -72,7 +72,15 @@ const Form: FC<Props> = (props) => {
 		if (match.path.includes('edit')) {
 			fetch(match.params.id);
 		} else {
-			setValue('uuid', `registrar-${String.random(5)}-${new Date().getFullYear()}`);
+			userService.fetch().then((users) => {
+				setValue(
+					'uuid',
+					`registrar-${`${users.filter((user) => user.role === 'Registrar').length}`.padStart(
+						5,
+						'0'
+					)}-${new Date().getFullYear()}`
+				);
+			});
 		}
 		// eslint-disable-next-line
 	}, []);
