@@ -39,6 +39,9 @@ const Profile: FC<Props> = (props) => {
 	});
 
 	const submit = async (data: Inputs) => {
+		if (!user?.active) {
+			return;
+		}
 		setProcessing(true);
 		try {
 			await axios.post('/auth/profile', data);
@@ -52,6 +55,10 @@ const Profile: FC<Props> = (props) => {
 
 	if (!user) {
 		return null;
+	}
+
+	if (!user.active) {
+		toastr.info('Your account is currently inactive. Profile changes will not be saved.');
 	}
 
 	return (

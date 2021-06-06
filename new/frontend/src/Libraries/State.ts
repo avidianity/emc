@@ -31,7 +31,7 @@ export class State {
 		return this.setAll({});
 	}
 
-	getAll(): StorageItem {
+	protected getAll(): StorageItem {
 		try {
 			const data = this.storage.getItem(this.key);
 			return data ? JSON.parse(data) : {};
@@ -40,7 +40,7 @@ export class State {
 		}
 	}
 
-	setAll(data: StorageItem) {
+	protected setAll(data: StorageItem) {
 		this.storage.setItem(this.key, JSON.stringify(data));
 		return this;
 	}
@@ -72,7 +72,7 @@ export class State {
 		return this;
 	}
 
-	dispatch<T>(key: string, value: T) {
+	protected dispatch<T>(key: string, value: T) {
 		this.bus.dispatch(key, value);
 		return this;
 	}

@@ -26,7 +26,7 @@ class AuthController extends Controller
             return response(['message' => 'User does not exist.'], 404);
         }
 
-        if (!$user->active) {
+        if (!$user->active && $user->role !== 'Student') {
             return response(['message' => 'Account is currently disabled, please try again later.']);
         }
 
@@ -72,9 +72,9 @@ class AuthController extends Controller
             ->get();
     }
 
-    public function check()
+    public function check(Request $request)
     {
-        return response('', 204);
+        return response($request->user());
     }
 
     public function profile(Request $request)

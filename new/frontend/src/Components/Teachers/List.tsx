@@ -48,10 +48,6 @@ const List: FC<Props> = (props) => {
 
 	const columns = [
 		{
-			title: '#',
-			accessor: 'toggle',
-		},
-		{
 			title: 'Teacher #',
 			accessor: 'uuid',
 		},
@@ -90,6 +86,10 @@ const List: FC<Props> = (props) => {
 	];
 
 	if (user?.role === 'Admin') {
+		columns.unshift({
+			title: '#',
+			accessor: 'toggle',
+		});
 		columns.push({ title: 'Actions', accessor: 'actions' });
 	}
 

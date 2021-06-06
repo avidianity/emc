@@ -1,10 +1,12 @@
 import axios from 'axios';
 import React, { createRef, FC, useState } from 'react';
 import { useQuery } from 'react-query';
+import { useHistory } from 'react-router';
 import { UserContract } from '../../../Contracts/user.contract';
 import { Asker, handleError } from '../../../helpers';
 import { useArray } from '../../../hooks';
 import { State } from '../../../Libraries/State';
+import { routes } from '../../../routes';
 import { subjectService } from '../../../Services/subject.service';
 import { userService } from '../../../Services/user.service';
 
@@ -19,11 +21,32 @@ const Enrollment: FC<Props> = (props) => {
 	const [enrolled, setEnrolled] = useArray<number>();
 	const { data: user } = useQuery(['user', temp?.id], () => userService.fetchOne(temp?.id), {
 		onSuccess(user) {
+			if (!user.active) {
+				toastr.info('Your account is currently inactive. Please settle your payment to be reactivated by the registrar.');
+			}
 			setEnrolled(user.subjects?.map((subject) => subject.id!)!);
 		},
 	});
 	const ref = createRef<HTMLDivElement>();
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
+	const [selectAll, setSelectAll] = useState(false);
+	const history = useHistory();
+
+	const increment = async () => {
+		setProcessing(true);
+		if (await Asker.danger('Are you sure you want to increment? Your account will be temporarily suspended.')) {
+			try {
+				await axios.post('/admissions/increment');
+				toastr.success('Admission incremented successfully.');
+				state.remove('user').remove('token');
+				history.push(routes.HOME);
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setProcessing(false);
+			}
+		}
+	};
 
 	const add = (value: number) => {
 		selected.push(value);
@@ -39,6 +62,9 @@ const Enrollment: FC<Props> = (props) => {
 	const admission = user?.admissions?.last();
 
 	const submit = async () => {
+		if (!user?.active) {
+			return;
+		}
 		setProcessing(true);
 		try {
 			if (await Asker.notice("If you continue you can't edit the selected subjects.")) {
@@ -55,6 +81,10 @@ const Enrollment: FC<Props> = (props) => {
 	};
 
 	if (!user || !admission) {
+		return null;
+	}
+
+	if (!user.active) {
 		return null;
 	}
 
@@ -91,6 +121,32 @@ const Enrollment: FC<Props> = (props) => {
 				<span className='ml-auto'>
 					<b>Year:</b> {admission.year?.start} - {admission.year?.end}
 				</span>
+			</div>
+			<div className='d-flex mt-2'>
+				<button
+					className={`btn btn-${!selectAll ? 'secondary' : 'danger'} btn-sm d-inline`}
+					onClick={(e) => {
+						e.preventDefault();
+						if (subjects) {
+							if (!selectAll) {
+								const non = subjects.filter((subject) => !enrolled.includes(subject.id!));
+								setSelected([...selected, ...non.map((subject) => subject.id!)]);
+							} else {
+								setSelected([]);
+							}
+							setSelectAll(!selectAll);
+						}
+					}}>
+					{!selectAll ? 'Select All' : 'Unselect All'}
+				</button>
+				<button
+					className='btn btn-success btn-sm ml-auto'
+					onClick={(e) => {
+						e.preventDefault();
+						increment();
+					}}>
+					Increment
+				</button>
 			</div>
 			<form
 				onSubmit={(e) => {

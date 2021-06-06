@@ -51,52 +51,54 @@ const Sidebar: FC<Props> = (props) => {
 							</Link>
 						</li>
 					) : null}
-					<li className='nav-item dropdown'>
-						<a
-							href='/users'
-							className='dropdown-toggle nav-link collapsed'
-							onClick={(e) => {
-								e.preventDefault();
-								$('#users').collapse('toggle');
-							}}>
-							<i className='fe fe-user fe-16'></i>
-							<span className='ml-3 item-text'>Users</span>
-						</a>
-						<ul className='collapse list-unstyled pl-4 w-100' id='users'>
-							{roles[user.role].includes(routes.STUDENTS) ? (
-								<li className='nav-item'>
-									<Link to={url(routes.STUDENTS)} className='nav-link' activeClassName='active'>
-										<i className='fe fe-user fe-16'></i>
-										<span className='ml-3 item-text'>Students</span>
-									</Link>
-								</li>
-							) : null}
-							{roles[user.role].includes(routes.TEACHERS) ? (
-								<li className='nav-item'>
-									<Link to={url(routes.TEACHERS)} className='nav-link' activeClassName='active'>
-										<i className='fe fe-user fe-16'></i>
-										<span className='ml-3 item-text'>Teachers</span>
-									</Link>
-								</li>
-							) : null}
-							{roles[user.role].includes(routes.REGISTRARS) ? (
-								<li className='nav-item'>
-									<Link to={url(routes.REGISTRARS)} className='nav-link' activeClassName='active'>
-										<i className='fe fe-user fe-16'></i>
-										<span className='ml-3 item-text'>Registrars</span>
-									</Link>
-								</li>
-							) : null}
-							{roles[user.role].includes(routes.USERS) ? (
-								<li className='nav-item'>
-									<Link to={url(routes.USERS)} className='nav-link' activeClassName='active'>
-										<i className='fe fe-user fe-16'></i>
-										<span className='ml-3 item-text'>System Users</span>
-									</Link>
-								</li>
-							) : null}
-						</ul>
-					</li>
+					{user.role !== 'Student' ? (
+						<li className='nav-item dropdown'>
+							<a
+								href='/users'
+								className='dropdown-toggle nav-link collapsed'
+								onClick={(e) => {
+									e.preventDefault();
+									$('#users').collapse('toggle');
+								}}>
+								<i className='fe fe-user fe-16'></i>
+								<span className='ml-3 item-text'>Users</span>
+							</a>
+							<ul className='collapse list-unstyled pl-4 w-100' id='users'>
+								{roles[user.role].includes(routes.STUDENTS) ? (
+									<li className='nav-item'>
+										<Link to={url(routes.STUDENTS)} className='nav-link' activeClassName='active'>
+											<i className='fe fe-user fe-16'></i>
+											<span className='ml-3 item-text'>Students</span>
+										</Link>
+									</li>
+								) : null}
+								{roles[user.role].includes(routes.TEACHERS) ? (
+									<li className='nav-item'>
+										<Link to={url(routes.TEACHERS)} className='nav-link' activeClassName='active'>
+											<i className='fe fe-user fe-16'></i>
+											<span className='ml-3 item-text'>Teachers</span>
+										</Link>
+									</li>
+								) : null}
+								{roles[user.role].includes(routes.REGISTRARS) ? (
+									<li className='nav-item'>
+										<Link to={url(routes.REGISTRARS)} className='nav-link' activeClassName='active'>
+											<i className='fe fe-user fe-16'></i>
+											<span className='ml-3 item-text'>Registrars</span>
+										</Link>
+									</li>
+								) : null}
+								{roles[user.role].includes(routes.USERS) ? (
+									<li className='nav-item'>
+										<Link to={url(routes.USERS)} className='nav-link' activeClassName='active'>
+											<i className='fe fe-user fe-16'></i>
+											<span className='ml-3 item-text'>System Users</span>
+										</Link>
+									</li>
+								) : null}
+							</ul>
+						</li>
+					) : null}
 					{roles[user.role].includes(routes.MAILS) ? (
 						<li className='nav-item'>
 							<Link to={url(routes.MAILS)} className='nav-link' activeClassName='active'>

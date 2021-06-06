@@ -68,7 +68,8 @@ export default function App() {
 
 	const check = async () => {
 		try {
-			await axios.get('/auth/check');
+			const { data } = await axios.get('/auth/check');
+			state.set('user', data);
 		} catch (error) {
 			if (error.response?.status === 401) {
 				state.remove('user').remove('token');

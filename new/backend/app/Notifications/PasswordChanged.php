@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Models\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -42,10 +43,21 @@ class PasswordChanged extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        $mail = (new MailMessage)
+            ->subject('Password Change')
             ->greeting('Hello ' . $notifiable->first_name . '.')
             ->line('Your password has been changed.')
             ->line('New Password: ' . $this->password);
+
+        Mail::create([
+            'uuid' => $notifiable->uuid,
+            'to' => $notifiable->email,
+            'subject' => 'Password Change',
+            'status' => 'Sent',
+            'body' => $mail->render(),
+        ]);
+
+        return $mail;
     }
 
     /**

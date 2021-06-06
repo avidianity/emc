@@ -56,3 +56,11 @@
 .dark .table-bordered td {
 	border: 1px solid rgb(240, 240, 240) !important;
 }
+
+.btn-success {
+	color: #fff;
+}
+
+.btn-success:hover {
+	color: rgb(30, 30, 30);
+}
