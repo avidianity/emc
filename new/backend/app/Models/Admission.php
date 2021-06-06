@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\JSON;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,11 +19,13 @@ class Admission extends Model
         'student_id',
         'pre_registration',
         'year_id',
+        'requirements',
     ];
 
     protected $casts = [
         'graduated' => 'boolean',
         'pre_registration' => 'boolean',
+        'requirements' => JSON::class,
     ];
 
     public function course()
