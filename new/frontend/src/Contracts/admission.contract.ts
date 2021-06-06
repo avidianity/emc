@@ -8,7 +8,6 @@ export interface AdmissionContract extends ModelContract {
 	level: string;
 	status: string;
 	term: string;
-	graduated: boolean;
 	pre_registration?: boolean;
 	student_id: number;
 	year_id: number;

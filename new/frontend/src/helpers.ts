@@ -1,5 +1,5 @@
 import toastr from 'toastr';
-import _, { isArray, isString, trim } from 'lodash';
+import _, { isArray as _isArray, isString, trim } from 'lodash';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import swal from 'sweetalert';
@@ -20,6 +20,10 @@ export function outIf<T>(condition: boolean, output: T, defaultValue: any = ''):
 }
 export function toBool(data: any) {
 	return data ? true : false;
+}
+
+export function isArray<T>(value: any): value is T[] {
+	return _isArray<T>(value);
 }
 
 export function toJSON(data: any) {

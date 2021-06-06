@@ -22,7 +22,6 @@ class CreateAdmissionsTable extends Migration
             $table->string('level');
             $table->string('status');
             $table->string('term');
-            $table->boolean('graduated');
             $table->boolean('pre_registration')->default(false);
             $table->foreignIdFor(new User(), 'student_id')->constrained((new User())->getTable());
             $table->foreignIdFor(new Year())->constrained();

@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Jobs\SendMail;
 use App\Mail\Admission as MailAdmission;
 use App\Models\Admission;
+use App\Models\Course;
 use App\Models\Mail;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class AdmissionController extends Controller
 {

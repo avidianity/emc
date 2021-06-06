@@ -15,7 +15,6 @@ class Admission extends Model
         'level',
         'status',
         'term',
-        'graduated',
         'student_id',
         'pre_registration',
         'year_id',
@@ -23,7 +22,6 @@ class Admission extends Model
     ];
 
     protected $casts = [
-        'graduated' => 'boolean',
         'pre_registration' => 'boolean',
         'requirements' => JSON::class,
     ];

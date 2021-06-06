@@ -262,7 +262,7 @@ const Form: FC<Props> = (props) => {
 												value='First Semester'
 											/>
 											<label className='custom-control-label' htmlFor='1st-semester'>
-												First Semester
+												1st Semester
 											</label>
 										</div>
 									</div>
@@ -276,7 +276,7 @@ const Form: FC<Props> = (props) => {
 												value='Second Semester'
 											/>
 											<label className='custom-control-label' htmlFor='2nd-semester'>
-												Second Semester
+												2nd Semester
 											</label>
 										</div>
 									</div>
