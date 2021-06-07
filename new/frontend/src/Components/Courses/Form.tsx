@@ -2,8 +2,9 @@ import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory, useRouteMatch } from 'react-router';
 import { CourseContract } from '../../Contracts/course.contract';
+import { MajorContract } from '../../Contracts/major.contract';
 import { handleError, setValues } from '../../helpers';
-import { useMode } from '../../hooks';
+import { useArray, useMode } from '../../hooks';
 import { courseService } from '../../Services/course.service';
 
 type Props = {};
@@ -13,6 +14,7 @@ const Form: FC<Props> = (props) => {
 	const [mode, setMode] = useMode();
 	const { register, setValue, handleSubmit, reset } = useForm<CourseContract>();
 	const [id, setID] = useState(-1);
+	const [majors, setMajors] = useArray<MajorContract>();
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
 
@@ -21,6 +23,7 @@ const Form: FC<Props> = (props) => {
 			const data = await courseService.fetchOne(id);
 			setID(data.id!);
 			setValues(setValue, data);
+			setMajors(data.majors!);
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -29,16 +32,23 @@ const Form: FC<Props> = (props) => {
 	};
 
 	const submit = async (data: CourseContract) => {
-		setProcessing(true);
-		try {
-			await (mode === 'Add' ? courseService.create(data) : courseService.update(id, data));
-			toastr.success('Course has been saved successfully.');
-			reset();
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setProcessing(false);
+		const formats = [/[A-Z]{4}/g, /[A-Z]{4} - [A-Z]{1,}/g];
+		for (const format of formats) {
+			if (format.test(data.code)) {
+				setProcessing(true);
+				try {
+					await (mode === 'Add' ? courseService.create(data) : courseService.update(id, data));
+					toastr.success('Course has been saved successfully.');
+					reset();
+				} catch (error) {
+					handleError(error);
+				} finally {
+					setProcessing(false);
+				}
+				break;
+			}
 		}
+		return toastr.error('Course Code does not follow correct format.');
 	};
 
 	useEffect(() => {
@@ -72,16 +82,6 @@ const Form: FC<Props> = (props) => {
 								disabled={processing}></textarea>
 						</div>
 						<div className='form-group'>
-							<label htmlFor='majors'>Majors</label>
-							<textarea
-								{...register('majors')}
-								id='majors'
-								cols={30}
-								rows={4}
-								className='form-control'
-								disabled={processing}></textarea>
-						</div>
-						<div className='form-group'>
 							<div className='custom-control custom-checkbox'>
 								<input
 									{...register('open')}
@@ -93,6 +93,48 @@ const Form: FC<Props> = (props) => {
 								<label className='custom-control-label' htmlFor='open'>
 									Open for Enrollment
 								</label>
+							</div>
+						</div>
+						<div className='form-group'>
+							<h4>Majors</h4>
+							<button
+								className='btn btn-info btn-sm'
+								onClick={(e) => {
+									e.preventDefault();
+									majors.push({ name: '', course_id: 0 });
+									setMajors([...majors]);
+								}}>
+								Add
+							</button>
+							<div className='row'>
+								{majors.map((major, index) => (
+									<div className='col-12 col-md-6 col-lg-4 col-xl-3 p-2' key={index}>
+										<div className='p-2 border rounded'>
+											<button
+												className='btn btn-danger btn-sm mb-2'
+												onClick={(e) => {
+													e.preventDefault();
+													majors.splice(index, 1);
+													setMajors([...majors]);
+												}}>
+												Remove
+											</button>
+											<div className='form-group'>
+												<label>Major {index + 1}</label>
+												<input
+													type='text'
+													className='form-control'
+													onChange={(e) => {
+														major.name = e.target.value;
+														majors.splice(index, 1, major);
+														setMajors([...majors]);
+													}}
+													value={major.name}
+												/>
+											</div>
+										</div>
+									</div>
+								))}
 							</div>
 						</div>
 						<div className='form-group d-flex'>

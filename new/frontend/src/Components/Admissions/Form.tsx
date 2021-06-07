@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory, useRouteMatch } from 'react-router';
 import { handleError, setValues } from '../../helpers';
-import { useArray, useMode, useNullable } from '../../hooks';
+import { useMode, useNullable } from '../../hooks';
 import { admissionService } from '../../Services/admission.service';
 import Flatpickr from 'react-flatpickr';
 import dayjs from 'dayjs';
@@ -18,7 +18,6 @@ type Inputs = {
 	level: string;
 	status: string;
 	term: string;
-	graduated: boolean;
 	student_id: number;
 	year_id: number;
 	requirements: string[];
@@ -53,7 +52,6 @@ const Form: FC<Props> = (props) => {
 	const [birthday, setBirthday] = useNullable<Date>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const { data: years } = useQuery('years', () => yearService.fetch());
-	const [requirements, setRequirements] = useArray<string>();
 
 	const fetch = async (id: any) => {
 		try {
@@ -71,7 +69,7 @@ const Form: FC<Props> = (props) => {
 	const submit = async (data: Inputs) => {
 		setProcessing(true);
 		try {
-			data.requirements = requirements;
+			data.requirements = [];
 			data.student.birthday = birthday?.toJSON();
 			await (mode === 'Add' ? admissionService.create(data) : admissionService.update(id, data));
 			toastr.success('Admission has been saved successfully.');
@@ -315,42 +313,6 @@ const Form: FC<Props> = (props) => {
 									<option value='Irregular'>Irregular</option>
 								</select>
 							</div>
-							<div className='col-12 py-3'>
-								<h4>Requirements</h4>
-								<button
-									className='btn btn-info btn-sm'
-									onClick={(e) => {
-										e.preventDefault();
-										setRequirements([...requirements, '']);
-									}}>
-									Add
-								</button>
-							</div>
-							{requirements.map((requirement, index) => (
-								<div className='col-12 col-md-6 col-lg-4 p-2'>
-									<div className='form-group p-2 border rounded'>
-										<label>Requirement {index + 1}</label>
-										<input
-											type='text'
-											className='form-control'
-											onChange={(e) => {
-												requirements.splice(index, 1, e.target.value);
-												setRequirements([...requirements]);
-											}}
-											value={requirement}
-										/>
-										<button
-											className='btn btn-danger btn-sm mt-2'
-											onClick={(e) => {
-												e.preventDefault();
-												requirements.splice(index, 1);
-												setRequirements([...requirements]);
-											}}>
-											Remove
-										</button>
-									</div>
-								</div>
-							))}
 						</div>
 						<div className='form-group d-flex'>
 							<button type='button' className='btn btn-secondary' onClick={() => history.goBack()} disabled={processing}>

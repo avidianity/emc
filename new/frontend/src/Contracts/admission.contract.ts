@@ -11,8 +11,8 @@ export interface AdmissionContract extends ModelContract {
 	pre_registration?: boolean;
 	student_id: number;
 	year_id: number;
-	requirements: string[];
 	course?: CourseContract;
 	student?: UserContract;
 	year?: YearContract;
+	requirements: string[];
 }

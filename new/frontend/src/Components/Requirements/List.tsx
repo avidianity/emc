@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
@@ -5,13 +6,13 @@ import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
 import { useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
-import { courseService } from '../../Services/course.service';
+import { requirementService } from '../../Services/requirement.service';
 import Table from '../Shared/Table';
 
 type Props = {};
 
 const List: FC<Props> = (props) => {
-	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('courses', () => courseService.fetch());
+	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('requirements', () => requirementService.fetch());
 
 	const url = useURL();
 
@@ -21,9 +22,9 @@ const List: FC<Props> = (props) => {
 
 	const deleteItem = async (id: any) => {
 		try {
-			if (await Asker.danger('Are you sure you want to delete this Course?')) {
-				await courseService.delete(id);
-				toastr.info('Course has been deleted.', 'Notice');
+			if (await Asker.danger('Are you sure you want to delete this Requirement?')) {
+				await requirementService.delete(id);
+				toastr.info('Requirement has been deleted.', 'Notice');
 				refetch();
 			}
 		} catch (error) {
@@ -35,20 +36,16 @@ const List: FC<Props> = (props) => {
 
 	const columns = [
 		{
-			title: 'Course Code',
-			accessor: 'code',
+			title: 'ID',
+			accessor: 'id',
 		},
 		{
-			title: 'Course Description',
-			accessor: 'description',
+			title: 'Name',
+			accessor: 'name',
 		},
 		{
-			title: 'Majors',
-			accessor: 'majors',
-		},
-		{
-			title: 'Status',
-			accessor: 'open',
+			title: 'Created',
+			accessor: 'created_at',
 		},
 	];
 
@@ -62,32 +59,23 @@ const List: FC<Props> = (props) => {
 	return (
 		<Table
 			onRefresh={() => refetch()}
-			title='Courses'
+			title='Requirements'
 			loading={loading}
 			items={
-				items?.map((course) => ({
-					...course,
-					open: course.open ? (
-						<span className='badge badge-success'>Open for Enrollment</span>
-					) : (
-						<span className='badge badge-danger'>Not Open for Enrollment</span>
-					),
-					majors: course.majors?.map((major, index) => (
-						<span className='d-block' key={index}>
-							{major.name}
-						</span>
-					)),
+				items?.map((requirement) => ({
+					...requirement,
+					created_at: dayjs(requirement.created_at).format('MMMM DD, YYYY hh:mm A'),
 					actions:
 						user?.role === 'Registrar' ? (
 							<>
-								<Link to={url(`${course.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
+								<Link to={url(`${requirement.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
 									<i className='fas fa-edit'></i>
 								</Link>
 								<button
 									className='btn btn-danger btn-sm mx-1'
 									onClick={(e) => {
 										e.preventDefault();
-										deleteItem(course.id);
+										deleteItem(requirement.id);
 									}}>
 									<i className='fas fa-trash'></i>
 								</button>

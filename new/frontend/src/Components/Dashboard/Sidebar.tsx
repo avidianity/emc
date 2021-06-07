@@ -14,7 +14,16 @@ const Sidebar: FC<Props> = (props) => {
 
 	const roles: { [key: string]: string[] } = {
 		Admin: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.REGISTRARS, routes.USERS, routes.MAILS],
-		Registrar: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.SUBJECTS, routes.SCHEDULES, routes.ADMISSIONS, routes.YEARS],
+		Registrar: [
+			routes.COURSES,
+			routes.STUDENTS,
+			routes.TEACHERS,
+			routes.SUBJECTS,
+			routes.SCHEDULES,
+			routes.ADMISSIONS,
+			routes.YEARS,
+			routes.ADMISSION_REQUIREMENTS,
+		],
 		Teacher: [routes.COURSES, routes.STUDENTS, routes.SUBJECTS, routes.SCHEDULES],
 		Student: [routes.GRADES, routes.SCHEDULES, routes.PROFILE, routes.ENROLLMENT],
 	};
@@ -32,9 +41,9 @@ const Sidebar: FC<Props> = (props) => {
 			</a>
 			<nav className='vertnav navbar navbar-light'>
 				<div className='w-100 mb-4 d-flex'>
-					<a className='navbar-brand mx-auto mt-2 flex-fill text-center' href='./index.html'>
+					<Link className='navbar-brand mx-auto mt-2 flex-fill text-center' to={routes.DASHBOARD}>
 						<img src='/logo.jpg' alt='EMC' className='shadow border rounded-circle' style={{ height: '50px', width: '50px' }} />
-					</a>
+					</Link>
 				</div>
 				<ul className='navbar-nav flex-fill w-100 mb-2'>
 					<li className='nav-item'>
@@ -128,6 +137,14 @@ const Sidebar: FC<Props> = (props) => {
 							<Link to={url(routes.ADMISSIONS)} className='nav-link' activeClassName='active'>
 								<i className='fe fe-pen-tool fe-16'></i>
 								<span className='ml-3 item-text'>Admissions</span>
+							</Link>
+						</li>
+					) : null}
+					{roles[user.role].includes(routes.ADMISSION_REQUIREMENTS) ? (
+						<li className='nav-item'>
+							<Link to={url(routes.ADMISSION_REQUIREMENTS)} className='nav-link' activeClassName='active'>
+								<i className='fe fe-clipboard fe-16'></i>
+								<span className='ml-3 item-text'>Admission Requirements</span>
 							</Link>
 						</li>
 					) : null}

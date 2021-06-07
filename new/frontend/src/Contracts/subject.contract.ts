@@ -11,5 +11,5 @@ export interface SubjectContract extends ModelContract {
 	units: string;
 	course?: CourseContract;
 	schedules?: ScheduleContract[];
-	users_count?: number;
+	students_count?: number;
 }

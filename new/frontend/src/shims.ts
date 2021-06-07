@@ -1,3 +1,5 @@
+import { trim } from 'lodash';
+
 Error.prototype.toJSON = function () {
 	const alt = {} as any;
 
@@ -28,6 +30,10 @@ String.prototype.toNumber = function () {
 		return 0;
 	}
 	return Number(match.join('')) || 0;
+};
+
+String.prototype.trim = function () {
+	return trim(this.toString());
 };
 
 const characters = '1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM';

@@ -11,6 +11,7 @@ import Grades from '../Components/Dashboard/Student/Grades';
 import Profile from '../Components/Dashboard/Student/Profile';
 import Mails from '../Components/Mails';
 import Registrars from '../Components/Registrars';
+import Requirements from '../Components/Requirements';
 import Schedules from '../Components/Schedules';
 import Students from '../Components/Students';
 import Subjects from '../Components/Subjects';
@@ -89,6 +90,10 @@ const Dashboard: FC<Props> = (props) => {
 		{
 			path: url(routes.PROFILE),
 			component: Profile,
+		},
+		{
+			path: url(routes.ADMISSION_REQUIREMENTS),
+			component: Requirements,
 		},
 	];
 

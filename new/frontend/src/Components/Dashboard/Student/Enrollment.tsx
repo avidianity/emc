@@ -34,17 +34,17 @@ const Enrollment: FC<Props> = (props) => {
 
 	const increment = async () => {
 		setProcessing(true);
-		if (await Asker.danger('Are you sure you want to increment? Your account will be temporarily suspended.')) {
-			try {
+		try {
+			if (await Asker.danger('Are you sure you want to increment? Your account will be temporarily suspended.')) {
 				await axios.post('/admissions/increment');
 				toastr.success('Admission incremented successfully.');
 				state.remove('user').remove('token');
 				history.push(routes.HOME);
-			} catch (error) {
-				handleError(error);
-			} finally {
-				setProcessing(false);
 			}
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setProcessing(false);
 		}
 	};
 

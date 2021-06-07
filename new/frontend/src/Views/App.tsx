@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { v4 } from 'uuid';
-import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Switch, Route, RouteProps } from 'react-router-dom';
 import { routes } from '../routes';
 import Dashboard from './Dashboard';
 import Home from './Home';
@@ -8,6 +8,7 @@ import Login from './Login';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import axios from 'axios';
 import { State } from '../Libraries/State';
+import PreRegistration from '../Components/PreRegistration';
 
 const urls = [
 	// '/js/jquery.min.js',
@@ -45,7 +46,8 @@ const urls = [
 
 export default function App() {
 	const state = State.getInstance();
-	const links = useMemo(
+
+	const links: RouteProps[] = useMemo(
 		() => [
 			{
 				path: routes.HOME,
@@ -54,13 +56,15 @@ export default function App() {
 			},
 			{
 				path: routes.LOGIN,
-				exact: false,
 				component: Login,
 			},
 			{
 				path: routes.DASHBOARD,
-				exact: false,
 				component: Dashboard,
+			},
+			{
+				path: routes.PREREGISTRATION,
+				component: PreRegistration,
 			},
 		],
 		[]

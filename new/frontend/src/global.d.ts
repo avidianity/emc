@@ -6,6 +6,7 @@ declare global {
 
 	interface String {
 		toNumber(): number;
+		trim(): string;
 	}
 
 	interface Error {

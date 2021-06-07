@@ -18,4 +18,5 @@ export const routes = {
 	GRADES: '/grades',
 	ENROLLMENT: '/enrollment',
 	PROFILE: '/profile',
+	ADMISSION_REQUIREMENTS: '/admission-requirements',
 };
