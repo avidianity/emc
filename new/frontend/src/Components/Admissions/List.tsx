@@ -59,7 +59,7 @@ const List: FC<Props> = (props) => {
 			accessor: 'term',
 		},
 		{
-			title: 'Pre-Registered',
+			title: 'Is Pre-Registration?',
 			accessor: 'pre_registration',
 		},
 		{
@@ -92,7 +92,7 @@ const List: FC<Props> = (props) => {
 					) : (
 						<span className='badge badge-danger'>No</span>
 					),
-					requirements: admission.requirements.map((requirement, index) => (
+					requirements: admission.requirements?.map((requirement, index) => (
 						<span className='d-block' key={index}>
 							{requirement}
 						</span>

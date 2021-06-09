@@ -71,9 +71,14 @@ export function handleError(error: any, useHandle = true) {
 				return Object.values<string[]>(response.data.errors).map((errors) => errors.map((error) => toastr.error(error)));
 			}
 			if (response.data.message) {
-				if (response.status === 500) {
+				if ([500, 400, 403, 404].includes(response.status)) {
 					return toastr.error(response.data.message);
 				}
+
+				if (response.status === 401) {
+					return toastr.error('Authentication has expired. Please try logging in and try again.');
+				}
+
 				if (isArray(response.data.message)) {
 					return response.data.message.forEach((message: string) =>
 						toastr.error(sentencify(message), undefined, { extendedTimeOut: 2000 })

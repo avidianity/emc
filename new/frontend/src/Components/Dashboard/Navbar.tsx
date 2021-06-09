@@ -25,7 +25,7 @@ const Navbar: FC<Props> = (props) => {
 			dark.disable(true);
 			light.disable(false);
 		}
-	});
+	}, [mode]);
 
 	return (
 		<nav className='topnav navbar navbar-light'>
@@ -54,13 +54,9 @@ const Navbar: FC<Props> = (props) => {
 						onClick={(e) => {
 							e.preventDefault();
 							if (mode === 'dark') {
-								dark.disable(true);
-								light.disable(false);
 								state.set('mode', 'light');
 								setMode('light');
 							} else {
-								light.disable(true);
-								dark.disable(false);
 								state.set('mode', 'dark');
 								setMode('dark');
 							}
