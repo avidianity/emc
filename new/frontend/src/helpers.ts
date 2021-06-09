@@ -67,7 +67,7 @@ export function handleError(error: any, useHandle = true) {
 	if (error) {
 		if (error.response) {
 			const response = error.response;
-			if (response.data.errors && isArray<string>(response.data.errors)) {
+			if (response.data.errors && response.status === 422) {
 				return Object.values<string[]>(response.data.errors).map((errors) => errors.map((error) => toastr.error(error)));
 			}
 			if (response.data.message) {
