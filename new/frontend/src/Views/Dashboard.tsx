@@ -9,6 +9,7 @@ import Sidebar from '../Components/Dashboard/Sidebar';
 import Enrollment from '../Components/Dashboard/Student/Enrollment';
 import Grades from '../Components/Dashboard/Student/Grades';
 import Profile from '../Components/Dashboard/Student/Profile';
+import Logs from '../Components/Logs';
 import Mails from '../Components/Mails';
 import Registrars from '../Components/Registrars';
 import Requirements from '../Components/Requirements';
@@ -94,6 +95,10 @@ const Dashboard: FC<Props> = (props) => {
 		{
 			path: url(routes.ADMISSION_REQUIREMENTS),
 			component: Requirements,
+		},
+		{
+			path: url(routes.LOGS),
+			component: Logs,
 		},
 	];
 

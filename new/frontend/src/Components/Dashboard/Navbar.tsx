@@ -25,7 +25,7 @@ const Navbar: FC<Props> = (props) => {
 			dark.disable(true);
 			light.disable(false);
 		}
-	}, [mode]);
+	}, [mode, light, dark]);
 
 	return (
 		<nav className='topnav navbar navbar-light'>

@@ -59,6 +59,11 @@ const Form: FC<Props> = (props) => {
 			setID(data.id!);
 			setValues(setValue, data);
 			setBirthday(dayjs(data.student?.birthday).toDate());
+			if (data.student) {
+				for (const key in data.student) {
+					setValue(`student.${key}` as any, (data.student as any)[key]);
+				}
+			}
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -89,7 +94,10 @@ const Form: FC<Props> = (props) => {
 			userService.fetch().then((users) => {
 				setValue(
 					'student.uuid',
-					`student-${`${users.filter((user) => user.role === 'Student').length}`.padStart(5, '0')}-${new Date().getFullYear()}`
+					`student-${`${users.filter((user) => user.role === 'Student').length + 1}`.padStart(
+						5,
+						'0'
+					)}-${new Date().getFullYear()}`
 				);
 			});
 		}

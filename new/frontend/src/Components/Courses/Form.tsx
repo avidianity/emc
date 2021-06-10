@@ -37,9 +37,11 @@ const Form: FC<Props> = (props) => {
 			if (format.test(data.code)) {
 				setProcessing(true);
 				try {
+					data.majors = majors;
 					await (mode === 'Add' ? courseService.create(data) : courseService.update(id, data));
 					toastr.success('Course has been saved successfully.');
-					reset();
+					setMajors([]);
+					return reset();
 				} catch (error) {
 					handleError(error);
 				} finally {

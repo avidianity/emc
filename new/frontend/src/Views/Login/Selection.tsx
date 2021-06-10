@@ -11,16 +11,16 @@ const Selection: FC<Props> = (props) => {
 		<div className='vh-100 d-flex'>
 			<div className='card align-self-center mx-auto'>
 				<div className='card-body'>
-					<Link className=' m-2 d-block btn btn-primary' to={url(`admin`)}>
+					<Link className='m-2 d-block btn btn-primary btn-lg' to={url(`admin`)}>
 						Admin
 					</Link>
-					<Link className=' m-2 d-block btn btn-info' to={url(`registrar`)}>
+					<Link className='m-2 d-block btn btn-info btn-lg' to={url(`registrar`)}>
 						Registrar
 					</Link>
-					<Link className=' m-2 d-block btn btn-success' to={url(`teacher`)}>
+					<Link className='m-2 d-block btn btn-success btn-lg' to={url(`teacher`)}>
 						Teacher
 					</Link>
-					<Link className=' m-2 d-block btn btn-danger' to={url(`student`)}>
+					<Link className='m-2 d-block btn btn-danger btn-lg' to={url(`student`)}>
 						Student
 					</Link>
 				</div>

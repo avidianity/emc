@@ -30,27 +30,7 @@ const Form: FC<Props> = (props) => {
 	const { register, setValue, handleSubmit, reset } = useForm<Inputs>();
 	const [rows, setRows] = useArray<ScheduleRow>([
 		{
-			day: 'Monday',
-			start_time: null,
-			end_time: null,
-		},
-		{
-			day: 'Tuesday',
-			start_time: null,
-			end_time: null,
-		},
-		{
-			day: 'Wednesday',
-			start_time: null,
-			end_time: null,
-		},
-		{
-			day: 'Thursday',
-			start_time: null,
-			end_time: null,
-		},
-		{
-			day: 'Friday',
+			day: '',
 			start_time: null,
 			end_time: null,
 		},
@@ -164,19 +144,37 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12'>
+								<button
+									className='btn btn-info btn-sm'
+									onClick={(e) => {
+										e.preventDefault();
+										rows.push({ day: '', start_time: null, end_time: null });
+										setRows([...rows]);
+									}}>
+									Add Row
+								</button>
 								<table className='table'>
 									<thead>
 										<tr>
 											<th>Day</th>
 											<th>Start Time</th>
-											<th>End Tiome</th>
+											<th>End Time</th>
+											<th></th>
 										</tr>
 									</thead>
 									<tbody>
 										{rows.map(({ day, start_time, end_time }, index) => (
 											<tr key={index}>
 												<td>
-													<input type='text' className='form-control' value={day} disabled />
+													<input
+														type='text'
+														className='form-control'
+														value={day}
+														onChange={(e) => {
+															rows.splice(index, 1, { day: e.target.value, start_time, end_time });
+															setRows([...rows]);
+														}}
+													/>
 												</td>
 												<td>
 													<Flatpickr
@@ -215,6 +213,17 @@ const Form: FC<Props> = (props) => {
 														className='form-control'
 														disabled={processing}
 													/>
+												</td>
+												<td>
+													<button
+														className='btn btn-danger btn-sm'
+														onClick={(e) => {
+															e.preventDefault();
+															rows.splice(index, 1);
+															setRows([...rows]);
+														}}>
+														Remove
+													</button>
 												</td>
 											</tr>
 										))}

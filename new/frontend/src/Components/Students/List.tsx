@@ -35,7 +35,7 @@ const List: FC<Props> = (props) => {
 		},
 	});
 	const [student, setStudent] = useNullable<number>();
-	const modalRef = createRef<HTMLDivElement>();
+	const addGradeModalRef = createRef<HTMLDivElement>();
 	const url = useURL();
 	const user = State.getInstance().get<UserContract>('user');
 
@@ -44,8 +44,8 @@ const List: FC<Props> = (props) => {
 	}
 
 	const submit = async (data: GradeContract) => {
-		if (modalRef.current) {
-			$(modalRef.current).modal('hide');
+		if (addGradeModalRef.current) {
+			$(addGradeModalRef.current).modal('hide');
 		}
 		try {
 			data.student_id = student!;
@@ -98,10 +98,6 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Course',
 			accessor: 'course',
-		},
-		{
-			title: 'Enrolled Subjects',
-			accessor: 'subjects_count',
 		},
 		{
 			title: 'Status',
@@ -163,6 +159,12 @@ const List: FC<Props> = (props) => {
 												to={url(`${student.id}/subjects`)}
 												className='btn btn-primary btn-sm'
 												title='Add Subjects'>
+												<i className='fas fa-edit'></i>
+											</Link>
+											<Link
+												to={`/dashboard/admissions/${student.admissions?.last()?.id}/edit`}
+												className='btn btn-primary btn-sm'
+												title='Edit'>
 												<i className='fas fa-book'></i>
 											</Link>
 										</>
@@ -173,9 +175,9 @@ const List: FC<Props> = (props) => {
 											title='Add Grade'
 											onClick={(e) => {
 												e.preventDefault();
-												if (modalRef.current) {
+												if (addGradeModalRef.current) {
 													setStudent(student.id!);
-													$(modalRef.current).modal('toggle');
+													$(addGradeModalRef.current).modal('toggle');
 												}
 											}}>
 											<i className='fas fa-chart-bar'></i>
@@ -195,7 +197,7 @@ const List: FC<Props> = (props) => {
 				}
 				columns={columns}
 			/>
-			<div ref={modalRef} className='modal fade' tabIndex={-1}>
+			<div ref={addGradeModalRef} className='modal fade' tabIndex={-1}>
 				<div className='modal-dialog modal-dialog-centered modal-lg'>
 					<div className='modal-content'>
 						<div className='modal-header'>

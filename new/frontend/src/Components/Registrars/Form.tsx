@@ -75,7 +75,7 @@ const Form: FC<Props> = (props) => {
 			userService.fetch().then((users) => {
 				setValue(
 					'uuid',
-					`registrar-${`${users.filter((user) => user.role === 'Registrar').length}`.padStart(
+					`registrar-${`${users.filter((user) => user.role === 'Registrar').length + 1}`.padStart(
 						5,
 						'0'
 					)}-${new Date().getFullYear()}`

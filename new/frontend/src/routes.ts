@@ -19,4 +19,5 @@ export const routes = {
 	ENROLLMENT: '/enrollment',
 	PROFILE: '/profile',
 	ADMISSION_REQUIREMENTS: '/admission-requirements',
+	LOGS: '/logs',
 };

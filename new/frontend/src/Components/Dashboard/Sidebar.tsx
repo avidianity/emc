@@ -13,7 +13,7 @@ const Sidebar: FC<Props> = (props) => {
 	const user = State.getInstance().get<UserContract>('user');
 
 	const roles: { [key: string]: string[] } = {
-		Admin: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.REGISTRARS, routes.USERS, routes.MAILS],
+		Admin: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.REGISTRARS, routes.USERS, routes.MAILS, routes.LOGS],
 		Registrar: [
 			routes.COURSES,
 			routes.STUDENTS,
@@ -177,6 +177,14 @@ const Sidebar: FC<Props> = (props) => {
 							<Link to={url(routes.PROFILE)} className='nav-link' activeClassName='active'>
 								<i className='fe fe-user fe-16'></i>
 								<span className='ml-3 item-text'>Profile</span>
+							</Link>
+						</li>
+					) : null}
+					{roles[user.role].includes(routes.LOGS) ? (
+						<li className='nav-item'>
+							<Link to={url(routes.LOGS)} className='nav-link' activeClassName='active'>
+								<i className='fe fe-book fe-16'></i>
+								<span className='ml-3 item-text'>Logs</span>
 							</Link>
 						</li>
 					) : null}
