@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { createRef, FC, useState } from 'react';
 import { useQuery } from 'react-query';
-import { useHistory } from 'react-router';
 import { UserContract } from '../../../Contracts/user.contract';
 import { Asker, handleError } from '../../../helpers';
 import { useArray } from '../../../hooks';
@@ -29,7 +28,6 @@ const Enrollment: FC<Props> = (props) => {
 	const ref = createRef<HTMLDivElement>();
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
 	const [selectAll, setSelectAll] = useState(false);
-	const history = useHistory();
 
 	const add = (value: number) => {
 		selected.push(value);
