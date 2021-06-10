@@ -6,7 +6,6 @@ import { UserContract } from '../../../Contracts/user.contract';
 import { Asker, handleError } from '../../../helpers';
 import { useArray } from '../../../hooks';
 import { State } from '../../../Libraries/State';
-import { routes } from '../../../routes';
 import { subjectService } from '../../../Services/subject.service';
 import { userService } from '../../../Services/user.service';
 
@@ -31,22 +30,6 @@ const Enrollment: FC<Props> = (props) => {
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
 	const [selectAll, setSelectAll] = useState(false);
 	const history = useHistory();
-
-	const increment = async () => {
-		setProcessing(true);
-		try {
-			if (await Asker.danger('Are you sure you want to increment? Your account will be temporarily suspended.')) {
-				await axios.post('/admissions/increment');
-				toastr.success('Admission incremented successfully.');
-				state.remove('user').remove('token');
-				history.push(routes.HOME);
-			}
-		} catch (error) {
-			handleError(error);
-		} finally {
-			setProcessing(false);
-		}
-	};
 
 	const add = (value: number) => {
 		selected.push(value);
@@ -138,14 +121,6 @@ const Enrollment: FC<Props> = (props) => {
 						}
 					}}>
 					{!selectAll ? 'Select All' : 'Unselect All'}
-				</button>
-				<button
-					className='btn btn-success btn-sm ml-auto'
-					onClick={(e) => {
-						e.preventDefault();
-						increment();
-					}}>
-					Increment
 				</button>
 			</div>
 			<form
