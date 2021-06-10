@@ -61,7 +61,8 @@ export function setValues(setter: Function, data: any) {
 	}
 }
 
-let handle: NodeJS.Timeout | null = null;
+let networkHandle: NodeJS.Timeout | null = null;
+let authHandle: NodeJS.Timeout | null = null;
 
 export function handleError(error: any, useHandle = true) {
 	if (error) {
@@ -76,7 +77,16 @@ export function handleError(error: any, useHandle = true) {
 				}
 
 				if (response.status === 401) {
-					return toastr.error('Authentication has expired. Please try logging in and try again.');
+					if (authHandle === null) {
+						toastr.error('Authentication has expired. Please try logging in and try again.');
+						authHandle = setTimeout(() => {
+							if (authHandle !== null) {
+								clearTimeout(authHandle);
+								authHandle = null;
+							}
+						}, 5000);
+					}
+					return;
 				}
 
 				if (isArray(response.data.message)) {
@@ -89,12 +99,12 @@ export function handleError(error: any, useHandle = true) {
 			}
 		} else if (error.message) {
 			if (error.message.includes('Network Error')) {
-				if (handle === null && useHandle) {
+				if (networkHandle === null && useHandle) {
 					toastr.error('Unable to connect. Please check your internet connection or the server may be down.');
-					handle = setTimeout(() => {
-						if (handle !== null) {
-							clearTimeout(handle);
-							handle = null;
+					networkHandle = setTimeout(() => {
+						if (networkHandle !== null) {
+							clearTimeout(networkHandle);
+							networkHandle = null;
 						}
 					}, 5000);
 					return;
