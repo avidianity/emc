@@ -103,7 +103,7 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='uuid'>Registrar Number</label>
+								<label htmlFor='uuid'>Teacher Number</label>
 								<input
 									{...register('uuid')}
 									type='text'
