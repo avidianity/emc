@@ -270,11 +270,13 @@ const Form: FC<Props> = (props) => {
 										}
 									}}>
 									<option> -- Select -- </option>
-									{courses?.map((course, index) => (
-										<option value={course.id} key={index}>
-											{course.code}
-										</option>
-									))}
+									{courses
+										?.filter((course) => course.open)
+										.map((course, index) => (
+											<option value={course.id} key={index}>
+												{course.code}
+											</option>
+										))}
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>

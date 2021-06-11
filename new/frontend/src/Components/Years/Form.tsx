@@ -17,6 +17,7 @@ const Form: FC<Props> = (props) => {
 		defaultValues: {
 			start: new Date().getFullYear(),
 			end: new Date().getFullYear() + 1,
+			current: true,
 		},
 	});
 	const [id, setID] = useState(-1);

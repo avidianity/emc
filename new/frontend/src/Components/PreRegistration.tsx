@@ -166,11 +166,13 @@ const PreRegistration: FC<Props> = (props) => {
 					<label htmlFor='course_id'>Course Code</label>
 					<select {...register('course_id')} id='course_id' className='form-control'>
 						<option> -- Select -- </option>
-						{courses?.map((course, index) => (
-							<option value={course.id} key={index}>
-								{course.code}
-							</option>
-						))}
+						{courses
+							?.filter((course) => course.open)
+							.map((course, index) => (
+								<option value={course.id} key={index}>
+									{course.code}
+								</option>
+							))}
 					</select>
 				</div>
 				<div className='form-group col-12 col-md-4'>

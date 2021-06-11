@@ -25,6 +25,7 @@ const Subjects: FC<Props> = (props) => {
 		},
 	});
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
+	const admission = student?.admissions?.find((admission) => admission.year?.current);
 
 	const submit = async () => {
 		setProcessing(true);
@@ -45,8 +46,6 @@ const Subjects: FC<Props> = (props) => {
 		history.goBack();
 		return null;
 	}
-
-	const admission = student?.admissions?.last();
 
 	if (!student || !admission) {
 		return (
