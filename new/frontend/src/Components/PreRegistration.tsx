@@ -68,7 +68,7 @@ const PreRegistration: FC<Props> = (props) => {
 		setProcessing(false);
 		try {
 			data.status = 'Regular';
-			data.year_id = years?.last()?.id || 0;
+			data.year_id = years?.find((year) => year.current)?.id || 0;
 			data.pre_registration = true;
 			data.requirements = selected;
 			await axios.post('/admission/pre-registration', data);
