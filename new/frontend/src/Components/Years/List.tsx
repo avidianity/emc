@@ -1,7 +1,9 @@
+import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { UserContract } from '../../Contracts/user.contract';
+import { YearContract } from '../../Contracts/year.contract';
 import { handleError, Asker } from '../../helpers';
 import { useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
@@ -18,6 +20,18 @@ const List: FC<Props> = (props) => {
 	if (isError) {
 		handleError(error);
 	}
+
+	const setAsCurrent = async (year: YearContract) => {
+		try {
+			if (await Asker.notice('Are you sure you want to set the current school year?')) {
+				await yearService.update(year.id, { current: true });
+				toastr.info(`Year ${year.start} - ${year.end} has been set as current school year.`, 'Notice');
+				refetch();
+			}
+		} catch (error) {
+			handleError(error);
+		}
+	};
 
 	const deleteItem = async (id: any) => {
 		try {
@@ -46,6 +60,18 @@ const List: FC<Props> = (props) => {
 			title: 'End',
 			accessor: 'end',
 		},
+		{
+			title: 'Semester Start',
+			accessor: 'semester_start',
+		},
+		{
+			title: 'Semester End',
+			accessor: 'semester_end',
+		},
+		{
+			title: '',
+			accessor: 'current',
+		},
 	];
 
 	if (user?.role === 'Registrar') {
@@ -63,18 +89,33 @@ const List: FC<Props> = (props) => {
 			items={
 				items?.map((year) => ({
 					...year,
+					semester_start: dayjs(year.semester_start).format('MMMM DD, YYYY'),
+					semester_end: dayjs(year.semester_end).format('MMMM DD, YYYY'),
+					current: year.current ? <span className='badge badge-success'>Current</span> : '',
 					actions:
 						user?.role === 'Registrar' ? (
 							<>
-								<Link to={url(`${year.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
+								<Link to={url(`${year.id}/edit`)} className='btn btn-warning btn-sm mx-1' title='Edit'>
 									<i className='fas fa-edit'></i>
 								</Link>
+								{!year.current ? (
+									<button
+										className='btn btn-success btn-sm mx-1'
+										onClick={(e) => {
+											e.preventDefault();
+											setAsCurrent(year);
+										}}
+										title='Set as Current'>
+										<i className='fas fa-check'></i>
+									</button>
+								) : null}
 								<button
 									className='btn btn-danger btn-sm mx-1'
 									onClick={(e) => {
 										e.preventDefault();
 										deleteItem(year.id);
-									}}>
+									}}
+									title='Delete'>
 									<i className='fas fa-trash'></i>
 								</button>
 							</>

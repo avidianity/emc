@@ -3,8 +3,10 @@ import { useForm } from 'react-hook-form';
 import { useHistory, useRouteMatch } from 'react-router';
 import { YearContract } from '../../Contracts/year.contract';
 import { handleError, setValues } from '../../helpers';
-import { useMode } from '../../hooks';
+import { useMode, useNullable } from '../../hooks';
 import { yearService } from '../../Services/year.service';
+import Flatpickr from 'react-flatpickr';
+import dayjs from 'dayjs';
 
 type Props = {};
 
@@ -20,12 +22,16 @@ const Form: FC<Props> = (props) => {
 	const [id, setID] = useState(-1);
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
+	const [semesterStart, setSemesterStart] = useNullable<Date>();
+	const [semesterEnd, setSemesterEnd] = useNullable<Date>();
 
 	const fetch = async (id: any) => {
 		try {
 			const data = await yearService.fetchOne(id);
 			setID(data.id!);
 			setValues(setValue, data);
+			setSemesterStart(dayjs(data.semester_start).toDate());
+			setSemesterEnd(dayjs(data.semester_end).toDate());
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -36,6 +42,8 @@ const Form: FC<Props> = (props) => {
 	const submit = async (data: YearContract) => {
 		setProcessing(true);
 		try {
+			data.semester_start = semesterStart?.toJSON() || '';
+			data.semester_end = semesterEnd?.toJSON() || '';
 			await (mode === 'Add' ? yearService.create(data) : yearService.update(id, data));
 			toastr.success('School Year has been saved successfully.');
 			reset();
@@ -83,6 +91,48 @@ const Form: FC<Props> = (props) => {
 									className='form-control'
 									disabled={processing}
 								/>
+							</div>
+							<div className='form-group col-12 col-md-6'>
+								<label htmlFor='semester_start'>Semester Start</label>
+								<Flatpickr
+									value={semesterStart || undefined}
+									id='semester_start'
+									onChange={(dates) => {
+										if (dates.length > 0) {
+											setSemesterStart(dates[0]);
+										}
+									}}
+									className='form-control'
+									disabled={processing}
+								/>
+							</div>
+							<div className='form-group col-12 col-md-6'>
+								<label htmlFor='semester_end'>Semester End</label>
+								<Flatpickr
+									value={semesterEnd || undefined}
+									id='semester_end'
+									onChange={(dates) => {
+										if (dates.length > 0) {
+											setSemesterEnd(dates[0]);
+										}
+									}}
+									className='form-control'
+									disabled={processing}
+								/>
+							</div>
+							<div className='form-group col-12'>
+								<div className='custom-control custom-checkbox'>
+									<input
+										{...register('current')}
+										type='checkbox'
+										className='custom-control-input'
+										id='current'
+										disabled={processing}
+									/>
+									<label className='custom-control-label' htmlFor='current'>
+										Set as Current
+									</label>
+								</div>
 							</div>
 						</div>
 						<div className='form-group d-flex'>

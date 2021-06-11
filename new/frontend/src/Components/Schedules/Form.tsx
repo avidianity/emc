@@ -84,17 +84,7 @@ const Form: FC<Props> = (props) => {
 					<h5 className='card-title'>{mode} Schedule</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
-							<div className='form-group col-12'>
-								<label htmlFor='year_id'>School Year</label>
-								<select {...register('year_id')} id='year_id' className='form-control'>
-									<option> -- Select -- </option>
-									{years?.map((year, index) => (
-										<option value={year.id} key={index}>
-											{year.start} - {year.end}
-										</option>
-									))}
-								</select>
-							</div>
+							<input type='hidden' {...register('year_id')} value={years?.filter((year) => year.current)[0]?.id} />
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='course_id'>Course</label>
 								<select {...register('course_id')} id='course_id' className='form-control'>

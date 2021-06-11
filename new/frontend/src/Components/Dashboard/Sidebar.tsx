@@ -109,7 +109,7 @@ const Sidebar: FC<Props> = (props) => {
 						</li>
 					) : null}
 					{roles[user.role].includes(routes.MAILS) ? (
-						<li className='nav-item'>
+						<li className='nav-item d-none'>
 							<Link to={url(routes.MAILS)} className='nav-link' activeClassName='active'>
 								<i className='fe fe-mail fe-16'></i>
 								<span className='ml-3 item-text'>Email Outbox</span>

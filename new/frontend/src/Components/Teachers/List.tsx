@@ -68,7 +68,7 @@ const List: FC<Props> = (props) => {
 		},
 	];
 
-	if (user?.role === 'Admin') {
+	if (user?.role === 'Registrar') {
 		columns.unshift({
 			title: '#',
 			accessor: 'toggle',
@@ -176,7 +176,7 @@ const List: FC<Props> = (props) => {
 				columns={columns}
 				buttons={
 					<>
-						{user?.role === 'Admin' ? (
+						{user?.role === 'Registrar' ? (
 							<>
 								<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
 									<i className='fas fa-plus'></i>

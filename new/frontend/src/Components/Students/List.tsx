@@ -3,10 +3,13 @@ import React, { createRef, FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { CourseContract } from '../../Contracts/course.contract';
+import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
 import { useNullable, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
+import { courseService } from '../../Services/course.service';
 import { gradeService } from '../../Services/grade.service';
 import { subjectService } from '../../Services/subject.service';
 import { userService } from '../../Services/user.service';
@@ -29,6 +32,9 @@ const List: FC<Props> = (props) => {
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('users', () => userService.fetch());
 	const { data: years } = useQuery('years', () => yearService.fetch());
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
+	const { data: courses } = useQuery('courses', () => courseService.fetch());
+	const [course, setCourse] = useNullable<CourseContract>();
+	const [major, setMajor] = useNullable<MajorContract>();
 	const { register, handleSubmit, reset } = useForm<GradeContract>({
 		defaultValues: {
 			grade: 65,
@@ -118,6 +124,23 @@ const List: FC<Props> = (props) => {
 				items={
 					items
 						?.filter((user) => user.role === 'Student')
+						.filter((student) => {
+							const admission = student.admissions?.find((admission) => admission.year?.current);
+
+							if (!admission) {
+								return false;
+							}
+
+							if (course && major) {
+								return admission.course_id === course.id && admission.major_id === major.id;
+							} else if (course) {
+								return admission.course_id === course.id;
+							} else if (major) {
+								return admission.major_id === major.id;
+							}
+
+							return true;
+						})
 						.map((student) => ({
 							...student,
 							name: (
@@ -125,8 +148,12 @@ const List: FC<Props> = (props) => {
 									{student.last_name}, {student.first_name} {student.middle_name || ''}
 								</>
 							),
-							year: student.admissions?.last()?.level,
-							course: student.admissions?.last()?.course?.code,
+							year: student.admissions?.filter((admission) => admission.year?.current)[0]?.level,
+							course: `${student.admissions?.filter((admission) => admission.year?.current)[0]?.course?.code}${
+								student.admissions?.filter((admission) => admission.year?.current)[0]?.major
+									? ` - Major in ${student.admissions?.filter((admission) => admission.year?.current)[0]?.major?.name}`
+									: ''
+							}`,
 							birthday: dayjs(student.birthday).format('MMMM DD, YYYY'),
 							age: new Date().getFullYear() - dayjs(student.birthday).year(),
 							status: student.active ? (
@@ -138,6 +165,12 @@ const List: FC<Props> = (props) => {
 								<div style={{ minWidth: '100px' }}>
 									{user?.role === 'Registrar' ? (
 										<>
+											<Link
+												to={`/dashboard/admissions/${student.admissions?.last()?.id}/edit`}
+												className='btn btn-warning btn-sm mx-1'
+												title='Edit'>
+												<i className='fas fa-edit'></i>
+											</Link>
 											<button
 												className={`btn btn-${student.active ? 'danger' : 'info'} btn-sm mx-1`}
 												onClick={async (e) => {
@@ -157,14 +190,8 @@ const List: FC<Props> = (props) => {
 											</button>
 											<Link
 												to={url(`${student.id}/subjects`)}
-												className='btn btn-primary btn-sm'
+												className='btn btn-primary btn-sm mx-1'
 												title='Add Subjects'>
-												<i className='fas fa-edit'></i>
-											</Link>
-											<Link
-												to={`/dashboard/admissions/${student.admissions?.last()?.id}/edit`}
-												className='btn btn-primary btn-sm'
-												title='Edit'>
 												<i className='fas fa-book'></i>
 											</Link>
 										</>
@@ -196,6 +223,59 @@ const List: FC<Props> = (props) => {
 						})) || []
 				}
 				columns={columns}
+				misc={
+					<>
+						<label className='mb-0 mt-2 mx-1'>
+							Course:
+							<select
+								className='custom-select custom-select-sm form-control form-control-sm'
+								onChange={(e) => {
+									const id = e.target.value.toNumber();
+									if (id === 0) {
+										setCourse(null);
+										setMajor(null);
+									} else {
+										const course = courses?.find((course) => course.id === id);
+										if (course) {
+											setCourse(course);
+										}
+									}
+								}}>
+								<option value='0'>All</option>
+								{courses?.map((course, index) => (
+									<option value={course.id} key={index}>
+										{course.code}
+									</option>
+								))}
+							</select>
+						</label>
+						{course ? (
+							<label className='mb-0 mt-2 mx-1'>
+								Major:
+								<select
+									className='custom-select custom-select-sm form-control form-control-sm'
+									onChange={(e) => {
+										const id = e.target.value.toNumber();
+										if (id === 0) {
+											setMajor(null);
+										} else {
+											const major = course?.majors?.find((major) => major.id === id);
+											if (major) {
+												setMajor(major);
+											}
+										}
+									}}>
+									<option value='0'>All</option>
+									{course.majors?.map((major, index) => (
+										<option value={major.id} key={index}>
+											{major.name}
+										</option>
+									))}
+								</select>
+							</label>
+						) : null}
+					</>
+				}
 			/>
 			<div ref={addGradeModalRef} className='modal fade' tabIndex={-1}>
 				<div className='modal-dialog modal-dialog-centered modal-lg'>
@@ -208,17 +288,7 @@ const List: FC<Props> = (props) => {
 						</div>
 						<form onSubmit={handleSubmit(submit)}>
 							<div className='modal-body'>
-								<div className='form-group'>
-									<label htmlFor='year_id'>School Year</label>
-									<select {...register('year_id')} id='year_id' className='form-control'>
-										<option> -- Select -- </option>
-										{years?.map((year, index) => (
-											<option value={year.id} key={index}>
-												{year.start} - {year.end}
-											</option>
-										))}
-									</select>
-								</div>
+								<input type='hidden' {...register('year_id')} value={years?.filter((year) => year.current)[0]?.id} />
 								<div className='form-group'>
 									<label htmlFor='subject_id'>Subject</label>
 									<select {...register('subject_id')} id='subject_id' className='form-control'>

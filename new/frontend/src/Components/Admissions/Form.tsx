@@ -10,6 +10,7 @@ import { useQuery } from 'react-query';
 import { courseService } from '../../Services/course.service';
 import { yearService } from '../../Services/year.service';
 import { userService } from '../../Services/user.service';
+import { CourseContract } from '../../Contracts/course.contract';
 
 type Props = {};
 
@@ -20,6 +21,7 @@ type Inputs = {
 	term: string;
 	student_id: number;
 	year_id: number;
+	major_id?: number;
 	requirements: string[];
 	student: {
 		uuid: string;
@@ -50,6 +52,8 @@ const Form: FC<Props> = (props) => {
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
 	const [birthday, setBirthday] = useNullable<Date>();
+	const [majorID, setMajorID] = useNullable<number>();
+	const [course, setCourse] = useNullable<CourseContract>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const { data: years } = useQuery('years', () => yearService.fetch());
 
@@ -64,6 +68,9 @@ const Form: FC<Props> = (props) => {
 					setValue(`student.${key}` as any, (data.student as any)[key]);
 				}
 			}
+			if (data.major_id) {
+				setMajorID(data.major_id);
+			}
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -74,6 +81,9 @@ const Form: FC<Props> = (props) => {
 	const submit = async (data: Inputs) => {
 		setProcessing(true);
 		try {
+			if (majorID) {
+				data.major_id = majorID;
+			}
 			data.requirements = [];
 			data.student.birthday = birthday?.toJSON();
 			await (mode === 'Add' ? admissionService.create(data) : admissionService.update(id, data));
@@ -123,14 +133,16 @@ const Form: FC<Props> = (props) => {
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='year_id'>School Year</label>
-								<select {...register('year_id')} id='year_id' className='form-control'>
-									<option> -- Select -- </option>
-									{years?.map((year, index) => (
-										<option value={year.id} key={index}>
-											{year.start} - {year.end}
-										</option>
-									))}
+								<select id='year_id' className='form-control' disabled>
+									{years
+										?.filter((year) => year.current)
+										.map((year, index) => (
+											<option value={year.id} key={index}>
+												{year.start} - {year.end}
+											</option>
+										))}
 								</select>
+								<input type='hidden' {...register('year_id')} value={years?.filter((year) => year.current)[0]?.id} />
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='middle_name'>Middle Name</label>
@@ -246,7 +258,17 @@ const Form: FC<Props> = (props) => {
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='course_id'>Course Code</label>
-								<select {...register('course_id')} id='course_id' className='form-control'>
+								<select
+									{...register('course_id')}
+									id='course_id'
+									className='form-control'
+									onChange={(e) => {
+										const id = e.target.value.toNumber();
+										const course = courses?.find((course) => course.id === id);
+										if (course) {
+											setCourse(course);
+										}
+									}}>
 									<option> -- Select -- </option>
 									{courses?.map((course, index) => (
 										<option value={course.id} key={index}>
@@ -256,6 +278,22 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>
+								<label htmlFor='major_id'>Major</label>
+								<select
+									id='major_id'
+									className='form-control'
+									onChange={(e) => {
+										setMajorID(e.target.value.toNumber());
+									}}>
+									<option> -- Select -- </option>
+									{course?.majors?.map((major, index) => (
+										<option value={major.id} key={index}>
+											{major.name}
+										</option>
+									))}
+								</select>
+							</div>
+							<div className='form-group col-12'>
 								<label htmlFor='term'>Term</label>
 								<div className='row'>
 									<div className='col-12 col-md-4'>

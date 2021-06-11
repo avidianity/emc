@@ -86,7 +86,7 @@ const List: FC<Props> = (props) => {
 					id_number: admission.student?.uuid,
 					student: `${admission.student?.last_name}, ${admission.student?.first_name} ${admission.student?.middle_name || ''}`,
 					gender: admission.student?.gender,
-					course: admission.course?.code,
+					course: `${admission.course?.code}${admission.major ? ` - Major in ${admission.major.name}` : ''}`,
 					pre_registration: admission.pre_registration ? (
 						<span className='badge badge-success'>Yes</span>
 					) : (
