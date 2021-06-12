@@ -47,8 +47,8 @@ const Form: FC<Props> = (props) => {
 		try {
 			const data = await scheduleService.fetchOne(id);
 			setID(data.id!);
-			setValues(setValue, data);
 			setMode('Edit');
+			setValues(setValue, data);
 			setRows([...data.payload]);
 		} catch (error) {
 			handleError(error);
@@ -63,6 +63,7 @@ const Form: FC<Props> = (props) => {
 			await (mode === 'Add' ? scheduleService.create(data) : scheduleService.update(id, data));
 			toastr.success('Schedule has been saved successfully.');
 			reset();
+			setRows([]);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -84,7 +85,7 @@ const Form: FC<Props> = (props) => {
 					<h5 className='card-title'>{mode} Schedule</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
-							<input type='hidden' {...register('year_id')} value={years?.filter((year) => year.current)[0]?.id} />
+							<input type='hidden' {...register('year_id')} value={years?.find((year) => year.current)?.id} />
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='course_id'>Course</label>
 								<select {...register('course_id')} id='course_id' className='form-control'>
@@ -114,7 +115,13 @@ const Form: FC<Props> = (props) => {
 								<select {...register('subject_id')} id='subject_id' className='form-control'>
 									<option> -- Select -- </option>
 									{subjects
-										?.filter((subject) => subject.schedules?.length === 0)
+										?.filter((subject) => {
+											const valid = subject.schedules?.length === 0;
+											if (mode === 'Add') {
+												return valid;
+											}
+											return valid || subject.id === id;
+										})
 										.map((subject, index) => (
 											<option value={subject.id} key={index}>
 												{subject.code}
@@ -135,7 +142,7 @@ const Form: FC<Props> = (props) => {
 							</div>
 							<div className='form-group col-12'>
 								<button
-									className='btn btn-info btn-sm'
+									className='btn btn-info btn-sm mt-2 mb-4'
 									onClick={(e) => {
 										e.preventDefault();
 										rows.push({ day: '', start_time: null, end_time: null });

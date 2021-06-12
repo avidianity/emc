@@ -40,6 +40,10 @@ const List: FC<Props> = (props) => {
 			accessor: 'course',
 		},
 		{
+			title: 'Subject',
+			accessor: 'subject',
+		},
+		{
 			title: 'Teacher',
 			accessor: 'teacher',
 		},
@@ -68,6 +72,7 @@ const List: FC<Props> = (props) => {
 			items={
 				items?.map((schedule) => ({
 					...schedule,
+					subject: schedule?.subject?.code,
 					course: schedule.course?.code,
 					teacher: `${schedule.teacher?.last_name}, ${schedule.teacher?.first_name} ${schedule.teacher?.middle_name || ''}`,
 					times: (
@@ -81,22 +86,25 @@ const List: FC<Props> = (props) => {
 							)}
 						</>
 					),
-					actions:
-						user?.role === 'Registrar' ? (
-							<>
-								<Link to={url(`${schedule.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-									<i className='fas fa-edit'></i>
-								</Link>
-								<button
-									className='btn btn-danger btn-sm mx-1'
-									onClick={(e) => {
-										e.preventDefault();
-										deleteItem(schedule.id);
-									}}>
-									<i className='fas fa-trash'></i>
-								</button>
-							</>
-						) : null,
+					actions: (
+						<div style={{ minWidth: '100px' }}>
+							{user?.role === 'Registrar' ? (
+								<>
+									<Link to={url(`${schedule.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
+										<i className='fas fa-edit'></i>
+									</Link>
+									<button
+										className='btn btn-danger btn-sm mx-1'
+										onClick={(e) => {
+											e.preventDefault();
+											deleteItem(schedule.id);
+										}}>
+										<i className='fas fa-trash'></i>
+									</button>
+								</>
+							) : null}
+						</div>
+					),
 				})) || []
 			}
 			columns={columns}
