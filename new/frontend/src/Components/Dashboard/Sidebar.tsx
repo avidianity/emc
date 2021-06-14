@@ -97,14 +97,6 @@ const Sidebar: FC<Props> = (props) => {
 										</Link>
 									</li>
 								) : null}
-								{roles[user.role].includes(routes.USERS) ? (
-									<li className='nav-item'>
-										<Link to={url(routes.USERS)} className='nav-link' activeClassName='active'>
-											<i className='fe fe-user fe-16'></i>
-											<span className='ml-3 item-text'>System Users</span>
-										</Link>
-									</li>
-								) : null}
 							</ul>
 						</li>
 					) : null}

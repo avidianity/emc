@@ -11,6 +11,7 @@ import { requirementService } from '../Services/requirement.service';
 import { handleError } from '../helpers';
 import { userService } from '../Services/user.service';
 import axios from 'axios';
+import { CourseContract } from '../Contracts/course.contract';
 
 type Props = {};
 
@@ -21,6 +22,7 @@ type Inputs = {
 	term: string;
 	student_id: number;
 	year_id: number;
+	major_id?: number;
 	pre_registration: boolean;
 	requirements: string[];
 	student: {
@@ -49,6 +51,7 @@ const PreRegistration: FC<Props> = (props) => {
 	const [all, setAll] = useState(false);
 	const { register, handleSubmit, reset, setValue } = useForm<Inputs>();
 	const [birthday, setBirthday] = useNullable<Date>();
+	const [course, setCourse] = useNullable<CourseContract>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const { data: years } = useQuery('years', () => yearService.fetch(), {
 		onSuccess(years) {
@@ -68,6 +71,7 @@ const PreRegistration: FC<Props> = (props) => {
 		setProcessing(false);
 		try {
 			data.status = 'Regular';
+			data.term = '1st Semester';
 			data.year_id = years?.find((year) => year.current)?.id || 0;
 			data.pre_registration = true;
 			data.requirements = selected;
@@ -162,9 +166,21 @@ const PreRegistration: FC<Props> = (props) => {
 						disabled={processing}
 					/>
 				</div>
-				<div className='form-group col-12 col-md-4'>
+				<div className='form-group col-12 col-md-6'>
 					<label htmlFor='course_id'>Course Code</label>
-					<select {...register('course_id')} id='course_id' className='form-control'>
+					<select
+						{...register('course_id')}
+						id='course_id'
+						className='form-control'
+						onChange={(e) => {
+							const id = e.target.value.toNumber();
+							const course = courses?.find((course) => course.id === id);
+							if (course) {
+								setCourse(course);
+							} else {
+								setCourse(null);
+							}
+						}}>
 						<option> -- Select -- </option>
 						{courses
 							?.filter((course) => course.open)
@@ -175,48 +191,7 @@ const PreRegistration: FC<Props> = (props) => {
 							))}
 					</select>
 				</div>
-				<div className='form-group col-12 col-md-4'>
-					<label htmlFor='term'>Term</label>
-					<div className='row'>
-						<div className='col-12 col-md-4'>
-							<div className='custom-control custom-radio'>
-								<input
-									{...register('term')}
-									type='radio'
-									id='1st-semester'
-									className='custom-control-input'
-									value='First Semester'
-								/>
-								<label className='custom-control-label' htmlFor='1st-semester'>
-									1st Semester
-								</label>
-							</div>
-						</div>
-						<div className='col-12 col-md-4'>
-							<div className='custom-control custom-radio'>
-								<input
-									{...register('term')}
-									type='radio'
-									id='2nd-semester'
-									className='custom-control-input'
-									value='Second Semester'
-								/>
-								<label className='custom-control-label' htmlFor='2nd-semester'>
-									2nd Semester
-								</label>
-							</div>
-						</div>
-						<div className='col-12 col-md-4'>
-							<div className='custom-control custom-radio'>
-								<input {...register('term')} type='radio' id='summer' className='custom-control-input' value='Summer' />
-								<label className='custom-control-label' htmlFor='summer'>
-									Summer
-								</label>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div className='form-group col-12 col-md-4'>
+				<div className='form-group col-12 col-md-6'>
 					<label htmlFor='level'>Year Level</label>
 					<select {...register('level')} id='level' className='form-control'>
 						<option> -- Select -- </option>
@@ -227,6 +202,18 @@ const PreRegistration: FC<Props> = (props) => {
 						<option value='5th'>5th</option>
 					</select>
 				</div>
+				{course && course.majors && course.majors.length > 0 ? (
+					<div className='form-group col-12 col-md-6'>
+						<label htmlFor='major_id'>Major</label>
+						<select {...register('major_id')} id='major_id' className='form-control'>
+							{course?.majors?.map((major, index) => (
+								<option value={major.id} key={index}>
+									{major.name}
+								</option>
+							))}
+						</select>
+					</div>
+				) : null}
 				<div className='form-group col-12 p-2'>
 					<div className='text-center'>
 						<h3>Requirements</h3>

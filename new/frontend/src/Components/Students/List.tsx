@@ -78,16 +78,6 @@ const List: FC<Props> = (props) => {
 		}
 	};
 
-	const update = async (student: UserContract) => {
-		try {
-			await userService.update(student.id, { active: !student.active });
-			toastr.success(`Student ${student.active ? 'disabled' : 'enabled'} successfully.`);
-			refetch();
-		} catch (error) {
-			handleError(error);
-		}
-	};
-
 	const columns = [
 		{
 			title: 'ID Number',
@@ -171,23 +161,6 @@ const List: FC<Props> = (props) => {
 												title='Edit'>
 												<i className='fas fa-edit'></i>
 											</Link>
-											<button
-												className={`btn btn-${student.active ? 'danger' : 'info'} btn-sm mx-1`}
-												onClick={async (e) => {
-													e.preventDefault();
-													if (
-														await Asker.notice(
-															`Are you sure you want to ${
-																student.active ? 'unconfirm' : 'confirm'
-															} this student?`
-														)
-													) {
-														update(student);
-													}
-												}}
-												title={student.active ? 'Unconfirm' : 'Confirm'}>
-												<i className={`fas fa-user-${student.active ? 'times' : 'check'}`}></i>
-											</button>
 											<Link
 												to={url(`${student.id}/subjects`)}
 												className='btn btn-primary btn-sm mx-1'

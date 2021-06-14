@@ -6,6 +6,7 @@ import { handleError, Asker } from '../../helpers';
 import { useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { admissionService } from '../../Services/admission.service';
+import { userService } from '../../Services/user.service';
 import Table from '../Shared/Table';
 
 type Props = {};
@@ -14,6 +15,16 @@ const List: FC<Props> = (props) => {
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('admissions', () => admissionService.fetch());
 
 	const url = useURL();
+
+	const update = async (student: UserContract) => {
+		try {
+			await userService.update(student.id, { active: !student.active });
+			toastr.success(`Student ${student.active ? 'disabled' : 'enabled'} successfully.`);
+			refetch();
+		} catch (error) {
+			handleError(error);
+		}
+	};
 
 	if (isError) {
 		handleError(error);
@@ -81,39 +92,60 @@ const List: FC<Props> = (props) => {
 			title='Admissions'
 			loading={loading}
 			items={
-				items?.map((admission) => ({
-					...admission,
-					id_number: admission.student?.uuid,
-					student: `${admission.student?.last_name}, ${admission.student?.first_name} ${admission.student?.middle_name || ''}`,
-					gender: admission.student?.gender,
-					course: `${admission.course?.code}${admission.major ? ` - Major in ${admission.major.name}` : ''}`,
-					pre_registration: admission.pre_registration ? (
-						<span className='badge badge-success'>Yes</span>
-					) : (
-						<span className='badge badge-danger'>No</span>
-					),
-					requirements: admission.requirements?.map((requirement, index) => (
-						<span className='d-block' key={index}>
-							{requirement}
-						</span>
-					)),
-					actions:
-						user?.role === 'Registrar' ? (
-							<>
-								<Link to={url(`${admission.id}/edit`)} className='btn btn-warning btn-sm mx-1' title='Edit'>
-									<i className='fas fa-edit'></i>
-								</Link>
-								<button
-									className='btn btn-danger btn-sm mx-1 d-none'
-									onClick={(e) => {
-										e.preventDefault();
-										deleteItem(admission.id);
-									}}>
-									<i className='fas fa-trash'></i>
-								</button>
-							</>
-						) : null,
-				})) || []
+				items
+					?.filter((admission) => !admission.student?.active && admission.year?.current)
+					.map((admission) => ({
+						...admission,
+						id_number: admission.student?.uuid,
+						student: `${admission.student?.last_name}, ${admission.student?.first_name} ${
+							admission.student?.middle_name || ''
+						}`,
+						gender: admission.student?.gender,
+						course: `${admission.course?.code}${admission.major ? ` - Major in ${admission.major.name}` : ''}`,
+						pre_registration: admission.pre_registration ? (
+							<span className='badge badge-success'>Yes</span>
+						) : (
+							<span className='badge badge-danger'>No</span>
+						),
+						requirements: admission.requirements?.map((requirement, index) => (
+							<span className='d-block' key={index}>
+								{requirement}
+							</span>
+						)),
+						actions:
+							user?.role === 'Registrar' ? (
+								<>
+									<Link to={url(`${admission.id}/edit`)} className='btn btn-warning btn-sm mx-1' title='Edit'>
+										<i className='fas fa-edit'></i>
+									</Link>
+									<button
+										className={`btn btn-${admission.student?.active ? 'danger' : 'info'} btn-sm mx-1`}
+										onClick={async (e) => {
+											e.preventDefault();
+											if (
+												await Asker.notice(
+													`Are you sure you want to ${
+														admission.student?.active ? 'unconfirm' : 'confirm'
+													} this student?`
+												)
+											) {
+												update(admission.student!);
+											}
+										}}
+										title={admission.student?.active ? 'Unconfirm' : 'Confirm'}>
+										<i className={`fas fa-user-${admission.student?.active ? 'times' : 'check'}`}></i>
+									</button>
+									<button
+										className='btn btn-danger btn-sm mx-1 d-none'
+										onClick={(e) => {
+											e.preventDefault();
+											deleteItem(admission.id);
+										}}>
+										<i className='fas fa-trash'></i>
+									</button>
+								</>
+							) : null,
+					})) || []
 			}
 			columns={columns}
 			buttons={

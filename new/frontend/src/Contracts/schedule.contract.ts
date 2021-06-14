@@ -1,4 +1,5 @@
 import { CourseContract } from './course.contract';
+import { MajorContract } from './major.contract';
 import { ModelContract } from './model.contract';
 import { SubjectContract } from './subject.contract';
 import { UserContract } from './user.contract';
@@ -20,5 +21,7 @@ export interface ScheduleContract extends ModelContract {
 	year: string;
 	payload: ScheduleRow[];
 	year_id: number;
+	major_id?: number;
+	major?: MajorContract;
 	schoolyear?: YearContract;
 }

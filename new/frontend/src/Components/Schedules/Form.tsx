@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import { useHistory, useRouteMatch } from 'react-router';
 import { ScheduleRow } from '../../Contracts/schedule.contract';
 import { handleError, setValues } from '../../helpers';
-import { useArray, useMode } from '../../hooks';
+import { useArray, useMode, useNullable } from '../../hooks';
 import { courseService } from '../../Services/course.service';
 import { scheduleService } from '../../Services/schedule.service';
 import { subjectService } from '../../Services/subject.service';
@@ -12,6 +12,7 @@ import { userService } from '../../Services/user.service';
 import Flatpickr from 'react-flatpickr';
 import dayjs from 'dayjs';
 import { yearService } from '../../Services/year.service';
+import { CourseContract } from '../../Contracts/course.contract';
 
 type Props = {};
 
@@ -21,6 +22,7 @@ type Inputs = {
 	teacher_id: number;
 	year: string;
 	year_id: number;
+	major_id?: number;
 	payload: ScheduleRow[];
 };
 
@@ -28,6 +30,7 @@ const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
 	const { register, setValue, handleSubmit, reset } = useForm<Inputs>();
+	const [course, setCourse] = useNullable<CourseContract>();
 	const [rows, setRows] = useArray<ScheduleRow>([
 		{
 			day: '',
@@ -50,6 +53,7 @@ const Form: FC<Props> = (props) => {
 			setMode('Edit');
 			setValues(setValue, data);
 			setRows([...data.payload]);
+			setCourse(data.course!);
 		} catch (error) {
 			handleError(error);
 			history.goBack();
@@ -64,6 +68,7 @@ const Form: FC<Props> = (props) => {
 			toastr.success('Schedule has been saved successfully.');
 			reset();
 			setRows([]);
+			setCourse(null);
 		} catch (error) {
 			handleError(error);
 		} finally {
@@ -88,7 +93,19 @@ const Form: FC<Props> = (props) => {
 							<input type='hidden' {...register('year_id')} value={years?.find((year) => year.current)?.id} />
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='course_id'>Course</label>
-								<select {...register('course_id')} id='course_id' className='form-control'>
+								<select
+									{...register('course_id')}
+									id='course_id'
+									className='form-control'
+									onChange={(e) => {
+										const id = e.target.value.toNumber();
+										const course = courses?.find((course) => course.id === id);
+										if (course) {
+											setCourse(course);
+										} else {
+											setCourse(null);
+										}
+									}}>
 									<option> -- Select -- </option>
 									{courses?.map((course, index) => (
 										<option value={course.id} key={index}>
@@ -110,7 +127,21 @@ const Form: FC<Props> = (props) => {
 										))}
 								</select>
 							</div>
-							<div className='form-group col-12 col-md-6'>
+							{course && course.majors && course.majors.length > 0 ? (
+								<div className='form-group col-12 col-md-6'>
+									<label htmlFor='major_id'>Major</label>
+									<select {...register('major_id')} id='major_id' className='form-control'>
+										{course && course.majors
+											? course.majors.map((major, index) => (
+													<option value={major.id} key={index}>
+														{major.name}
+													</option>
+											  ))
+											: null}
+									</select>
+								</div>
+							) : null}
+							<div className={`form-group col-12 col-md-6 ${course && course.majors && course.majors.length > 0 ? '' : ''}`}>
 								<label htmlFor='subject_id'>Subject</label>
 								<select {...register('subject_id')} id='subject_id' className='form-control'>
 									<option> -- Select -- </option>
@@ -124,7 +155,7 @@ const Form: FC<Props> = (props) => {
 										})
 										.map((subject, index) => (
 											<option value={subject.id} key={index}>
-												{subject.code}
+												{subject.description}
 											</option>
 										))}
 								</select>

@@ -71,6 +71,7 @@ const Form: FC<Props> = (props) => {
 			if (data.major_id) {
 				setMajorID(data.major_id);
 			}
+			setCourse(data.course!);
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -267,6 +268,8 @@ const Form: FC<Props> = (props) => {
 										const course = courses?.find((course) => course.id === id);
 										if (course) {
 											setCourse(course);
+										} else {
+											setCourse(null);
 										}
 									}}>
 									<option> -- Select -- </option>
@@ -279,22 +282,24 @@ const Form: FC<Props> = (props) => {
 										))}
 								</select>
 							</div>
-							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='major_id'>Major</label>
-								<select
-									id='major_id'
-									className='form-control'
-									onChange={(e) => {
-										setMajorID(e.target.value.toNumber());
-									}}>
-									<option> -- Select -- </option>
-									{course?.majors?.map((major, index) => (
-										<option value={major.id} key={index}>
-											{major.name}
-										</option>
-									))}
-								</select>
-							</div>
+							{course && course.majors && course.majors.length > 0 ? (
+								<div className='form-group col-12 col-md-6'>
+									<label htmlFor='major_id'>Major</label>
+									<select
+										id='major_id'
+										className='form-control'
+										onChange={(e) => {
+											setMajorID(e.target.value.toNumber());
+										}}>
+										<option> -- Select -- </option>
+										{course.majors.map((major, index) => (
+											<option value={major.id} key={index}>
+												{major.name}
+											</option>
+										))}
+									</select>
+								</div>
+							) : null}
 							<div className='form-group col-12'>
 								<label htmlFor='term'>Term</label>
 								<div className='row'>
@@ -305,7 +310,7 @@ const Form: FC<Props> = (props) => {
 												type='radio'
 												id='1st-semester'
 												className='custom-control-input'
-												value='First Semester'
+												value='1st Semester'
 											/>
 											<label className='custom-control-label' htmlFor='1st-semester'>
 												1st Semester
@@ -319,7 +324,7 @@ const Form: FC<Props> = (props) => {
 												type='radio'
 												id='2nd-semester'
 												className='custom-control-input'
-												value='Second Semester'
+												value='2nd Semester'
 											/>
 											<label className='custom-control-label' htmlFor='2nd-semester'>
 												2nd Semester

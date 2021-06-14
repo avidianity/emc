@@ -68,7 +68,7 @@ const List: FC<Props> = (props) => {
 		},
 	];
 
-	if (user?.role === 'Registrar') {
+	if (['Registrar', 'Admin'].includes(user?.role || '')) {
 		columns.unshift({
 			title: '#',
 			accessor: 'toggle',
@@ -152,7 +152,11 @@ const List: FC<Props> = (props) => {
 											e.preventDefault();
 											if (
 												await Asker.notice(
-													`Are you sure you want to ${teacher.active ? 'disable' : 'enable'} this teacher?`
+													`Are you sure you want to ${teacher.active ? 'disable' : 'enable'} this teacher? ${
+														teacher.active
+															? 'If you disable this teacher, this teacher can’t access the system. And you can’t distribute subjects to this teacher.'
+															: 'If you enable this teacher, this teacher can access the system. And you can distribute subject to this teacher.'
+													}`
 												)
 											) {
 												update(teacher);
@@ -176,7 +180,7 @@ const List: FC<Props> = (props) => {
 				columns={columns}
 				buttons={
 					<>
-						{user?.role === 'Registrar' ? (
+						{['Registrar', 'Admin'].includes(user?.role || '') ? (
 							<>
 								<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
 									<i className='fas fa-plus'></i>
@@ -191,7 +195,13 @@ const List: FC<Props> = (props) => {
 												await Asker.danger(
 													`Are you sure you want to disable ${selected.length} ${
 														selected.length === 1 ? 'teacher' : 'teachers'
-													}?`
+													}? If you disable ${selected.length === 1 ? 'this' : 'these'} ${
+														selected.length === 1 ? 'teacher' : 'teachers'
+													}, ${selected.length === 1 ? 'this' : 'these'} ${
+														selected.length === 1 ? 'teacher' : 'teachers'
+													} can’t access the system. And you can’t distribute subjects to ${
+														selected.length === 1 ? 'this' : 'these'
+													} ${selected.length === 1 ? 'teacher' : 'teachers'}.`
 												)
 											) {
 												try {
