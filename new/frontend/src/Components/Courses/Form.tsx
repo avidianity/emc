@@ -3,16 +3,22 @@ import { useForm } from 'react-hook-form';
 import { useHistory, useRouteMatch } from 'react-router';
 import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
-import { handleError, setValues } from '../../helpers';
+import { Asker, handleError, setValues } from '../../helpers';
 import { useArray, useMode } from '../../hooks';
 import { courseService } from '../../Services/course.service';
 
 type Props = {};
 
+type Inputs = CourseContract & { force: boolean };
+
 const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
-	const { register, setValue, handleSubmit, reset } = useForm<CourseContract>();
+	const { register, setValue, handleSubmit, reset } = useForm<Inputs>({
+		defaultValues: {
+			force: false,
+		},
+	});
 	const [id, setID] = useState(-1);
 	const [majors, setMajors] = useArray<MajorContract>();
 	const history = useHistory();
@@ -31,7 +37,7 @@ const Form: FC<Props> = (props) => {
 		}
 	};
 
-	const submit = async (data: CourseContract) => {
+	const submit = async (data: Inputs) => {
 		const formats = [/[A-Z]{4}/g, /[A-Z]{4} - [A-Z]{1,}/g];
 		for (const format of formats) {
 			if (format.test(data.code)) {
@@ -43,7 +49,15 @@ const Form: FC<Props> = (props) => {
 					setMajors([]);
 					return reset();
 				} catch (error) {
-					handleError(error);
+					if (error.response?.status === 409) {
+						if (await Asker.notice(error.response?.data?.message)) {
+							data.force = true;
+							await submit(data);
+							return;
+						}
+					} else {
+						handleError(error);
+					}
 				} finally {
 					setProcessing(false);
 				}

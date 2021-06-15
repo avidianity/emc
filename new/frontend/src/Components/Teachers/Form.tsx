@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory, useRouteMatch } from 'react-router';
-import { handleError, setValues } from '../../helpers';
+import { Asker, handleError, setValues } from '../../helpers';
 import { useMode, useNullable } from '../../hooks';
 import { userService } from '../../Services/user.service';
 import Flatpickr from 'react-flatpickr';
@@ -27,12 +27,17 @@ type Inputs = {
 	mothers_name?: string;
 	fathers_occupation?: string;
 	mothers_occupation?: string;
+	force: boolean;
 };
 
 const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
-	const { register, setValue, handleSubmit, reset } = useForm<Inputs>();
+	const { register, setValue, handleSubmit, reset } = useForm<Inputs>({
+		defaultValues: {
+			force: false,
+		},
+	});
 	const [birthday, setBirthday] = useNullable<Date>();
 	const [id, setID] = useState(-1);
 	const history = useHistory();
@@ -62,7 +67,15 @@ const Form: FC<Props> = (props) => {
 			reset();
 			setBirthday(null);
 		} catch (error) {
-			handleError(error);
+			if (error.response?.status === 409) {
+				if (await Asker.notice(error.response?.data?.message)) {
+					data.force = true;
+					await submit(data);
+					return;
+				}
+			} else {
+				handleError(error);
+			}
 		} finally {
 			setProcessing(false);
 		}

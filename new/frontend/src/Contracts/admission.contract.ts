@@ -18,4 +18,5 @@ export interface AdmissionContract extends ModelContract {
 	year?: YearContract;
 	major?: MajorContract;
 	requirements: string[];
+	done: boolean;
 }

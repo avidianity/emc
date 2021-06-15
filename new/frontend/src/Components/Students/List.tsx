@@ -1,3 +1,4 @@
+import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { createRef, FC } from 'react';
 import { useForm } from 'react-hook-form';
@@ -48,6 +49,30 @@ const List: FC<Props> = (props) => {
 	if (isError) {
 		handleError(error);
 	}
+
+	const evaluate = async () => {
+		if (await Asker.notice('Are you sure you want to evaluate all students?', 'Notice')) {
+			try {
+				toastr.info('Processing students. Please wait.', 'Notice');
+				const {
+					data: { missing, failed, passed },
+				} = await axios.post<{ missing: number; failed: number; passed: number }>('/admissions/increment');
+				toastr.success(
+					`Processing done. 
+                    <br />Passed Students: ${passed}
+                    <br />Failed Students: ${failed} 
+                    <br />Subjects with missing grades: ${missing}`,
+					'Success',
+					{
+						escapeHtml: false,
+					}
+				);
+			} catch (error) {
+				toastr.error('Unable to process students.');
+				console.log(error);
+			}
+		}
+	};
 
 	const submit = async (data: GradeContract) => {
 		if (addGradeModalRef.current) {
@@ -113,7 +138,7 @@ const List: FC<Props> = (props) => {
 				loading={loading}
 				items={
 					items
-						?.filter((user) => user.role === 'Student')
+						?.filter((user) => user.role === 'Student' && user.active)
 						.filter((student) => {
 							const admission = student.admissions?.find((admission) => admission.year?.current);
 
@@ -247,6 +272,19 @@ const List: FC<Props> = (props) => {
 								</select>
 							</label>
 						) : null}
+					</>
+				}
+				buttons={
+					<>
+						<button
+							className='btn btn-secondary btn-sm mx-1'
+							title='Evaluate Students'
+							onClick={(e) => {
+								e.preventDefault();
+								evaluate();
+							}}>
+							<i className='fas fa-chevron-up'></i>
+						</button>
 					</>
 				}
 			/>

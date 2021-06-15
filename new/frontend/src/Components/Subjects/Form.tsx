@@ -2,7 +2,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { useHistory, useRouteMatch } from 'react-router';
-import { handleError, setValues } from '../../helpers';
+import { Asker, handleError, setValues } from '../../helpers';
 import { useMode } from '../../hooks';
 import { courseService } from '../../Services/course.service';
 import { subjectService } from '../../Services/subject.service';
@@ -16,12 +16,17 @@ type Inputs = {
 	level: string;
 	term: string;
 	units: string;
+	force: boolean;
 };
 
 const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
-	const { register, setValue, handleSubmit, reset } = useForm<Inputs>();
+	const { register, setValue, handleSubmit, reset } = useForm<Inputs>({
+		defaultValues: {
+			force: false,
+		},
+	});
 	const [id, setID] = useState(-1);
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
@@ -46,7 +51,15 @@ const Form: FC<Props> = (props) => {
 			toastr.success('Subject has been saved successfully.');
 			reset();
 		} catch (error) {
-			handleError(error);
+			if (error.response?.status === 409) {
+				if (await Asker.notice(error.response?.data?.message)) {
+					data.force = true;
+					await submit(data);
+					return;
+				}
+			} else {
+				handleError(error);
+			}
 		} finally {
 			setProcessing(false);
 		}

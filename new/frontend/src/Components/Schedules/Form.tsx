@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { useHistory, useRouteMatch } from 'react-router';
 import { ScheduleRow } from '../../Contracts/schedule.contract';
-import { handleError, setValues } from '../../helpers';
+import { Asker, handleError, setValues } from '../../helpers';
 import { useArray, useMode, useNullable } from '../../hooks';
 import { courseService } from '../../Services/course.service';
 import { scheduleService } from '../../Services/schedule.service';
@@ -24,12 +24,17 @@ type Inputs = {
 	year_id: number;
 	major_id?: number;
 	payload: ScheduleRow[];
+	force: boolean;
 };
 
 const Form: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
-	const { register, setValue, handleSubmit, reset } = useForm<Inputs>();
+	const { register, setValue, handleSubmit, reset } = useForm<Inputs>({
+		defaultValues: {
+			force: false,
+		},
+	});
 	const [course, setCourse] = useNullable<CourseContract>();
 	const [rows, setRows] = useArray<ScheduleRow>([
 		{
@@ -70,7 +75,15 @@ const Form: FC<Props> = (props) => {
 			setRows([]);
 			setCourse(null);
 		} catch (error) {
-			handleError(error);
+			if (error.response?.status === 409) {
+				if (await Asker.notice(error.response?.data?.message)) {
+					data.force = true;
+					await submit(data);
+					return;
+				}
+			} else {
+				handleError(error);
+			}
 		} finally {
 			setProcessing(false);
 		}
