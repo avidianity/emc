@@ -314,7 +314,7 @@ const Form: FC<Props> = (props) => {
 									</select>
 								</div>
 							) : null}
-							<div className='form-group col-12'>
+							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='term'>Term</label>
 								<div className='row'>
 									<div className='col-12 col-md-4'>
