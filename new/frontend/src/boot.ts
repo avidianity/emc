@@ -2,6 +2,7 @@ import toastr from 'toastr';
 import 'toastr/build/toastr.css';
 import axios from 'axios';
 import './shims';
+import '@avidian/extras';
 import $ from 'jquery';
 import 'popper.js';
 import 'bootstrap';
