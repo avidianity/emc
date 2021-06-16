@@ -68,6 +68,12 @@ const Form: FC<Props> = (props) => {
 	const submit = async (data: Inputs) => {
 		setProcessing(true);
 		try {
+			const year = years?.find((year) => year.current);
+			if (year) {
+				data.year_id = year.id!;
+			} else {
+				return toastr.error('A School Year is not set, please create/make one as current.');
+			}
 			data.payload = rows;
 			await (mode === 'Add' ? scheduleService.create(data) : scheduleService.update(id, data));
 			toastr.success('Schedule has been saved successfully.');
@@ -103,7 +109,6 @@ const Form: FC<Props> = (props) => {
 					<h5 className='card-title'>{mode} Schedule</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
-							<input type='hidden' {...register('year_id')} value={years?.find((year) => year.current)?.id} />
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='course_id'>Course</label>
 								<select

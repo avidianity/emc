@@ -70,10 +70,6 @@ const List: FC<Props> = (props) => {
 			accessor: 'term',
 		},
 		{
-			title: 'Is Pre-Registration?',
-			accessor: 'pre_registration',
-		},
-		{
 			title: 'Requirements',
 			accessor: 'requirements',
 		},
@@ -102,11 +98,6 @@ const List: FC<Props> = (props) => {
 						}`,
 						gender: admission.student?.gender,
 						course: `${admission.course?.code}${admission.major ? ` - Major in ${admission.major.name}` : ''}`,
-						pre_registration: admission.pre_registration ? (
-							<span className='badge badge-success'>Yes</span>
-						) : (
-							<span className='badge badge-danger'>No</span>
-						),
 						requirements: admission.requirements?.map((requirement, index) => (
 							<span className='d-block' key={index}>
 								{requirement}
