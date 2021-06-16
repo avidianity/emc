@@ -2,15 +2,6 @@
 # yarn lockfile v1
 
 
-"@avidian/extras@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@avidian/extras/-/extras-0.0.2.tgz#7ffa91557576e76b7f9e5406eee02a2e816e8770"
-  integrity sha512-aQ5ZXgRwSwMcpE5bH0Eet448dmPbrKSCE2An+rH9Kf0uXXjXMnYwvg+9vW//SCujKyjYM7lR+WcZVwrOSrbkPw==
-  dependencies:
-    core-js "^3.14.0"
-    dayjs "^1.10.5"
-    lodash "^4.17.21"
-
 "@babel/code-frame@7.10.4":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.10.4.tgz#168da1a36e90da68ae8d49c0f1b48c7c6249213a"
@@ -3686,7 +3677,7 @@ core-js@^2.4.0:
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-2.6.12.tgz#d9333dfa7b065e347cc5682219d6f690859cc2ec"
   integrity sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==
 
-core-js@^3.14.0, core-js@^3.6.5:
+core-js@^3.6.5:
   version "3.14.0"
   resolved "https://registry.yarnpkg.com/core-js/-/core-js-3.14.0.tgz#62322b98c71cc2018b027971a69419e2425c2a6c"
   integrity sha512-3s+ed8er9ahK+zJpp9ZtuVcDoFzHNiZsPbNAAE4KXgrRHbjSqqNN6xGSXq6bq7TZIbKj4NLrLb6bJ5i+vSVjHA==
