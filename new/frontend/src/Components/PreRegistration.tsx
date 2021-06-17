@@ -8,7 +8,7 @@ import { yearService } from '../Services/year.service';
 import Flatpickr from 'react-flatpickr';
 import { useHistory } from 'react-router';
 import { requirementService } from '../Services/requirement.service';
-import { handleError } from '../helpers';
+import { Asker, handleError } from '../helpers';
 import { userService } from '../Services/user.service';
 import axios from 'axios';
 import { CourseContract } from '../Contracts/course.contract';
@@ -44,12 +44,17 @@ type Inputs = {
 		fathers_occupation?: string;
 		mothers_occupation?: string;
 	};
+	force: boolean;
 };
 
 const PreRegistration: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const [all, setAll] = useState(false);
-	const { register, handleSubmit, reset, setValue } = useForm<Inputs>();
+	const { register, handleSubmit, reset, setValue } = useForm<Inputs>({
+		defaultValues: {
+			force: false,
+		},
+	});
 	const [birthday, setBirthday] = useNullable<Date>();
 	const [course, setCourse] = useNullable<CourseContract>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
@@ -80,7 +85,15 @@ const PreRegistration: FC<Props> = (props) => {
 			reset();
 			history.goBack();
 		} catch (error) {
-			handleError(error);
+			if (error.response?.status === 409) {
+				if (await Asker.notice(error.response?.data?.message)) {
+					data.force = true;
+					await submit(data);
+					return;
+				}
+			} else {
+				handleError(error);
+			}
 		} finally {
 			setProcessing(false);
 		}
