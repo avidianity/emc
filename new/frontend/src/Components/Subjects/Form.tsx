@@ -2,8 +2,9 @@ import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { useHistory, useRouteMatch } from 'react-router';
+import { CourseContract } from '../../Contracts/course.contract';
 import { Asker, handleError, setValues } from '../../helpers';
-import { useMode } from '../../hooks';
+import { useMode, useNullable } from '../../hooks';
 import { courseService } from '../../Services/course.service';
 import { subjectService } from '../../Services/subject.service';
 
@@ -17,6 +18,7 @@ type Inputs = {
 	term: string;
 	units: string;
 	force: boolean;
+	major_id?: number;
 };
 
 const Form: FC<Props> = (props) => {
@@ -28,6 +30,7 @@ const Form: FC<Props> = (props) => {
 		},
 	});
 	const [id, setID] = useState(-1);
+	const [course, setCourse] = useNullable<CourseContract>();
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
@@ -104,6 +107,20 @@ const Form: FC<Props> = (props) => {
 									))}
 								</select>
 							</div>
+							{course && course.majors && course.majors.length > 0 ? (
+								<div className='form-group col-12 col-md-6'>
+									<label htmlFor='major_id'>Major</label>
+									<select {...register('major_id')} id='major_id' className='form-control'>
+										{course && course.majors
+											? course.majors.map((major, index) => (
+													<option value={major.id} key={index}>
+														{major.name}
+													</option>
+											  ))
+											: null}
+									</select>
+								</div>
+							) : null}
 							<div className='form-group col-12 col-md-4'>
 								<label htmlFor='level'>Year Level</label>
 								<select {...register('level')} id='level' className='form-control'>

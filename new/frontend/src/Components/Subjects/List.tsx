@@ -43,8 +43,8 @@ const List: FC<Props> = (props) => {
 			accessor: 'description',
 		},
 		{
-			title: 'Course Code',
-			accessor: 'course_code',
+			title: 'Course',
+			accessor: 'course',
 		},
 		{
 			title: 'Year Level',
@@ -75,7 +75,7 @@ const List: FC<Props> = (props) => {
 			items={
 				items?.map((subject) => ({
 					...subject,
-					course_code: subject.course?.code,
+					course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
 					actions:
 						user?.role === 'Registrar' ? (
 							<div style={{ minWidth: '100px' }}>
