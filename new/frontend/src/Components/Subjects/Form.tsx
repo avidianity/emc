@@ -98,7 +98,20 @@ const Form: FC<Props> = (props) => {
 							</div>
 							<div className='form-group col-12 col-md-4'>
 								<label htmlFor='course_id'>Course Code</label>
-								<select {...register('course_id')} id='course_id' className='form-control'>
+								<select
+									{...register('course_id')}
+									id='course_id'
+									className='form-control'
+									onChange={(e) => {
+										const id = e.target.value.toNumber();
+
+										const course = courses?.find((course) => course.id === id);
+										if (course) {
+											setCourse(course);
+										} else {
+											setCourse(null);
+										}
+									}}>
 									<option> -- Select -- </option>
 									{courses?.map((course, index) => (
 										<option value={course.id} key={index}>
