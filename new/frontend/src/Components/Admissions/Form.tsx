@@ -97,6 +97,7 @@ const Form: FC<Props> = (props) => {
 			data.requirements = [];
 			data.student.number = number;
 			data.student.birthday = birthday?.toJSON();
+			data.year_id = years?.find((year) => year.current)?.id!;
 			await (mode === 'Add' ? admissionService.create(data) : admissionService.update(id, data));
 			toastr.success('Admission has been saved successfully.');
 			setBirthday(null);
@@ -161,7 +162,6 @@ const Form: FC<Props> = (props) => {
 											</option>
 										))}
 								</select>
-								<input type='hidden' {...register('year_id')} value={years?.filter((year) => year.current)[0]?.id} />
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='middle_name'>Middle Name</label>
