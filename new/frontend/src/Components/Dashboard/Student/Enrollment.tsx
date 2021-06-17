@@ -40,7 +40,7 @@ const Enrollment: FC<Props> = (props) => {
 		setSelected([...selected]);
 	};
 
-	const admission = user?.admissions?.last();
+	const admission = user?.admissions?.find((admission) => admission.year?.current);
 
 	const submit = async () => {
 		if (!user?.active) {

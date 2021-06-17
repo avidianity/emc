@@ -99,6 +99,9 @@ const Analytics: FC<Props> = (props) => {
 							scales: {
 								y: {
 									beginAtZero: true,
+									ticks: {
+										precision: 0,
+									},
 								},
 							},
 						},
@@ -138,6 +141,9 @@ const Analytics: FC<Props> = (props) => {
 							scales: {
 								y: {
 									beginAtZero: true,
+									ticks: {
+										precision: 0,
+									},
 								},
 							},
 						},

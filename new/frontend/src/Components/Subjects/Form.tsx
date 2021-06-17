@@ -134,7 +134,7 @@ const Form: FC<Props> = (props) => {
 										type='radio'
 										id='1st-semester'
 										className='custom-control-input'
-										value='First Semester'
+										value='1st Semester'
 									/>
 									<label className='custom-control-label' htmlFor='1st-semester'>
 										1st Semester
@@ -146,7 +146,7 @@ const Form: FC<Props> = (props) => {
 										type='radio'
 										id='2nd-semester'
 										className='custom-control-input'
-										value='Second Semester'
+										value='2nd Semester'
 									/>
 									<label className='custom-control-label' htmlFor='2nd-semester'>
 										2nd Semester
