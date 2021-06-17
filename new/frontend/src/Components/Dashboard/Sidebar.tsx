@@ -1,13 +1,16 @@
 import React, { FC } from 'react';
+import { useQuery } from 'react-query';
 import { NavLink as Link } from 'react-router-dom';
 import { UserContract } from '../../Contracts/user.contract';
 import { useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { routes } from '../../routes';
+import { admissionService } from '../../Services/admission.service';
 
 type Props = {};
 
 const Sidebar: FC<Props> = (props) => {
+	const { data: admissions } = useQuery('admissions', () => admissionService.fetch());
 	const url = useURL();
 
 	const user = State.getInstance().get<UserContract>('user');
@@ -128,7 +131,21 @@ const Sidebar: FC<Props> = (props) => {
 						<li className='nav-item'>
 							<Link to={url(routes.ADMISSIONS)} className='nav-link' activeClassName='active'>
 								<i className='fe fe-pen-tool fe-16'></i>
-								<span className='ml-3 item-text'>Admissions</span>
+								<span className='ml-3 item-text'>
+									Admissions
+									{admissions &&
+									admissions.filter(
+										(admission) => admission.year?.current && !admission.done && !admission.student?.active
+									).length > 0 ? (
+										<span className='ml-1 badge badge-danger'>
+											{
+												admissions.filter(
+													(admission) => admission.year?.current && !admission.done && !admission.student?.active
+												).length
+											}
+										</span>
+									) : null}
+								</span>
 							</Link>
 						</li>
 					) : null}
