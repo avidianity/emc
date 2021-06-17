@@ -55,7 +55,7 @@ const Form: FC<Props> = (props) => {
 			reset();
 		} catch (error) {
 			if (error.response?.status === 409) {
-				if (await Asker.notice(error.response?.data?.message)) {
+				if (await Asker.save(error.response?.data?.message)) {
 					data.force = true;
 					await submit(data);
 					return;
@@ -96,7 +96,7 @@ const Form: FC<Props> = (props) => {
 									disabled={processing}
 								/>
 							</div>
-							<div className='form-group col-12 col-md-4'>
+							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='course_id'>Course Code</label>
 								<select
 									{...register('course_id')}
@@ -134,7 +134,7 @@ const Form: FC<Props> = (props) => {
 									</select>
 								</div>
 							) : null}
-							<div className='form-group col-12 col-md-4'>
+							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='level'>Year Level</label>
 								<select {...register('level')} id='level' className='form-control'>
 									<option> -- Select -- </option>
@@ -145,7 +145,7 @@ const Form: FC<Props> = (props) => {
 									<option value='5th'>5th</option>
 								</select>
 							</div>
-							<div className='form-group col-12 col-md-4'>
+							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='units'>Number of Units</label>
 								<select {...register('units')} id='units' className='form-control'>
 									<option> -- Select -- </option>

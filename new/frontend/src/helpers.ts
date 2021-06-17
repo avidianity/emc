@@ -10,8 +10,13 @@ export class Asker {
 	static async notice(message: string, title?: string) {
 		return toBool(await swal({ title, text: message, buttons: ['Cancel', 'Confirm'], icon: 'warning' }));
 	}
+
 	static async danger(message: string, title?: string) {
 		return toBool(await swal({ title, text: message, buttons: ['Cancel', 'Confirm'], dangerMode: true, icon: 'warning' }));
+	}
+
+	static async save(message: string, title?: string) {
+		return toBool(await swal({ title, text: message, buttons: ['Cancel', 'Save'], icon: 'info' }));
 	}
 }
 

@@ -104,7 +104,7 @@ const Form: FC<Props> = (props) => {
 			reset();
 		} catch (error) {
 			if (error.response?.status === 409) {
-				if (await Asker.notice(error.response?.data?.message)) {
+				if (await Asker.save(error.response?.data?.message)) {
 					data.force = true;
 					await submit(data);
 					return;
