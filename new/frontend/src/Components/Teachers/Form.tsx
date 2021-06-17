@@ -6,6 +6,7 @@ import { useMode, useNullable } from '../../hooks';
 import { userService } from '../../Services/user.service';
 import Flatpickr from 'react-flatpickr';
 import dayjs from 'dayjs';
+import InputMask from 'react-input-mask';
 
 type Props = {};
 
@@ -42,6 +43,7 @@ const Form: FC<Props> = (props) => {
 	const [id, setID] = useState(-1);
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
+	const [number, setNumber] = useState('');
 
 	const fetch = async (id: any) => {
 		try {
@@ -49,6 +51,7 @@ const Form: FC<Props> = (props) => {
 			setID(data.id!);
 			setValues(setValue, data);
 			setBirthday(dayjs(data.birthday).toDate());
+			setNumber(data.number);
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -62,6 +65,7 @@ const Form: FC<Props> = (props) => {
 			data.role = 'Teacher';
 			data.active = true;
 			data.birthday = birthday?.toJSON();
+			data.number = number;
 			await (mode === 'Add' ? userService.create(data) : userService.update(id, data));
 			toastr.success('Teacher has been saved successfully.');
 			reset();
@@ -149,15 +153,15 @@ const Form: FC<Props> = (props) => {
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='number'>Phone Number</label>
-								<input
-									{...register('number')}
-									pattern='09[0-9]{2}-[0-9]{3}-[0-9]{4}'
+								<InputMask
+									mask='0\999-999-9999'
 									type='text'
 									id='number'
 									className='form-control'
 									disabled={processing}
+									value={number}
+									onChange={(e) => setNumber(e.target.value)}
 								/>
-								<small className='text-muted form-text'>Format: 0912-345-6789</small>
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='birthday'>Birthday</label>

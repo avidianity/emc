@@ -11,6 +11,7 @@ import { courseService } from '../../Services/course.service';
 import { yearService } from '../../Services/year.service';
 import { userService } from '../../Services/user.service';
 import { CourseContract } from '../../Contracts/course.contract';
+import InputMask from 'react-input-mask';
 
 type Props = {};
 
@@ -59,6 +60,7 @@ const Form: FC<Props> = (props) => {
 	const match = useRouteMatch<{ id: string }>();
 	const [birthday, setBirthday] = useNullable<Date>();
 	const [majorID, setMajorID] = useNullable<number>();
+	const [number, setNumber] = useState('');
 	const [course, setCourse] = useNullable<CourseContract>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const { data: years } = useQuery('years', () => yearService.fetch());
@@ -77,6 +79,7 @@ const Form: FC<Props> = (props) => {
 			if (data.major_id) {
 				setMajorID(data.major_id);
 			}
+			setNumber(data.student?.number!);
 			setCourse(data.course!);
 			setMode('Edit');
 		} catch (error) {
@@ -92,6 +95,7 @@ const Form: FC<Props> = (props) => {
 				data.major_id = majorID;
 			}
 			data.requirements = [];
+			data.student.number = number;
 			data.student.birthday = birthday?.toJSON();
 			await (mode === 'Add' ? admissionService.create(data) : admissionService.update(id, data));
 			toastr.success('Admission has been saved successfully.');
@@ -232,15 +236,15 @@ const Form: FC<Props> = (props) => {
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='number'>Phone Number</label>
-								<input
-									{...register('student.number')}
-									pattern='09[0-9]{2}-[0-9]{3}-[0-9]{4}'
+								<InputMask
+									mask='0\999-999-9999'
 									type='text'
 									id='number'
 									className='form-control'
 									disabled={processing}
+									value={number}
+									onChange={(e) => setNumber(e.target.value)}
 								/>
-								<small className='text-muted form-text'>Format: 0912-345-6789</small>
 							</div>
 							<div className='col-12 d-flex'>
 								<i className='ml-auto'>Student user account credentials will be sent via email.</i>

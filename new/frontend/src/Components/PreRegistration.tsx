@@ -12,6 +12,7 @@ import { Asker, handleError } from '../helpers';
 import { userService } from '../Services/user.service';
 import axios from 'axios';
 import { CourseContract } from '../Contracts/course.contract';
+import InputMask from 'react-input-mask';
 
 type Props = {};
 
@@ -70,6 +71,7 @@ const PreRegistration: FC<Props> = (props) => {
 	});
 	const { data: requirements } = useQuery('requirements', () => requirementService.fetch());
 	const [selected, setSelected] = useArray<string>();
+	const [number, setNumber] = useState('');
 	const history = useHistory();
 
 	const submit = async (data: Inputs) => {
@@ -80,6 +82,7 @@ const PreRegistration: FC<Props> = (props) => {
 			data.year_id = years?.find((year) => year.current)?.id || 0;
 			data.pre_registration = true;
 			data.requirements = selected;
+			data.student.number = number;
 			await axios.post('/admission/pre-registration', data);
 			toastr.success('Pre Registration saved successfully.');
 			reset();
@@ -134,15 +137,15 @@ const PreRegistration: FC<Props> = (props) => {
 				</div>
 				<div className='form-group col-12 col-md-6'>
 					<label htmlFor='number'>Phone Number</label>
-					<input
-						{...register('student.number')}
-						pattern='09[0-9]{2}-[0-9]{3}-[0-9]{4}'
+					<InputMask
+						mask='0\999-999-9999'
 						type='text'
 						id='number'
 						className='form-control'
 						disabled={processing}
+						value={number}
+						onChange={(e) => setNumber(e.target.value)}
 					/>
-					<small className='text-muted form-text'>Format: 0912-345-6789</small>
 				</div>
 				<div className='form-group col-12 col-md-6'>
 					<label htmlFor='last_name'>Last Name</label>
