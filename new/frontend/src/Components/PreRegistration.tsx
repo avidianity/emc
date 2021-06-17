@@ -75,7 +75,7 @@ const PreRegistration: FC<Props> = (props) => {
 	const history = useHistory();
 
 	const submit = async (data: Inputs) => {
-		setProcessing(false);
+		setProcessing(true);
 		try {
 			data.status = 'Regular';
 			data.term = '1st Semester';
