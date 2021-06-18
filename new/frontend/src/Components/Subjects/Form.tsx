@@ -41,6 +41,7 @@ const Form: FC<Props> = (props) => {
 			setID(data.id!);
 			setValues(setValue, data);
 			setMode('Edit');
+			setCourse(data.course!);
 		} catch (error) {
 			handleError(error);
 			history.goBack();
@@ -124,13 +125,12 @@ const Form: FC<Props> = (props) => {
 								<div className='form-group col-12 col-md-6'>
 									<label htmlFor='major_id'>Major</label>
 									<select {...register('major_id')} id='major_id' className='form-control'>
-										{course && course.majors
-											? course.majors.map((major, index) => (
-													<option value={major.id} key={index}>
-														{major.name}
-													</option>
-											  ))
-											: null}
+										<option> -- Select -- </option>
+										{course.majors.map((major, index) => (
+											<option value={major.id} key={index}>
+												{major.name}
+											</option>
+										))}
 									</select>
 								</div>
 							) : null}

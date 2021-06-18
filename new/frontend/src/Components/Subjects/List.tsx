@@ -1,16 +1,22 @@
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { CourseContract } from '../../Contracts/course.contract';
+import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
-import { useURL } from '../../hooks';
+import { useNullable, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
+import { courseService } from '../../Services/course.service';
 import { subjectService } from '../../Services/subject.service';
 import Table from '../Shared/Table';
 
 type Props = {};
 
 const List: FC<Props> = (props) => {
+	const { data: courses } = useQuery('courses', () => courseService.fetch());
+	const [course, setCourse] = useNullable<CourseContract>();
+	const [major, setMajor] = useNullable<MajorContract>();
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('subjects', () => subjectService.fetch());
 
 	const url = useURL();
@@ -73,26 +79,38 @@ const List: FC<Props> = (props) => {
 			title='Subjects'
 			loading={loading}
 			items={
-				items?.map((subject) => ({
-					...subject,
-					course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
-					actions:
-						user?.role === 'Registrar' ? (
-							<div style={{ minWidth: '100px' }}>
-								<Link to={url(`${subject.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-									<i className='fas fa-edit'></i>
-								</Link>
-								<button
-									className='btn btn-danger btn-sm mx-1'
-									onClick={(e) => {
-										e.preventDefault();
-										deleteItem(subject.id);
-									}}>
-									<i className='fas fa-trash'></i>
-								</button>
-							</div>
-						) : null,
-				})) || []
+				items
+					?.filter((subject) => {
+						if (course && major) {
+							return subject.course_id === course.id && subject.major_id === major.id;
+						} else if (course) {
+							return subject.course_id === course.id;
+						} else if (major) {
+							return subject.major_id === major.id;
+						}
+
+						return true;
+					})
+					.map((subject) => ({
+						...subject,
+						course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
+						actions:
+							user?.role === 'Registrar' ? (
+								<div style={{ minWidth: '100px' }}>
+									<Link to={url(`${subject.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
+										<i className='fas fa-edit'></i>
+									</Link>
+									<button
+										className='btn btn-danger btn-sm mx-1'
+										onClick={(e) => {
+											e.preventDefault();
+											deleteItem(subject.id);
+										}}>
+										<i className='fas fa-trash'></i>
+									</button>
+								</div>
+							) : null,
+					})) || []
 			}
 			columns={columns}
 			buttons={
@@ -101,6 +119,55 @@ const List: FC<Props> = (props) => {
 						<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
 							<i className='fas fa-plus'></i>
 						</Link>
+					) : null}
+				</>
+			}
+			misc={
+				<>
+					<label className='mb-0 mt-2 mx-1'>
+						Course:
+						<select
+							className='custom-select custom-select-sm form-control form-control-sm'
+							onChange={(e) => {
+								const id = e.target.value.toNumber();
+								const course = courses?.find((course) => course.id === id);
+								if (course) {
+									setCourse(course);
+								} else {
+									setCourse(null);
+								}
+								setMajor(null);
+							}}>
+							<option value='0'>All</option>
+							{courses?.map((course, index) => (
+								<option value={course.id} key={index}>
+									{course.code}
+								</option>
+							))}
+						</select>
+					</label>
+					{course ? (
+						<label className='mb-0 mt-2 mx-1'>
+							Major:
+							<select
+								className='custom-select custom-select-sm form-control form-control-sm'
+								onChange={(e) => {
+									const id = e.target.value.toNumber();
+									const major = course?.majors?.find((major) => major.id === id);
+									if (major) {
+										setMajor(major);
+									} else {
+										setMajor(null);
+									}
+								}}>
+								<option value='0'>All</option>
+								{course.majors?.map((major, index) => (
+									<option value={major.id} key={index}>
+										{major.name}
+									</option>
+								))}
+							</select>
+						</label>
 					) : null}
 				</>
 			}
