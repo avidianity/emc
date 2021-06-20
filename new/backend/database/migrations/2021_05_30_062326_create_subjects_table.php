@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Course;
+use App\Models\Major;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,6 +20,9 @@ class CreateSubjectsTable extends Migration
             $table->string('code');
             $table->string('description');
             $table->foreignIdFor(new Course())->constrained();
+            $table->foreignIdFor(new Major())
+                ->nullable()
+                ->constrained();
             $table->string('level');
             $table->string('term');
             $table->string('units');

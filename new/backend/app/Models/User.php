@@ -7,13 +7,12 @@ use App\Mail\AccountCreated;
 use App\Mail\Admission;
 use App\Models\Admission as ModelsAdmission;
 use App\Notifications\PasswordChanged;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
-use Str;
 
 class User extends Authenticatable
 {
@@ -77,6 +76,22 @@ class User extends Authenticatable
                     'message' => 'User has updated their password.',
                 ]);
             }
+        });
+
+        static::deleting(function (self $user) {
+            $user->admissions->each(function (ModelsAdmission $admission) {
+                $admission->delete();
+            });
+
+            $user->grades->each(function (Grade $grade) {
+                $grade->delete();
+            });
+
+            $user->schedules->each(function (Schedule $schedule) {
+                $schedule->delete();
+            });
+
+            $user->subjects()->detach();
         });
     }
 

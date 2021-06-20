@@ -12,7 +12,33 @@ class Year extends Model
     protected $fillable = [
         'start',
         'end',
+        'semester_start',
+        'semester_end',
+        'current',
     ];
+
+    protected $casts = [
+        'semester_start' => 'datetime',
+        'semester_end' => 'datetime',
+        'current' => 'boolean',
+    ];
+
+    protected static function booted()
+    {
+        static::deleting(function (self $year) {
+            $year->admissions->each(function (Admission $admission) {
+                $admission->delete();
+            });
+
+            $year->grades->each(function (Grade $grade) {
+                $grade->delete();
+            });
+
+            $year->schedules->each(function (Schedule $schedule) {
+                $schedule->delete();
+            });
+        });
+    }
 
     public function admissions()
     {

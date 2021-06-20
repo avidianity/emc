@@ -17,6 +17,7 @@ class Schedule extends Model
         'year',
         'payload',
         'year_id',
+        'major_id',
     ];
 
     protected $casts = [
@@ -41,5 +42,10 @@ class Schedule extends Model
     public function schoolyear()
     {
         return $this->belongsTo(Year::class);
+    }
+
+    public function major()
+    {
+        return $this->belongsTo(Major::class);
     }
 }

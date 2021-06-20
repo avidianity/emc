@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Course;
+use App\Models\Major;
 use App\Models\User;
 use App\Models\Year;
 use Illuminate\Database\Migrations\Migration;
@@ -25,6 +26,10 @@ class CreateAdmissionsTable extends Migration
             $table->boolean('pre_registration')->default(false);
             $table->foreignIdFor(new User(), 'student_id')->constrained((new User())->getTable());
             $table->foreignIdFor(new Year())->constrained();
+            $table->foreignIdFor(new Major())
+                ->nullable()
+                ->constrained();
+            $table->boolean('done')->default(false);
             $table->timestamps();
         });
     }

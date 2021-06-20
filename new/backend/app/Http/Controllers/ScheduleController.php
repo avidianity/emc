@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Course;
+use App\Models\Major;
 use App\Models\Schedule;
 use App\Models\Subject;
+use App\Models\User;
+use App\Models\Year;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class ScheduleController extends Controller
 {
@@ -15,12 +21,14 @@ class ScheduleController extends Controller
      */
     public function index(Request $request)
     {
-        $builder = Schedule::with('course', 'teacher', 'subject');
+        $builder = Schedule::with('course', 'teacher', 'subject', 'major');
         /**
          * @var \App\Models\User
          */
         $user = $request->user();
-        $admission = $user->admissions->last();
+        $admission = $user->admissions()->whereHas('year', function (Builder $builder) {
+            return $builder->where('current', true);
+        })->first();
 
         if ($user->role === 'Student') {
             $subjects = $user->subjects->map(function (Subject $subject) {
@@ -47,7 +55,34 @@ class ScheduleController extends Controller
      */
     public function store(Request $request)
     {
-        return Schedule::create($request->all());
+        $data = $request->validate([
+            'course_id' => ['required', 'numeric', Rule::exists(Course::class, 'id')],
+            'subject_id' => ['required', 'numeric', Rule::exists(Subject::class, 'id')],
+            'teacher_id' => ['required', 'numeric', Rule::exists(User::class, 'id')],
+            'year' => ['required', 'string'],
+            'payload' => ['required', 'array'],
+            'payload.*.day' => ['required', 'string'],
+            'payload.*.start_time' => ['required', 'string'],
+            'payload.*.end_time' => ['required', 'string'],
+            'year_id' => ['required', 'numeric', Rule::exists(Year::class, 'id')],
+            'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
+            'force' => ['required', 'boolean'],
+        ]);
+
+        if (!$data['force']) {
+            if (
+                Schedule::whereCourseId($data['course_id'])
+                ->whereTeacherId($data['teacher_id'])
+                ->whereSubjectId($data['subject_id'])
+                ->whereYear('year', $data['year'])
+                ->whereYearId($data['year_id'])
+                ->count() > 0
+            ) {
+                return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+            }
+        }
+
+        return Schedule::create($data);
     }
 
     /**
@@ -58,6 +93,7 @@ class ScheduleController extends Controller
      */
     public function show(Schedule $schedule)
     {
+        $schedule->load('course.majors', 'teacher', 'subject');
         return $schedule;
     }
 
@@ -70,7 +106,20 @@ class ScheduleController extends Controller
      */
     public function update(Request $request, Schedule $schedule)
     {
-        $schedule->update($request->all());
+        $data = $request->validate([
+            'course_id' => ['nullable', 'numeric', Rule::exists(Course::class, 'id')],
+            'subject_id' => ['nullable', 'numeric', Rule::exists(Subject::class, 'id')],
+            'teacher_id' => ['nullable', 'numeric', Rule::exists(User::class, 'id')],
+            'year' => ['nullable', 'string'],
+            'payload' => ['nullable', 'array'],
+            'payload.*.day' => ['required', 'string'],
+            'payload.*.start_time' => ['required', 'string'],
+            'payload.*.end_time' => ['required', 'string'],
+            'year_id' => ['nullable', 'numeric', Rule::exists(Year::class, 'id')],
+            'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
+        ]);
+
+        $schedule->update($data);
 
         return $schedule;
     }

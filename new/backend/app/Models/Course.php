@@ -13,12 +13,32 @@ class Course extends Model
         'code',
         'description',
         'open',
-        'majors',
     ];
 
     protected $casts = [
         'open' => 'boolean',
     ];
+
+    protected static function booted()
+    {
+        static::deleted(function (self $course) {
+            $course->admissions->each(function (Admission $admission) {
+                $admission->delete();
+            });
+
+            $course->schedules->each(function (Schedule $schedule) {
+                $schedule->delete();
+            });
+
+            $course->majors->each(function (Major $major) {
+                $major->delete();
+            });
+
+            $course->subjects->each(function (Subject $subject) {
+                $subject->delete();
+            });
+        });
+    }
 
     public function admissions()
     {
@@ -28,5 +48,15 @@ class Course extends Model
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    public function majors()
+    {
+        return $this->hasMany(Major::class);
+    }
+
+    public function subjects()
+    {
+        return $this->hasMany(Subject::class);
     }
 }

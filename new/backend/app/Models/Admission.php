@@ -19,10 +19,13 @@ class Admission extends Model
         'pre_registration',
         'year_id',
         'requirements',
+        'major_id',
+        'done',
     ];
 
     protected $casts = [
         'pre_registration' => 'boolean',
+        'done' => 'boolean',
         'requirements' => JSON::class,
     ];
 
@@ -39,5 +42,10 @@ class Admission extends Model
     public function year()
     {
         return $this->belongsTo(Year::class);
+    }
+
+    public function major()
+    {
+        return $this->belongsTo(Major::class);
     }
 }

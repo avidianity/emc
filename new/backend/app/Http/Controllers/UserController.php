@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMail;
+use App\Mail\Admission;
+use App\Models\Mail;
+use App\Models\Schedule;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -13,12 +19,35 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return User::with([
-            'admissions.course',
+        /**
+         * @var User
+         */
+        $user = $request->user();
+
+        $builder = User::with([
+            'admissions.course.majors',
+            'admissions.year',
+            'admissions.major',
         ])
-            ->withCount('subjects')->get();
+            ->withCount('subjects');
+
+        if ($user->role === 'Teacher') {
+            $user->load('schedules.subject');
+            /**
+             * @var \Illuminate\Database\Eloquent\Collection<mixed, int>
+             */
+            $subjects = $user->schedules->map(function (Schedule $schedule) {
+                return $schedule->subject->id;
+            });
+
+            $builder = $builder->whereHas('subjects', function (Builder $builder) use ($subjects) {
+                return $builder->whereIn('subject_id', $subjects);
+            });
+        }
+
+        return $builder->get();
     }
 
     /**
@@ -29,7 +58,38 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->all();
+        $data = $request->validate([
+            'uuid' => ['required', 'string'],
+            'first_name' => ['required', 'string'],
+            'last_name' => ['required', 'string'],
+            'middle_name' => ['nullable', 'string'],
+            'gender' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+            'place_of_birth' => ['nullable', 'string'],
+            'birthday' => ['required', 'date'],
+            'role' => ['required', 'string'],
+            'email' => ['required', 'string'],
+            'number' => ['required', 'string'],
+            'active' => ['required', 'boolean'],
+            'fathers_name' => ['nullable', 'string'],
+            'mothers_name' => ['nullable', 'string'],
+            'fathers_occupation' => ['nullable', 'string'],
+            'mothers_occupation' => ['nullable', 'string'],
+            'allowed_units' => ['nullable', 'numeric'],
+            'force' => ['required', 'boolean'],
+        ]);
+
+        if (!$data['force']) {
+            if (
+                User::whereFirstName($data['first_name'])
+                ->whereLastName($data['last_name'])
+                ->whereEmail($data['email'])
+                ->whereRole($data['role'])
+                ->count() > 0
+            ) {
+                return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+            }
+        }
 
         return User::create($data);
     }
@@ -46,6 +106,7 @@ class UserController extends Controller
             'subjects',
             'admissions.year',
             'admissions.course',
+            'admissions.major',
         ]);
         return $user;
     }
@@ -59,9 +120,56 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $data = $request->all();
+        $data = $request->validate([
+            'uuid' => ['nullable', 'string'],
+            'first_name' => ['nullable', 'string'],
+            'last_name' => ['nullable', 'string'],
+            'middle_name' => ['nullable', 'string'],
+            'gender' => ['nullable', 'string'],
+            'address' => ['nullable', 'string'],
+            'place_of_birth' => ['nullable', 'string'],
+            'birthday' => ['nullable', 'date'],
+            'role' => ['nullable', 'string'],
+            'email' => ['nullable', 'string'],
+            'numeric' => ['nullable', 'string'],
+            'active' => ['nullable', 'boolean'],
+            'password' => ['nullable', 'string'],
+            'fathers_name' => ['nullable', 'string'],
+            'mothers_name' => ['nullable', 'string'],
+            'fathers_occupation' => ['nullable', 'string'],
+            'mothers_occupation' => ['nullable', 'string'],
+            'allowed_units' => ['nullable', 'numeric'],
+        ]);
 
         $user->update($data);
+
+        if ($user->role === 'Student' && $user->active) {
+            $student = $user;
+
+            $admission = $student->admissions()
+                ->whereHas('year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })
+                ->first();
+
+            if ($admission) {
+                $password = Str::random(5);
+
+                $student->update(['password' => $password]);
+
+                $recipes = [$student, $request->user(), $admission, $password];
+
+                $mail = Mail::create([
+                    'uuid' => $student->uuid,
+                    'to' => $student->email,
+                    'subject' => 'Student Admission',
+                    'status' => 'Pending',
+                    'body' => (new Admission(...$recipes))->render(),
+                ]);
+
+                SendMail::dispatch($mail, $recipes, Admission::class);
+            }
+        }
 
         return $user;
     }

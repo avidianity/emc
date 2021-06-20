@@ -17,6 +17,9 @@ class CreateYearsTable extends Migration
             $table->id();
             $table->year('start');
             $table->year('end');
+            $table->timestamp('semester_start');
+            $table->timestamp('semester_end');
+            $table->boolean('current');
             $table->timestamps();
         });
         Schema::enableForeignKeyConstraints();

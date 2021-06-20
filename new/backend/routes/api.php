@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\MailController;
+use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
@@ -34,19 +36,34 @@ Route::prefix('/auth')->group(function () {
     });
 });
 
+Route::post('/admission/pre-registration', [AdmissionController::class, 'preRegistration']);
+
+Route::apiResources([
+    'requirements' => RequirementController::class,
+    'courses' => CourseController::class,
+    'years' => YearController::class,
+]);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users/change', [UserController::class, 'change']);
     Route::post('/users/{user}/subjects', [SubjectController::class, 'enroll']);
     Route::post('/admissions/increment', [AdmissionController::class, 'increment']);
     Route::apiResources([
         'admissions' => AdmissionController::class,
-        'courses' => CourseController::class,
         'grades' => GradeController::class,
         'mails' => MailController::class,
         'schedules' => ScheduleController::class,
         'subjects' => SubjectController::class,
         'users' => UserController::class,
-        'years' => YearController::class,
         'logs' => LogController::class,
     ]);
+
+    Route::prefix('/analytics')->group(function () {
+        Route::get('/students', [AnalyticsController::class, 'students']);
+        Route::get('/genders', [AnalyticsController::class, 'genders']);
+        Route::get('/courses', [AnalyticsController::class, 'courses']);
+        Route::get('/graduates', [AnalyticsController::class, 'graduates']);
+        Route::get('/enrollees', [AnalyticsController::class, 'enrollees']);
+        Route::get('/subjects', [AnalyticsController::class, 'subjects']);
+    });
 });

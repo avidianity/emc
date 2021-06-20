@@ -3,7 +3,7 @@
 
 Here are your account credentials<br />
 Account Number: <b>{{ $user->uuid }}</b><br />
-<div id="password">Password: <b>{{ $user->password }}</b></div>
+<p id="password">Password: <b>{{ $user->password }}</b></p>
 
 Please use these crendentials to login to the system.
 

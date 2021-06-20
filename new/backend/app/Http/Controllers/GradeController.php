@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use App\Models\Subject;
+use App\Models\User;
+use App\Models\Year;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class GradeController extends Controller
 {
@@ -25,7 +29,26 @@ class GradeController extends Controller
      */
     public function store(Request $request)
     {
-        return Grade::create($request->all());
+        $data = $request->validate([
+            'student_id' => ['required', 'numeric', Rule::exists(User::class, 'id')],
+            'subject_id' => ['required', 'numeric', Rule::exists(Subject::class, 'id')],
+            'teacher_id' => ['required', 'numeric', Rule::exists(User::class, 'id')],
+            'grade' => ['required', 'numeric', 'min:0', 'max:100'],
+            'status' => ['required', 'string'],
+            'year_id' => ['required', 'numeric', Rule::exists(Year::class, 'id')],
+        ]);
+
+        $grade = Grade::whereStudentId($data['student_id'])
+            ->whereSubjectId($data['subject_id'])
+            ->whereYearId($data['year_id'])
+            ->first();
+
+        if ($grade) {
+            $grade->update($data);
+            return $grade;
+        }
+
+        return Grade::create($data);
     }
 
     /**
@@ -48,7 +71,16 @@ class GradeController extends Controller
      */
     public function update(Request $request, Grade $grade)
     {
-        $grade->update($request->all());
+        $data = $request->validate([
+            'student_id' => ['required', 'numeric', Rule::exists(User::class, 'id')],
+            'subject_id' => ['required', 'numeric', Rule::exists(Subject::class, 'id')],
+            'teacher_id' => ['required', 'numeric', Rule::exists(User::class, 'id')],
+            'grade' => ['required', 'numeric', 'min:0', 'max:100'],
+            'status' => ['required', 'string'],
+            'year_id' => ['required', 'numeric', Rule::exists(Year::class, 'id')],
+        ]);
+
+        $grade->update($data);
 
         return $grade;
     }

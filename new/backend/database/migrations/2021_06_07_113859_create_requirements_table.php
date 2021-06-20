@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddRequirementsToAdmissionsTable extends Migration
+class CreateRequirementsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,10 @@ class AddRequirementsToAdmissionsTable extends Migration
      */
     public function up()
     {
-        Schema::table('admissions', function (Blueprint $table) {
-            $table->json('requirements');
+        Schema::create('requirements', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +27,6 @@ class AddRequirementsToAdmissionsTable extends Migration
      */
     public function down()
     {
-        Schema::table('admissions', function (Blueprint $table) {
-            $table->dropColumn('requirements');
-        });
+        Schema::dropIfExists('requirements');
     }
 }

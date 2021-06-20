@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCoursesTable extends Migration
+class AddRequirementsToAdmissionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,8 @@ class CreateCoursesTable extends Migration
      */
     public function up()
     {
-        Schema::create('courses', function (Blueprint $table) {
-            $table->id();
-            $table->string('code')->index();
-            $table->string('description');
-            $table->boolean('open');
-            $table->timestamps();
+        Schema::table('admissions', function (Blueprint $table) {
+            $table->json('requirements')->nullable()->after('major_id');
         });
     }
 
@@ -29,6 +25,8 @@ class CreateCoursesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('courses');
+        Schema::table('admissions', function (Blueprint $table) {
+            $table->dropColumn('requirements');
+        });
     }
 }

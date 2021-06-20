@@ -1,5 +1,5 @@
 #!/bin/sh
 
-mailhog > /dev/null 2>&1 &
-php artisan serve > /dev/null 2>&1 &
-php artisan queue:work > /dev/null 2>&1 &
+mailhog &
+php artisan queue:work &
+php artisan serve &
