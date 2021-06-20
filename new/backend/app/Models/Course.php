@@ -21,7 +21,7 @@ class Course extends Model
 
     protected static function booted()
     {
-        static::deleted(function (self $course) {
+        static::deleting(function (self $course) {
             $course->admissions->each(function (Admission $admission) {
                 $admission->delete();
             });
