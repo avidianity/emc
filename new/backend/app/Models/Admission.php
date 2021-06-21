@@ -29,6 +29,13 @@ class Admission extends Model
         'requirements' => JSON::class,
     ];
 
+    protected static function booted()
+    {
+        static::deleted(function (self $admission) {
+            $admission->student->delete();
+        });
+    }
+
     public function course()
     {
         return $this->belongsTo(Course::class);

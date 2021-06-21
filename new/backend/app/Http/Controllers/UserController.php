@@ -141,9 +141,11 @@ class UserController extends Controller
             'allowed_units' => ['nullable', 'numeric'],
         ]);
 
+        $isPreviouslyInactive = $user->active === false;
+
         $user->update($data);
 
-        if ($user->role === 'Student' && $user->active) {
+        if ($user->role === 'Student' && $user->active && $isPreviouslyInactive) {
             $student = $user;
 
             $admission = $student->admissions()

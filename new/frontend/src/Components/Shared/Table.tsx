@@ -67,8 +67,12 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 	}, []);
 
 	useEffect(() => {
-		if (items.length > 0) {
-			$('.dataTables_empty').remove();
+		const message = $('.dataTables_empty');
+		if (items.length > 0 || loading) {
+			message.addClass('d-none');
+		}
+		if (!loading && items.length === 0) {
+			message.removeClass('d-none');
 		}
 	});
 

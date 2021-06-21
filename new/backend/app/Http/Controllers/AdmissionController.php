@@ -356,18 +356,6 @@ class AdmissionController extends Controller
 
         $admission->load(['course']);
 
-        $recipes = [$student, $admission, $password];
-
-        $mail = Mail::create([
-            'uuid' => $student->uuid,
-            'to' => $student->email,
-            'subject' => 'Pre Registration',
-            'status' => 'Pending',
-            'body' => (new PreRegistration(...$recipes))->render(),
-        ]);
-
-        SendMail::dispatch($mail, $recipes, PreRegistration::class);
-
         return $admission;
     }
 }
