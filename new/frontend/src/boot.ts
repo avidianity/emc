@@ -22,7 +22,7 @@ window.toastr = toastr;
 window.$ = $;
 window.jQuery = $;
 
-const url = process.env.REACT_APP_SERVER_URL || 'http://localhost:8000';
+const url = process.env.REACT_APP_SERVER_URL || '';
 
 axios.defaults.baseURL = `${url}/api`;
 axios.defaults.withCredentials = true;
