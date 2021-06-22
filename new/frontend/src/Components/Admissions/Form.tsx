@@ -175,13 +175,7 @@ const Form: FC<Props> = (props) => {
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='uuid'>Student Number</label>
-								<input
-									{...register('student.uuid')}
-									type='text'
-									id='uuid'
-									className='form-control'
-									disabled={processing || mode === 'Edit'}
-								/>
+								<input {...register('student.uuid')} type='text' id='uuid' className='form-control' disabled />
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='last_name'>Last Name</label>

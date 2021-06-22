@@ -84,6 +84,7 @@ const PreRegistration: FC<Props> = (props) => {
 			data.pre_registration = true;
 			data.requirements = selected;
 			data.student.number = number;
+			data.student.birthday = birthday?.toJSON() || '';
 			await axios.post('/admission/pre-registration', data);
 			toastr.success('Pre Registration saved successfully.');
 			reset();
@@ -292,7 +293,7 @@ const PreRegistration: FC<Props> = (props) => {
 				</div>
 				<div className='form-group col-12 col-md-6 d-none'>
 					<label htmlFor='uuid'>Student Number</label>
-					<input {...register('student.uuid')} type='text' id='uuid' className='form-control' disabled={processing} />
+					<input {...register('student.uuid')} type='text' id='uuid' className='form-control' />
 				</div>
 				<div className='form-group col-12 d-flex'>
 					<span className='mr-auto'>
