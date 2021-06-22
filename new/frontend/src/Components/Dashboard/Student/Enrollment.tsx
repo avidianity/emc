@@ -148,6 +148,9 @@ const Enrollment: FC<Props> = (props) => {
 								}
 								return enrolled.includes(subject.id!);
 							})
+							.filter((subject) => {
+								return admission.term === subject.term && admission.level === subject.level;
+							})
 							.map((subject, index) => (
 								<tr key={index}>
 									<td>

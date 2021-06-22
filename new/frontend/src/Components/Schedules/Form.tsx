@@ -13,6 +13,7 @@ import Flatpickr from 'react-flatpickr';
 import dayjs from 'dayjs';
 import { yearService } from '../../Services/year.service';
 import { CourseContract } from '../../Contracts/course.contract';
+import { MajorContract } from '../../Contracts/major.contract';
 
 type Props = {};
 
@@ -36,6 +37,7 @@ const Form: FC<Props> = (props) => {
 		},
 	});
 	const [course, setCourse] = useNullable<CourseContract>();
+	const [major, setMajor] = useNullable<MajorContract>();
 	const [rows, setRows] = useArray<ScheduleRow>([
 		{
 			day: '',
@@ -122,6 +124,7 @@ const Form: FC<Props> = (props) => {
 											setCourse(course);
 										} else {
 											setCourse(null);
+											setMajor(null);
 										}
 									}}>
 									<option> -- Select -- </option>
@@ -148,7 +151,19 @@ const Form: FC<Props> = (props) => {
 							{course && course.majors && course.majors.length > 0 ? (
 								<div className='form-group col-12 col-md-6'>
 									<label htmlFor='major_id'>Major</label>
-									<select {...register('major_id')} id='major_id' className='form-control'>
+									<select
+										{...register('major_id')}
+										id='major_id'
+										className='form-control'
+										onChange={(e) => {
+											const id = e.target.value.toNumber();
+											const major = course?.majors?.find((major) => major.id === id);
+											if (major) {
+												setMajor(major);
+											} else {
+												setMajor(null);
+											}
+										}}>
 										<option> -- Select -- </option>
 										{course.majors.map((major, index) => (
 											<option value={major.id} key={index}>
@@ -169,6 +184,16 @@ const Form: FC<Props> = (props) => {
 												return valid;
 											}
 											return valid || subject.id === id;
+										})
+										.filter((subject) => {
+											if (course && major) {
+												return subject.course_id === course.id && subject.major_id === major.id;
+											} else if (course) {
+												return subject.course_id === course.id;
+											} else if (major) {
+												return subject.major_id === major.id;
+											}
+											return true;
 										})
 										.map((subject, index) => (
 											<option value={subject.id} key={index}>
