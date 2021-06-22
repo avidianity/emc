@@ -110,7 +110,31 @@ const Enrollment: FC<Props> = (props) => {
 						e.preventDefault();
 						if (subjects) {
 							if (!selectAll) {
-								const non = subjects.filter((subject) => !enrolled.includes(subject.id!));
+								const non = subjects
+									.filter((subject) => {
+										if (!print) {
+											const valid =
+												subject.level === admission.level &&
+												subject.term === admission.term &&
+												subject.course_id === admission.course_id;
+											if (admission.major_id) {
+												return valid && admission.major_id === subject.major_id;
+											}
+										}
+										const valid =
+											enrolled.includes(subject.id!) &&
+											subject.level === admission.level &&
+											subject.term === admission.term &&
+											subject.course_id === admission.course_id;
+										if (admission.major_id) {
+											return valid && admission.major_id === subject.major_id;
+										}
+										return valid;
+									})
+									.filter((subject) => {
+										return admission.term === subject.term && admission.level === subject.level;
+									})
+									.filter((subject) => !enrolled.includes(subject.id!));
 								setSelected([...selected, ...non.map((subject) => subject.id!)]);
 							} else {
 								setSelected([]);
