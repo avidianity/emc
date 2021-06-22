@@ -105,7 +105,7 @@ const Enrollment: FC<Props> = (props) => {
 			</div>
 			<div className='d-flex mt-2'>
 				<button
-					className={`btn btn-${!selectAll ? 'secondary' : 'danger'} btn-sm d-inline`}
+					className={`btn btn-${!selectAll ? 'secondary' : 'danger'} btn-sm`}
 					onClick={(e) => {
 						e.preventDefault();
 						if (subjects) {
@@ -241,18 +241,18 @@ const Enrollment: FC<Props> = (props) => {
 							className='btn btn-info btn-sm'
 							onClick={(e) => {
 								e.preventDefault();
-								setPrint(true);
 								$('#leftSidebar').addClass('d-none');
 								$('.topnav').addClass('d-none');
 								$('input').addClass('d-none');
 								$('button').addClass('d-none');
+								setPrint(true);
 								setTimeout(() => {
 									window.print();
-									setPrint(false);
 									$('#leftSidebar').removeClass('d-none');
 									$('.topnav').removeClass('d-none');
 									$('input').removeClass('d-none');
 									$('button').removeClass('d-none');
+									setPrint(false);
 								}, 100);
 							}}>
 							Download
