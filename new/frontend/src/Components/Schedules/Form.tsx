@@ -14,6 +14,7 @@ import dayjs from 'dayjs';
 import { yearService } from '../../Services/year.service';
 import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
+import { UserContract } from '../../Contracts/user.contract';
 
 type Props = {};
 
@@ -38,6 +39,7 @@ const Form: FC<Props> = (props) => {
 	});
 	const [course, setCourse] = useNullable<CourseContract>();
 	const [major, setMajor] = useNullable<MajorContract>();
+	const [teacher, setTeacher] = useNullable<UserContract>();
 	const [rows, setRows] = useArray<ScheduleRow>([
 		{
 			day: '',
@@ -137,7 +139,19 @@ const Form: FC<Props> = (props) => {
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='teacher_id'>Teacher</label>
-								<select {...register('teacher_id')} id='teacher_id' className='form-control'>
+								<select
+									{...register('teacher_id')}
+									id='teacher_id'
+									className='form-control'
+									onChange={(e) => {
+										const id = e.target.value.toNumber();
+										const teacher = users?.find((user) => user.role === 'Teacher' && user.id === id);
+										if (teacher) {
+											setTeacher(teacher);
+										} else {
+											setTeacher(null);
+										}
+									}}>
 									<option> -- Select -- </option>
 									{users
 										?.filter((user) => user.role === 'Teacher')
@@ -179,7 +193,17 @@ const Form: FC<Props> = (props) => {
 									<option> -- Select -- </option>
 									{subjects
 										?.filter((subject) => {
-											const valid = subject.schedules?.length === 0;
+											const valid =
+												subject.schedules?.find((schedule) => {
+													if (course && major && teacher) {
+														return (
+															schedule.teacher_id === teacher.id &&
+															schedule.course_id === course.id &&
+															schedule.major_id === major.id
+														);
+													}
+													return true;
+												}) === undefined;
 											if (mode === 'Add') {
 												return valid;
 											}
