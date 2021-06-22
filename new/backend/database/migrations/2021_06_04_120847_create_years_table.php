@@ -17,8 +17,8 @@ class CreateYearsTable extends Migration
             $table->id();
             $table->year('start');
             $table->year('end');
-            $table->timestamp('semester_start');
-            $table->timestamp('semester_end');
+            $table->timestamp('semester_start')->nullable();
+            $table->timestamp('semester_end')->nullable();
             $table->boolean('current');
             $table->timestamps();
         });

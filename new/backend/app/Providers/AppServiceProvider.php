@@ -26,8 +26,10 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         Schema::defaultStringLength(191);
-        if (Year::whereCurrent(true)->count() === 0) {
-            optional(Year::latest()->first())->update(['current' => true]);
+        if (Schema::hasTable((new Year())->getTable())) {
+            if (Year::whereCurrent(true)->count() === 0) {
+                optional(Year::latest()->first())->update(['current' => true]);
+            }
         }
     }
 }
