@@ -200,7 +200,7 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='gender'>Gender</label>
 								<select {...register('student.gender')} id='gender' className='form-control' disabled={processing}>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									<option value='Male'>Male</option>
 									<option value='Female'>Female</option>
 								</select>
@@ -284,7 +284,7 @@ const Form: FC<Props> = (props) => {
 											setCourse(null);
 										}
 									}}>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									{courses
 										?.filter((course) => course.open)
 										.map((course, index) => (
@@ -304,7 +304,7 @@ const Form: FC<Props> = (props) => {
 											setMajorID(e.target.value.toNumber());
 										}}
 										value={`${majorID}`}>
-										<option> -- Select -- </option>
+										<option value=''> -- Select -- </option>
 										{course.majors.map((major, index) => (
 											<option value={major.id} key={index}>
 												{major.name}
@@ -363,7 +363,7 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='level'>Year Level</label>
 								<select {...register('level')} id='level' className='form-control'>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									<option value='1st'>1st</option>
 									<option value='2nd'>2nd</option>
 									<option value='3rd'>3rd</option>
@@ -374,7 +374,7 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='status'>Student Status</label>
 								<select {...register('status')} id='status' className='form-control'>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									<option value='Regular'>Regular</option>
 									<option value='Irregular'>Irregular</option>
 								</select>

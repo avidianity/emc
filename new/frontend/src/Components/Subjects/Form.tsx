@@ -113,7 +113,7 @@ const Form: FC<Props> = (props) => {
 											setCourse(null);
 										}
 									}}>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									{courses?.map((course, index) => (
 										<option value={course.id} key={index}>
 											{course.code}
@@ -125,7 +125,7 @@ const Form: FC<Props> = (props) => {
 								<div className='form-group col-12 col-md-6'>
 									<label htmlFor='major_id'>Major</label>
 									<select {...register('major_id')} id='major_id' className='form-control'>
-										<option> -- Select -- </option>
+										<option value=''> -- Select -- </option>
 										{course.majors.map((major, index) => (
 											<option value={major.id} key={index}>
 												{major.name}
@@ -137,7 +137,7 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='level'>Year Level</label>
 								<select {...register('level')} id='level' className='form-control'>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									<option value='1st'>1st</option>
 									<option value='2nd'>2nd</option>
 									<option value='3rd'>3rd</option>
@@ -148,7 +148,7 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='units'>Number of Units</label>
 								<select {...register('units')} id='units' className='form-control'>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									{[1, 2, 3, 4, 5].map((unit, index) => (
 										<option value={unit} key={index}>
 											{unit}

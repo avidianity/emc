@@ -140,7 +140,7 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='gender'>Gender</label>
 								<select {...register('gender')} id='gender' className='form-control'>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									<option value='Male'>Male</option>
 									<option value='Female'>Female</option>
 								</select>

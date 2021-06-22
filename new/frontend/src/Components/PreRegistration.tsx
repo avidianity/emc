@@ -160,7 +160,7 @@ const PreRegistration: FC<Props> = (props) => {
 				<div className='form-group col-12 col-md-6'>
 					<label htmlFor='gender'>Gender</label>
 					<select {...register('student.gender')} id='gender' className='form-control' disabled={processing}>
-						<option> -- Select -- </option>
+						<option value=''> -- Select -- </option>
 						<option value='Male'>Male</option>
 						<option value='Female'>Female</option>
 					</select>
@@ -199,7 +199,7 @@ const PreRegistration: FC<Props> = (props) => {
 								setCourse(null);
 							}
 						}}>
-						<option> -- Select -- </option>
+						<option value=''> -- Select -- </option>
 						{courses
 							?.filter((course) => course.open)
 							.map((course, index) => (

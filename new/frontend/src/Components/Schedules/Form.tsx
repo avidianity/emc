@@ -129,7 +129,7 @@ const Form: FC<Props> = (props) => {
 											setMajor(null);
 										}
 									}}>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									{courses?.map((course, index) => (
 										<option value={course.id} key={index}>
 											{course.code}
@@ -152,7 +152,7 @@ const Form: FC<Props> = (props) => {
 											setTeacher(null);
 										}
 									}}>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									{users
 										?.filter((user) => user.role === 'Teacher')
 										.map((teacher, index) => (
@@ -178,7 +178,7 @@ const Form: FC<Props> = (props) => {
 												setMajor(null);
 											}
 										}}>
-										<option> -- Select -- </option>
+										<option value=''> -- Select -- </option>
 										{course.majors.map((major, index) => (
 											<option value={major.id} key={index}>
 												{major.name}
@@ -190,7 +190,7 @@ const Form: FC<Props> = (props) => {
 							<div className={`form-group col-12 col-md-6 ${course && course.majors && course.majors.length > 0 ? '' : ''}`}>
 								<label htmlFor='subject_id'>Subject</label>
 								<select {...register('subject_id')} id='subject_id' className='form-control'>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									{subjects
 										?.filter((subject) => {
 											const valid =
@@ -229,7 +229,7 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='year'>Year Level</label>
 								<select {...register('year')} id='year' className='form-control'>
-									<option> -- Select -- </option>
+									<option value=''> -- Select -- </option>
 									<option value='1st'>1st</option>
 									<option value='2nd'>2nd</option>
 									<option value='3rd'>3rd</option>
