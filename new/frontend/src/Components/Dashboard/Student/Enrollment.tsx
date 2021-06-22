@@ -146,7 +146,12 @@ const Enrollment: FC<Props> = (props) => {
 										subject.course_id === admission.course_id
 									);
 								}
-								return enrolled.includes(subject.id!);
+								return (
+									enrolled.includes(subject.id!) &&
+									subject.level === admission.level &&
+									subject.term === admission.term &&
+									subject.course_id === admission.course_id
+								);
 							})
 							.filter((subject) => {
 								return admission.term === subject.term && admission.level === subject.level;
@@ -185,7 +190,12 @@ const Enrollment: FC<Props> = (props) => {
 							<td></td>
 							<td>
 								{subjects
-									?.filter((subject) => selected.includes(subject.id!) || enrolled.includes(subject.id!))
+									?.filter((subject) => {
+										if (!print) {
+											return selected.includes(subject.id!) || enrolled.includes(subject.id!);
+										}
+										return enrolled.includes(subject.id!);
+									})
 									.reduce((previous, next) => next.units.toNumber() + previous, 0)}
 							</td>
 						</tr>
