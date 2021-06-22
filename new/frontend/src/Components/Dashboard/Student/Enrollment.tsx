@@ -254,7 +254,8 @@ const Enrollment: FC<Props> = (props) => {
 									$('button').removeClass('d-none');
 									setPrint(false);
 								}, 100);
-							}}>
+							}}
+							disabled={processing || enrolled.length > 0}>
 							Download
 						</button>
 					</span>
