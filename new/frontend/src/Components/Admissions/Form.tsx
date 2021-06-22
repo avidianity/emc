@@ -76,11 +76,11 @@ const Form: FC<Props> = (props) => {
 					setValue(`student.${key}` as any, (data.student as any)[key]);
 				}
 			}
+			setCourse(data.course!);
 			if (data.major_id) {
 				setMajorID(data.major_id);
 			}
 			setNumber(data.student?.number!);
-			setCourse(data.course!);
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -302,7 +302,8 @@ const Form: FC<Props> = (props) => {
 										className='form-control'
 										onChange={(e) => {
 											setMajorID(e.target.value.toNumber());
-										}}>
+										}}
+										value={`${majorID}`}>
 										<option> -- Select -- </option>
 										{course.majors.map((major, index) => (
 											<option value={major.id} key={index}>
