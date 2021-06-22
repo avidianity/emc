@@ -54,6 +54,7 @@ const PreRegistration: FC<Props> = (props) => {
 	const { register, handleSubmit, reset, setValue } = useForm<Inputs>({
 		defaultValues: {
 			force: false,
+			level: '1st',
 		},
 	});
 	const [birthday, setBirthday] = useNullable<Date>();
@@ -205,17 +206,6 @@ const PreRegistration: FC<Props> = (props) => {
 									{course.description}
 								</option>
 							))}
-					</select>
-				</div>
-				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='level'>Year Level</label>
-					<select {...register('level')} id='level' className='form-control'>
-						<option> -- Select -- </option>
-						<option value='1st'>1st</option>
-						<option value='2nd'>2nd</option>
-						<option value='3rd'>3rd</option>
-						<option value='4th'>4th</option>
-						<option value='5th'>5th</option>
 					</select>
 				</div>
 				{course && course.majors && course.majors.length > 0 ? (

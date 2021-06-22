@@ -180,11 +180,13 @@ const List: FC<Props> = (props) => {
 				columns={columns}
 				buttons={
 					<>
+						{user?.role === 'Registrar' ? (
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
+								<i className='fas fa-plus'></i>
+							</Link>
+						) : null}
 						{['Registrar', 'Admin'].includes(user?.role || '') ? (
 							<>
-								<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
-									<i className='fas fa-plus'></i>
-								</Link>
 								<button
 									className='btn btn-danger btn-sm ml-2'
 									title='Disable Selected'

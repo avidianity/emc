@@ -276,15 +276,17 @@ const List: FC<Props> = (props) => {
 				}
 				buttons={
 					<>
-						<button
-							className='btn btn-secondary btn-sm mx-1'
-							title='Evaluate Students'
-							onClick={(e) => {
-								e.preventDefault();
-								evaluate();
-							}}>
-							<i className='fas fa-chevron-up'></i>
-						</button>
+						{user?.role === 'Registrar' ? (
+							<button
+								className='btn btn-secondary btn-sm mx-1'
+								title='Evaluate Students'
+								onClick={(e) => {
+									e.preventDefault();
+									evaluate();
+								}}>
+								<i className='fas fa-chevron-up'></i>
+							</button>
+						) : null}
 					</>
 				}
 			/>
