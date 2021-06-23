@@ -3,6 +3,7 @@ import { Route, RouteProps, Switch } from 'react-router-dom';
 import { useURL } from '../../hooks';
 import Form from './Form';
 import List from './List';
+import View from './View';
 
 type Props = {};
 
@@ -22,6 +23,10 @@ const Subjects: FC<Props> = (props) => {
 		{
 			path: url('/:id/edit'),
 			component: Form,
+		},
+		{
+			path: url('/:id/view'),
+			component: View,
 		},
 	];
 

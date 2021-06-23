@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { NavLink as Link } from 'react-router-dom';
 import { UserContract } from '../../Contracts/user.contract';
-import { useURL } from '../../hooks';
+import { useCurrentYear, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { routes } from '../../routes';
 import { admissionService } from '../../Services/admission.service';
@@ -12,6 +12,7 @@ type Props = {};
 const Sidebar: FC<Props> = (props) => {
 	const { data: admissions } = useQuery('admissions', () => admissionService.fetch());
 	const url = useURL();
+	const { data: year } = useCurrentYear();
 
 	const user = State.getInstance().get<UserContract>('user');
 
@@ -43,10 +44,15 @@ const Sidebar: FC<Props> = (props) => {
 				</i>
 			</a>
 			<nav className='vertnav navbar navbar-light'>
-				<div className='w-100 mb-4 d-flex'>
+				<div className='w-100 mb-4 d-flex flex-column'>
 					<Link className='navbar-brand mx-auto mt-2 flex-fill text-center' to={routes.DASHBOARD}>
 						<img src='/logo.jpg' alt='EMC' className='shadow border rounded-circle' style={{ height: '50px', width: '50px' }} />
 					</Link>
+					{year ? (
+						<span className='mx-auto'>
+							S.Y {year.start} - {year.end}
+						</span>
+					) : null}
 				</div>
 				<ul className='navbar-nav flex-fill w-100 mb-2'>
 					<li className='nav-item'>

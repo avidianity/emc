@@ -143,6 +143,7 @@ const Form: FC<Props> = (props) => {
 									<option value='3rd'>3rd</option>
 									<option value='4th'>4th</option>
 									<option value='5th'>5th</option>
+									<option value='6th'>6th</option>
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>

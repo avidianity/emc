@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
-import { useArray, useNullable } from '../hooks';
+import { useArray, useCurrentYear, useNullable } from '../hooks';
 import { courseService } from '../Services/course.service';
 import { yearService } from '../Services/year.service';
 import Flatpickr from 'react-flatpickr';
@@ -76,6 +76,7 @@ const PreRegistration: FC<Props> = (props) => {
 	const [selected, setSelected] = useArray<string>();
 	const [number, setNumber] = useState('');
 	const history = useHistory();
+	const { data: year } = useCurrentYear({ onSuccess: () => check() });
 
 	const submit = async (data: Inputs) => {
 		setProcessing(true);
@@ -106,6 +107,25 @@ const PreRegistration: FC<Props> = (props) => {
 		}
 	};
 
+	const check = async () => {
+		if (year) {
+			const now = dayjs();
+			const start = dayjs(year.registration_start);
+			const end = dayjs(year.registration_end);
+			if (now.isBefore(start)) {
+				await Asker.okay(
+					`Registration will start at ${start.format('MMMM DD, YYYY')}. Please wait until the given date.`,
+					'Notice'
+				);
+				return history.goBack();
+			}
+			if (now.isAfter(end)) {
+				await Asker.okay(`Registration has already ended. Please register at the next registration phase.`, 'Notice');
+				return history.goBack();
+			}
+		}
+	};
+
 	useEffect(() => {
 		userService.fetch().then((users) => {
 			setValue(
@@ -113,7 +133,6 @@ const PreRegistration: FC<Props> = (props) => {
 				`student-${`${users.filter((user) => user.role === 'Student').length}`.padStart(5, '0')}-${new Date().getFullYear()}`
 			);
 		});
-
 		// eslint-disable-next-line
 	}, []);
 

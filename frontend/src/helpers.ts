@@ -18,6 +18,10 @@ export class Asker {
 	static async save(message: string, title?: string) {
 		return toBool(await swal({ title, text: message, buttons: ['Cancel', 'Save'], icon: 'info' }));
 	}
+
+	static async okay(message: string, title?: string) {
+		return toBool(await swal(title || '', message, 'info'));
+	}
 }
 
 export function outIf<T>(condition: boolean, output: T, defaultValue: any = ''): T {

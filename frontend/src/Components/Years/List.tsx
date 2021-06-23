@@ -96,7 +96,7 @@ const List: FC<Props> = (props) => {
 					year: `${year.start} - ${year.end}`,
 					semester_start: dayjs(year.semester_start).format('MMMM DD, YYYY'),
 					semester_end: dayjs(year.semester_end).format('MMMM DD, YYYY'),
-					registration: `${dayjs(year.registration_end).format('MMMM DD, YYYY')} to ${dayjs(year.registration_end).format(
+					registration: `${dayjs(year.registration_start).format('MMMM DD, YYYY')} to ${dayjs(year.registration_end).format(
 						'MMMM DD, YYYY'
 					)}`,
 					current: year.current ? <span className='badge badge-success'>Current</span> : '',

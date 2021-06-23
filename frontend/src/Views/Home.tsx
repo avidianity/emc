@@ -50,7 +50,7 @@ const Home: FC<Props> = (props) => {
 					</div>
 				</div>
 			</div>
-			<div ref={ref} className='modal fade' tabIndex={-1}>
+			<div ref={ref} className='modal fade bg-dark' tabIndex={-1}>
 				<div className='modal-dialog modal-dialog-centered modal-lg'>
 					<div className='modal-content'>
 						<div className='modal-header'>
@@ -69,7 +69,7 @@ const Home: FC<Props> = (props) => {
 						</div>
 						<div className='modal-body'>
 							<button
-								className='m-2 d-block btn btn-primary btn-lg w-100'
+								className='m-2 d-block btn btn-danger btn-lg w-100'
 								onClick={(e) => {
 									e.preventDefault();
 									if (ref.current) {
@@ -80,7 +80,7 @@ const Home: FC<Props> = (props) => {
 								Admin
 							</button>
 							<button
-								className='m-2 d-block btn btn-primary btn-lg w-100'
+								className='m-2 d-block btn btn-danger btn-lg w-100'
 								onClick={(e) => {
 									e.preventDefault();
 									if (ref.current) {
@@ -91,7 +91,7 @@ const Home: FC<Props> = (props) => {
 								Registrar
 							</button>
 							<button
-								className='m-2 d-block btn btn-primary btn-lg w-100'
+								className='m-2 d-block btn btn-danger btn-lg w-100'
 								onClick={(e) => {
 									e.preventDefault();
 									if (ref.current) {
@@ -102,7 +102,7 @@ const Home: FC<Props> = (props) => {
 								Teacher
 							</button>
 							<button
-								className='m-2 d-block btn btn-primary btn-lg w-100'
+								className='m-2 d-block btn btn-danger btn-lg w-100'
 								onClick={(e) => {
 									e.preventDefault();
 									if (ref.current) {
@@ -116,7 +116,7 @@ const Home: FC<Props> = (props) => {
 						<div className='modal-footer'>
 							<button
 								type='button'
-								className='btn btn-secondary btn-sm'
+								className='btn btn-danger btn-sm'
 								onClick={(e) => {
 									e.preventDefault();
 									if (ref.current) {

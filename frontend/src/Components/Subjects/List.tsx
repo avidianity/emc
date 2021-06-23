@@ -66,7 +66,7 @@ const List: FC<Props> = (props) => {
 		},
 	];
 
-	if (user?.role === 'Registrar') {
+	if (['Registrar', 'Teacher'].includes(user?.role || '')) {
 		columns.push({
 			title: 'Actions',
 			accessor: 'actions',
@@ -94,22 +94,30 @@ const List: FC<Props> = (props) => {
 					.map((subject) => ({
 						...subject,
 						course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
-						actions:
-							user?.role === 'Registrar' ? (
-								<div style={{ minWidth: '100px' }}>
-									<Link to={url(`${subject.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-										<i className='fas fa-edit'></i>
+						actions: (
+							<div style={{ minWidth: '100px' }}>
+								{user?.role === 'Teacher' ? (
+									<Link to={url(`${subject.id}/view`)} className='btn btn-info btn-sm mx-1' title='View'>
+										<i className='fas fa-eye'></i>
 									</Link>
-									<button
-										className='btn btn-danger btn-sm mx-1'
-										onClick={(e) => {
-											e.preventDefault();
-											deleteItem(subject.id);
-										}}>
-										<i className='fas fa-trash'></i>
-									</button>
-								</div>
-							) : null,
+								) : null}
+								{user?.role === 'Registrar' ? (
+									<>
+										<Link to={url(`${subject.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
+											<i className='fas fa-edit'></i>
+										</Link>
+										<button
+											className='btn btn-danger btn-sm mx-1'
+											onClick={(e) => {
+												e.preventDefault();
+												deleteItem(subject.id);
+											}}>
+											<i className='fas fa-trash'></i>
+										</button>
+									</>
+								) : null}
+							</div>
+						),
 					})) || []
 			}
 			columns={columns}

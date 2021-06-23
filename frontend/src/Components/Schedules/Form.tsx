@@ -40,6 +40,7 @@ const Form: FC<Props> = (props) => {
 	const [course, setCourse] = useNullable<CourseContract>();
 	const [major, setMajor] = useNullable<MajorContract>();
 	const [teacher, setTeacher] = useNullable<UserContract>();
+	const [year, setYear] = useNullable<string>();
 	const [rows, setRows] = useArray<ScheduleRow>([
 		{
 			day: '',
@@ -162,6 +163,28 @@ const Form: FC<Props> = (props) => {
 										))}
 								</select>
 							</div>
+							<div className='form-group col-12 col-md-6'>
+								<label htmlFor='year'>Year Level</label>
+								<select
+									{...register('year')}
+									id='year'
+									className='form-control'
+									onChange={(e) => {
+										const value = e.target.value;
+										if (value.length === 3) {
+											setYear(value);
+										} else {
+											setYear(null);
+										}
+									}}>
+									<option value=''> -- Select -- </option>
+									<option value='1st'>1st</option>
+									<option value='2nd'>2nd</option>
+									<option value='3rd'>3rd</option>
+									<option value='4th'>4th</option>
+									<option value='5th'>5th</option>
+								</select>
+							</div>
 							{course && course.majors && course.majors.length > 0 ? (
 								<div className='form-group col-12 col-md-6'>
 									<label htmlFor='major_id'>Major</label>
@@ -206,6 +229,7 @@ const Form: FC<Props> = (props) => {
 													}
 													return true;
 												}) === undefined;
+
 											if (mode === 'Add') {
 												return valid;
 											}
@@ -221,22 +245,17 @@ const Form: FC<Props> = (props) => {
 											}
 											return true;
 										})
+										.filter((subject) => {
+											if (year) {
+												return subject.level === year;
+											}
+											return true;
+										})
 										.map((subject, index) => (
 											<option value={subject.id} key={index}>
 												{subject.description}
 											</option>
 										))}
-								</select>
-							</div>
-							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='year'>Year Level</label>
-								<select {...register('year')} id='year' className='form-control'>
-									<option value=''> -- Select -- </option>
-									<option value='1st'>1st</option>
-									<option value='2nd'>2nd</option>
-									<option value='3rd'>3rd</option>
-									<option value='4th'>4th</option>
-									<option value='5th'>5th</option>
 								</select>
 							</div>
 							<div className='form-group col-12'>
