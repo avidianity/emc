@@ -1,5 +1,0 @@
-#!/bin/sh
-
-mailhog &
-php artisan queue:work &
-php artisan serve &

@@ -1,9 +1,0 @@
-/app/*
-/queue/*
-/logs/*
-/sessions/*
-
-!/logs/.gitkeep
-!/app/.gitkeep
-!/queue/.gitkeep
-!/sessions/.gitkeep
