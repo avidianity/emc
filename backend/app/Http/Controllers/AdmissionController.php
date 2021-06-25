@@ -212,10 +212,7 @@ class AdmissionController extends Controller
             /**
              * @var \App\Models\Admission|null
              */
-            $admission = $user->admissions()
-                ->whereHas('year', function (Builder $builder) {
-                    return $builder->where('current', true);
-                })->first();
+            $admission = $user->admissions->last();
 
             if (!$admission) {
                 continue;
