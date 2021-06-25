@@ -155,6 +155,10 @@ class SubjectController extends Controller
          */
         $self = $request->user();
 
+        if ($self->payment_status !== 'Fully Paid') {
+            return response(['message' => 'Payment status not settled. Current Status: ' . $self->payment_status], 400);
+        }
+
         $data = $request->all();
 
         $subjects = Subject::find($data['subjects']);

@@ -13,6 +13,7 @@ use App\Models\Major;
 use App\Models\Subject;
 use App\Models\User;
 use App\Models\Year;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -204,10 +205,17 @@ class AdmissionController extends Controller
          * @var \App\Models\User
          */
         foreach (User::with('admissions')->whereRole('Student')->whereActive(true)->get() as $user) {
+            if ($user->payment_status !== 'Fully Paid') {
+                continue;
+            }
+
             /**
              * @var \App\Models\Admission|null
              */
-            $admission = $user->admissions->last();
+            $admission = $user->admissions()
+                ->whereHas('year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })->first();
 
             if (!$admission) {
                 continue;
