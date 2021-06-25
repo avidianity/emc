@@ -257,6 +257,7 @@ const List: FC<Props> = (props) => {
 													e.preventDefault();
 													if (updatePaymentModalRef.current) {
 														setStudent(student.id!);
+														setValueUser('payment_status', student.payment_status);
 														$(updatePaymentModalRef.current).modal('toggle');
 													}
 												}}>
