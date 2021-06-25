@@ -234,6 +234,7 @@ const PreRegistration: FC<Props> = (props) => {
 					<div className='form-group col-12 col-md-6'>
 						<label htmlFor='major_id'>Major</label>
 						<select {...register('major_id')} id='major_id' className='form-control'>
+							<option value=''> -- Select -- </option>
 							{course?.majors?.map((major, index) => (
 								<option value={major.id} key={index}>
 									{major.name}

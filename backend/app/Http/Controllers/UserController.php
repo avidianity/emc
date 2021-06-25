@@ -12,6 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -84,6 +85,7 @@ class UserController extends Controller
             'mothers_occupation' => ['nullable', 'string'],
             'allowed_units' => ['nullable', 'numeric'],
             'force' => ['required', 'boolean'],
+            'payment_status' => ['nullable', 'string', Rule::in(User::PAYMENT_STATUSES)],
         ]);
 
         if (!$data['force']) {
@@ -153,6 +155,7 @@ class UserController extends Controller
             'fathers_occupation' => ['nullable', 'string'],
             'mothers_occupation' => ['nullable', 'string'],
             'allowed_units' => ['nullable', 'numeric'],
+            'payment_status' => ['nullable', 'string', Rule::in(User::PAYMENT_STATUSES)],
         ]);
 
         $isPreviouslyInactive = $user->active === false;

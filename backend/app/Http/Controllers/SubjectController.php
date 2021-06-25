@@ -90,7 +90,9 @@ class SubjectController extends Controller
         $subject->load([
             'course.majors',
             'students.grades',
+            'students.admissions.year',
             'major',
+            'schedules',
         ]);
         return $subject;
     }

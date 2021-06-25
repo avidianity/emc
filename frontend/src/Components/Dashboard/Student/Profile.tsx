@@ -44,7 +44,8 @@ const Profile: FC<Props> = (props) => {
 		}
 		setProcessing(true);
 		try {
-			await axios.post('/auth/profile', data);
+			const { data: user } = await axios.post('/auth/profile', data);
+			state.set('user', user);
 			toastr.success('Profile updated successfully.');
 		} catch (error) {
 			handleError(error);

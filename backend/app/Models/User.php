@@ -18,6 +18,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasApiTokens;
 
+    const PAYMENT_STATUSES = ['Not Paid', 'Fully Paid', 'Partially Paid'];
+
     protected $fillable = [
         'uuid',
         'first_name',
@@ -37,6 +39,7 @@ class User extends Authenticatable
         'fathers_occupation',
         'mothers_occupation',
         'allowed_units',
+        'payment_status',
     ];
 
     protected $casts = [

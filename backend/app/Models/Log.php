@@ -18,4 +18,13 @@ class Log extends Model
     protected $casts = [
         'payload' => JSON::class,
     ];
+
+    protected static function booted()
+    {
+        static::creating(function (self $log) {
+            if (!$log->payload) {
+                $log->payload = [];
+            }
+        });
+    }
 }

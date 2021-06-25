@@ -3,16 +3,12 @@ import React, { createRef, FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useQuery } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
-import { CourseContract } from '../../Contracts/course.contract';
-import { MajorContract } from '../../Contracts/major.contract';
 import { SubjectContract } from '../../Contracts/subject.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError } from '../../helpers';
-import { useNullable } from '../../hooks';
+import { useCurrentYear, useNullable } from '../../hooks';
 import { State } from '../../Libraries/State';
-import { courseService } from '../../Services/course.service';
 import { gradeService } from '../../Services/grade.service';
 import { subjectService } from '../../Services/subject.service';
 import Table from '../Shared/Table';
@@ -32,12 +28,8 @@ const View: FC<Props> = (props) => {
 	const params = useParams<{ id: string }>();
 	const id = params.id.toNumber();
 	const history = useHistory();
-	const [course, setCourse] = useNullable<CourseContract>();
-	const [major, setMajor] = useNullable<MajorContract>();
 	const addGradeModalRef = createRef<HTMLDivElement>();
 	const [student, setStudent] = useNullable<number>();
-	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
-	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const [subject, setSubject] = useNullable<SubjectContract>();
 	const [loading, setLoading] = useState(false);
 	const { register, handleSubmit, reset } = useForm<Inputs>({
@@ -45,7 +37,7 @@ const View: FC<Props> = (props) => {
 			grade: 65,
 		},
 	});
-
+	const { data: year } = useCurrentYear();
 	const user = State.getInstance().get<UserContract>('user');
 
 	const submit = async (data: Inputs) => {
@@ -55,6 +47,7 @@ const View: FC<Props> = (props) => {
 		try {
 			data.student_id = student!;
 			data.teacher_id = user!.id!;
+			data.subject_id = subject?.id || id;
 			await gradeService.create(data);
 			toastr.success('Grade added succesfully.');
 		} catch (error) {
@@ -113,6 +106,27 @@ const View: FC<Props> = (props) => {
 					</p>
 				</div>
 				<div className='card-body'>
+					<h4 className='mb-0 mt-3'>Schedule</h4>
+					<table className='table table-bordered table-sm mb-5'>
+						<thead>
+							<tr>
+								<th className='text-center'>Day</th>
+								<th className='text-center'>Start Time</th>
+								<th className='text-center'>End Time</th>
+							</tr>
+						</thead>
+						<tbody>
+							{subject.schedules
+								?.find((schedule) => schedule.teacher_id === user?.id)
+								?.payload.map((row, index) => (
+									<tr key={index}>
+										<td className='text-center'>{row.day}</td>
+										<td className='text-center'>{dayjs(row.start_time!).format('hh:mm A')}</td>
+										<td className='text-center'>{dayjs(row.end_time!).format('hh:mm A')}</td>
+									</tr>
+								))}
+						</tbody>
+					</table>
 					<Table
 						onRefresh={() => refetch()}
 						title='Student List'
@@ -126,16 +140,9 @@ const View: FC<Props> = (props) => {
 										return false;
 									}
 
-									if (course && major) {
-										return admission.course_id === course.id && admission.major_id === major.id;
-									} else if (course) {
-										return admission.course_id === course.id;
-									} else if (major) {
-										return admission.major_id === major.id;
-									}
-
 									return true;
 								})
+								.filter((student) => student.enrolled)
 								.map((student) => ({
 									...student,
 									name: (
@@ -144,20 +151,6 @@ const View: FC<Props> = (props) => {
 										</>
 									),
 									year: student.admissions?.filter((admission) => admission.year?.current)[0]?.level,
-									course: `${student.admissions?.filter((admission) => admission.year?.current)[0]?.course?.code}${
-										student.admissions?.filter((admission) => admission.year?.current)[0]?.major
-											? ` - Major in ${
-													student.admissions?.filter((admission) => admission.year?.current)[0]?.major?.name
-											  }`
-											: ''
-									}`,
-									birthday: dayjs(student.birthday).format('MMMM DD, YYYY'),
-									age: new Date().getFullYear() - dayjs(student.birthday).year(),
-									status: student.active ? (
-										<span className='badge badge-success'>Confirmed</span>
-									) : (
-										<span className='badge badge-danger'>Unconfirmed</span>
-									),
 									actions: (
 										<>
 											<button
@@ -190,75 +183,10 @@ const View: FC<Props> = (props) => {
 								accessor: 'year',
 							},
 							{
-								title: 'Course',
-								accessor: 'course',
-							},
-							{
-								title: 'Units Available',
-								accessor: 'allowed_units',
-							},
-							{
-								title: 'Status',
-								accessor: 'status',
-							},
-							{
 								title: 'Actions',
 								accessor: 'actions',
 							},
 						]}
-						misc={
-							<>
-								<label className='mb-0 mt-2 mx-1'>
-									Course:
-									<select
-										className='custom-select custom-select-sm form-control form-control-sm'
-										onChange={(e) => {
-											const id = e.target.value.toNumber();
-											if (id === 0) {
-												setCourse(null);
-												setMajor(null);
-											} else {
-												const course = courses?.find((course) => course.id === id);
-												if (course) {
-													setCourse(course);
-												}
-											}
-										}}>
-										<option value='0'>All</option>
-										{courses?.map((course, index) => (
-											<option value={course.id} key={index}>
-												{course.code}
-											</option>
-										))}
-									</select>
-								</label>
-								{course ? (
-									<label className='mb-0 mt-2 mx-1'>
-										Major:
-										<select
-											className='custom-select custom-select-sm form-control form-control-sm'
-											onChange={(e) => {
-												const id = e.target.value.toNumber();
-												if (id === 0) {
-													setMajor(null);
-												} else {
-													const major = course?.majors?.find((major) => major.id === id);
-													if (major) {
-														setMajor(major);
-													}
-												}
-											}}>
-											<option value='0'>All</option>
-											{course.majors?.map((major, index) => (
-												<option value={major.id} key={index}>
-													{major.name}
-												</option>
-											))}
-										</select>
-									</label>
-								) : null}
-							</>
-						}
 					/>
 					<div ref={addGradeModalRef} className='modal fade' tabIndex={-1}>
 						<div className='modal-dialog modal-dialog-centered modal-lg'>
@@ -270,18 +198,8 @@ const View: FC<Props> = (props) => {
 									</button>
 								</div>
 								<form onSubmit={handleSubmit(submit)}>
+									<input type='hidden' {...register('year_id')} value={year?.id} />
 									<div className='modal-body'>
-										<div className='form-group'>
-											<label htmlFor='subject_id'>Subject</label>
-											<select {...register('subject_id')} id='subject_id' className='form-control'>
-												<option> -- Select -- </option>
-												{subjects?.map((subject, index) => (
-													<option value={subject.id} key={index}>
-														{subject.code}
-													</option>
-												))}
-											</select>
-										</div>
 										<div className='form-group'>
 											<label htmlFor='grade'>Grade</label>
 											<input

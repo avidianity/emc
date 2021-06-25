@@ -44,6 +44,7 @@ type Inputs = {
 		mothers_occupation?: string;
 		type: string;
 		enrolled: boolean;
+		payment_status: 'Not Paid' | 'Fully Paid' | 'Partially Paid';
 	};
 	force: boolean;
 	done: boolean;

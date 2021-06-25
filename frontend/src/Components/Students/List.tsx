@@ -8,13 +8,12 @@ import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
-import { useNullable, useURL } from '../../hooks';
+import { useCurrentYear, useNullable, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { courseService } from '../../Services/course.service';
 import { gradeService } from '../../Services/grade.service';
 import { subjectService } from '../../Services/subject.service';
 import { userService } from '../../Services/user.service';
-import { yearService } from '../../Services/year.service';
 
 import Table from '../Shared/Table';
 
@@ -27,24 +26,39 @@ type GradeContract = {
 	year_id: number;
 };
 
+type UserInput = {
+	payment_status: 'Not Paid' | 'Partially Paid' | 'Fully Paid';
+};
+
 type Props = {};
 
 const List: FC<Props> = (props) => {
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('users', () => userService.fetch());
-	const { data: years } = useQuery('years', () => yearService.fetch());
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const [course, setCourse] = useNullable<CourseContract>();
 	const [major, setMajor] = useNullable<MajorContract>();
-	const { register, handleSubmit, reset } = useForm<GradeContract>({
+	const {
+		register: registerGrade,
+		handleSubmit,
+		reset,
+	} = useForm<GradeContract>({
 		defaultValues: {
 			grade: 65,
 		},
 	});
+	const { register: registerUser, handleSubmit: handleSubmitUser, reset: resetUser, setValue: setValueUser } = useForm<UserInput>();
 	const [student, setStudent] = useNullable<number>();
 	const addGradeModalRef = createRef<HTMLDivElement>();
+	const updatePaymentModalRef = createRef<HTMLDivElement>();
 	const url = useURL();
+	const { data: year } = useCurrentYear();
 	const user = State.getInstance().get<UserContract>('user');
+	const statuses = {
+		'Not Paid': 'danger',
+		'Fully Paid': 'success',
+		'Partially Paid': 'warning',
+	};
 
 	if (isError) {
 		handleError(error);
@@ -74,7 +88,7 @@ const List: FC<Props> = (props) => {
 		}
 	};
 
-	const submit = async (data: GradeContract) => {
+	const submitGrade = async (data: GradeContract) => {
 		if (addGradeModalRef.current) {
 			$(addGradeModalRef.current).modal('hide');
 		}
@@ -88,6 +102,21 @@ const List: FC<Props> = (props) => {
 		} finally {
 			setStudent(null);
 			reset();
+		}
+	};
+
+	const submitUser = async (data: UserInput) => {
+		if (updatePaymentModalRef.current) {
+			$(updatePaymentModalRef.current).modal('hide');
+		}
+		try {
+			await userService.update(student, data);
+			toastr.success('Student payment updated succesfully.');
+		} catch (error) {
+			handleError(error);
+		} finally {
+			setStudent(null);
+			resetUser();
 		}
 	};
 
@@ -123,6 +152,10 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Units Available',
 			accessor: 'allowed_units',
+		},
+		{
+			title: 'Payment Status',
+			accessor: 'payment_status',
 		},
 		{
 			title: 'Status',
@@ -180,6 +213,9 @@ const List: FC<Props> = (props) => {
 							) : (
 								<span className='badge badge-danger'>Unconfirmed</span>
 							),
+							payment_status: (
+								<span className={`badge badge-${statuses[student.payment_status]}`}>{student.payment_status}</span>
+							),
 							actions: (
 								<div style={{ minWidth: '100px' }}>
 									{user?.role === 'Registrar' ? (
@@ -201,18 +237,32 @@ const List: FC<Props> = (props) => {
 										</Link>
 									) : null}
 									{user?.role === 'Teacher' ? (
-										<button
-											className='btn btn-primary btn-sm mx-1'
-											title='Add Grade'
-											onClick={(e) => {
-												e.preventDefault();
-												if (addGradeModalRef.current) {
-													setStudent(student.id!);
-													$(addGradeModalRef.current).modal('toggle');
-												}
-											}}>
-											<i className='fas fa-chart-bar'></i>
-										</button>
+										<>
+											<button
+												className='btn btn-primary btn-sm mx-1'
+												title='Add Grade'
+												onClick={(e) => {
+													e.preventDefault();
+													if (addGradeModalRef.current) {
+														setStudent(student.id!);
+														$(addGradeModalRef.current).modal('toggle');
+													}
+												}}>
+												<i className='fas fa-chart-bar'></i>
+											</button>
+											<button
+												className='btn btn-primary btn-sm mx-1'
+												title='Update Payment'
+												onClick={(e) => {
+													e.preventDefault();
+													if (updatePaymentModalRef.current) {
+														setStudent(student.id!);
+														$(updatePaymentModalRef.current).modal('toggle');
+													}
+												}}>
+												<i className='fas fa-money-bill'></i>
+											</button>
+										</>
 									) : null}
 									<button
 										className='btn btn-danger btn-sm mx-1 d-none'
@@ -305,12 +355,12 @@ const List: FC<Props> = (props) => {
 								<span aria-hidden='true'>&times;</span>
 							</button>
 						</div>
-						<form onSubmit={handleSubmit(submit)}>
+						<form onSubmit={handleSubmit(submitGrade)}>
 							<div className='modal-body'>
-								<input type='hidden' {...register('year_id')} value={years?.filter((year) => year.current)[0]?.id} />
+								<input type='hidden' {...registerGrade('year_id')} value={year?.id} />
 								<div className='form-group'>
 									<label htmlFor='subject_id'>Subject</label>
-									<select {...register('subject_id')} id='subject_id' className='form-control'>
+									<select {...registerGrade('subject_id')} id='subject_id' className='form-control'>
 										<option> -- Select -- </option>
 										{subjects?.map((subject, index) => (
 											<option value={subject.id} key={index}>
@@ -321,11 +371,51 @@ const List: FC<Props> = (props) => {
 								</div>
 								<div className='form-group'>
 									<label htmlFor='grade'>Grade</label>
-									<input {...register('grade')} type='number' id='grade' min={0} max={100} className='form-control' />
+									<input
+										{...registerGrade('grade')}
+										type='number'
+										id='grade'
+										min={0}
+										max={100}
+										className='form-control'
+									/>
 								</div>
 								<div className='form-group'>
 									<label htmlFor='status'>Status</label>
-									<input {...register('status')} type='text' id='status' className='form-control' />
+									<input {...registerGrade('status')} type='text' id='status' className='form-control' />
+								</div>
+							</div>
+							<div className='modal-footer'>
+								<button type='submit' className='btn btn-primary btn-sm'>
+									Submit
+								</button>
+								<button type='button' className='btn btn-secondary btn-sm' data-dismiss='modal'>
+									Close
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div ref={updatePaymentModalRef} className='modal fade' tabIndex={-1}>
+				<div className='modal-dialog modal-dialog-centered modal-lg'>
+					<div className='modal-content'>
+						<div className='modal-header'>
+							<h5 className='modal-title'>Update Payment</h5>
+							<button type='button' className='close' data-dismiss='modal'>
+								<span aria-hidden='true'>&times;</span>
+							</button>
+						</div>
+						<form onSubmit={handleSubmitUser(submitUser)}>
+							<div className='modal-body'>
+								<div className='form-group'>
+									<label htmlFor='payment_status'>Subject</label>
+									<select {...registerUser('payment_status')} id='subject_id' className='form-control'>
+										<option value=''> -- Select -- </option>
+										<option value='Not Paid'>Not Paid</option>
+										<option value='Partially Paid'>Partially Paid</option>
+										<option value='Fully Paid'>Fully Paid</option>
+									</select>
 								</div>
 							</div>
 							<div className='modal-footer'>

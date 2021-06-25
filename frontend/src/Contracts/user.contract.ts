@@ -28,4 +28,5 @@ export interface UserContract extends ModelContract {
 	allowed_units?: number;
 	type: string;
 	enrolled: boolean;
+	payment_status: 'Not Paid' | 'Fully Paid' | 'Partially Paid';
 }

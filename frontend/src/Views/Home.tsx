@@ -52,9 +52,9 @@ const Home: FC<Props> = (props) => {
 			</div>
 			<div ref={ref} className='modal fade bg-dark' tabIndex={-1}>
 				<div className='modal-dialog modal-dialog-centered modal-lg'>
-					<div className='modal-content'>
+					<div className='modal-content bg-dark'>
 						<div className='modal-header'>
-							<h5 className='modal-title'>Login</h5>
+							<h5 className='modal-title text-white'>Login</h5>
 							<button
 								type='button'
 								className='close'

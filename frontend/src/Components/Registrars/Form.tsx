@@ -31,6 +31,7 @@ type Inputs = {
 	force: boolean;
 	type: string;
 	enrolled: boolean;
+	payment_status: 'Not Paid' | 'Fully Paid' | 'Partially Paid';
 };
 
 const Form: FC<Props> = (props) => {

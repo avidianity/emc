@@ -81,7 +81,7 @@ const Grades: FC<Props> = (props) => {
 									<td>{grade.subject?.code}</td>
 									<td style={{ minWidth: '100px' }}>{grade.subject?.description}</td>
 									<td>{grade.subject?.units}</td>
-									<td>{grade.grade}</td>
+									<td>{grade.grade}%</td>
 									<td>{grade.status}</td>
 								</tr>
 							))}
@@ -90,7 +90,9 @@ const Grades: FC<Props> = (props) => {
 									<b>Total Units</b>
 								</td>
 								<td></td>
-								<td>{admission.student?.grades?.reduce((previous, next) => previous + next.grade, 0)}</td>
+								<td>
+									{admission.student?.grades?.reduce((previous, next) => previous + next.subject!.units.toNumber(), 0)}
+								</td>
 								<td></td>
 								<td></td>
 							</tr>

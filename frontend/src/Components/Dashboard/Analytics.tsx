@@ -64,7 +64,7 @@ const Analytics: FC<Props> = (props) => {
 	useEffect(() => {
 		const charts: Chart<any>[] = [];
 
-		fetch().then(({ courses, subjects }) => {
+		fetch().then(({ courses }) => {
 			try {
 				charts.push(
 					new Chart($('#course') as any, {
@@ -75,48 +75,6 @@ const Analytics: FC<Props> = (props) => {
 								{
 									label: '# of Students',
 									data: courses.map((course) => course.admissions_count),
-									backgroundColor: [
-										'rgba(255, 99, 132, 0.2)',
-										'rgba(54, 162, 235, 0.2)',
-										'rgba(255, 206, 86, 0.2)',
-										'rgba(75, 192, 192, 0.2)',
-										'rgba(153, 102, 255, 0.2)',
-										'rgba(255, 159, 64, 0.2)',
-									],
-									borderColor: [
-										'rgba(255, 99, 132, 1)',
-										'rgba(54, 162, 235, 1)',
-										'rgba(255, 206, 86, 1)',
-										'rgba(75, 192, 192, 1)',
-										'rgba(153, 102, 255, 1)',
-										'rgba(255, 159, 64, 1)',
-									],
-									borderWidth: 1,
-								},
-							],
-						},
-						options: {
-							scales: {
-								y: {
-									beginAtZero: true,
-									ticks: {
-										precision: 0,
-									},
-								},
-							},
-						},
-					})
-				);
-
-				charts.push(
-					new Chart($('#subject') as any, {
-						type: 'bar',
-						data: {
-							labels: subjects.map((subject) => subject.code),
-							datasets: [
-								{
-									label: '# of Students',
-									data: subjects.map((subject) => subject.students_count),
 									backgroundColor: [
 										'rgba(255, 99, 132, 0.2)',
 										'rgba(54, 162, 235, 0.2)',
@@ -246,23 +204,13 @@ const Analytics: FC<Props> = (props) => {
 				<div className='col-12'>
 					<hr className='mt-5' />
 				</div>
-				<div className='col-12 col-md-6'>
+				<div className='col-12'>
 					<div className='card shadow'>
 						<div className='card-header'>
 							<h4 className='card-title'>Students per Course</h4>
 						</div>
 						<div className='card-body'>
 							<canvas id='course'></canvas>
-						</div>
-					</div>
-				</div>
-				<div className='col-12 col-md-6'>
-					<div className='card shadow'>
-						<div className='card-header'>
-							<h4 className='card-title'>Students per Subject</h4>
-						</div>
-						<div className='card-body'>
-							<canvas id='subject'></canvas>
 						</div>
 					</div>
 				</div>
