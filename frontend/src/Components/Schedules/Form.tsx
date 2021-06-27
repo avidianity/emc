@@ -65,7 +65,13 @@ const Form: FC<Props> = (props) => {
 			setMode('Edit');
 			setValues(setValue, data);
 			setRows([...data.payload]);
-			setCourse(data.course!);
+			if (data.course) {
+				setCourse(data.course);
+			}
+			if (data.major) {
+				setMajor(data.major);
+			}
+			setTerm(data.term);
 		} catch (error) {
 			handleError(error);
 			history.goBack();
@@ -87,6 +93,8 @@ const Form: FC<Props> = (props) => {
 			reset();
 			setRows([]);
 			setCourse(null);
+			setMajor(null);
+			setTerm(null);
 		} catch (error) {
 			if (error.response?.status === 409) {
 				if (await Asker.save(error.response?.data?.message)) {
