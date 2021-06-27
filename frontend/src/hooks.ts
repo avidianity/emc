@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useRouteMatch } from 'react-router-dom';
+import { SectionContract } from './Contracts/section.contract';
 import { YearContract } from './Contracts/year.contract';
 
 export function useURL() {
@@ -37,4 +38,18 @@ export function useCurrentYear(options?: { onSuccess: (year?: YearContract) => v
 			},
 		}
 	);
+}
+
+export function useCurrentSection() {
+	const [section, setSection] = useNullable<SectionContract>();
+
+	useEffect(() => {
+		axios
+			.get('/sections/current')
+			.then((response) => setSection(response.data))
+			.catch((error) => console.log(error.toJSON()));
+		// eslint-disable-next-line
+	}, []);
+
+	return section;
 }

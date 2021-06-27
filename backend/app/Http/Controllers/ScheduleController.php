@@ -67,6 +67,7 @@ class ScheduleController extends Controller
             'payload.*.end_time' => ['required', 'string'],
             'year_id' => ['required', 'numeric', Rule::exists(Year::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
+            'term' => ['required', 'string'],
             'force' => ['required', 'boolean'],
         ]);
 
@@ -125,6 +126,7 @@ class ScheduleController extends Controller
             'payload.*.end_time' => ['required', 'string'],
             'year_id' => ['nullable', 'numeric', Rule::exists(Year::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
+            'term' => ['required', 'string'],
         ]);
 
         $schedule->update($data);

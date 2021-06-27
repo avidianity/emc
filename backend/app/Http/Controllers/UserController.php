@@ -7,6 +7,7 @@ use App\Mail\Admission;
 use App\Models\Log;
 use App\Models\Mail;
 use App\Models\Schedule;
+use App\Models\Section;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -38,6 +39,7 @@ class UserController extends Controller
             'admissions.course.majors',
             'admissions.year',
             'admissions.major',
+            'sections.year',
         ])
             ->withCount('subjects');
 
@@ -123,6 +125,7 @@ class UserController extends Controller
             'admissions.year',
             'admissions.course',
             'admissions.major',
+            'sections.year',
         ]);
         return $user;
     }
@@ -160,11 +163,18 @@ class UserController extends Controller
 
         $isPreviouslyInactive = $user->active === false;
 
+        if ($request->has('payment_status') && $data['payment_status'] === null) {
+            unset($data['payment_status']);
+        }
+
         $user->update($data);
 
         if ($user->role === 'Student' && $user->active && $isPreviouslyInactive) {
             $student = $user;
 
+            /**
+             * @var \App\Models\Admission
+             */
             $admission = $student->admissions()
                 ->whereHas('year', function (Builder $builder) {
                     return $builder->where('current', true);
@@ -172,6 +182,33 @@ class UserController extends Controller
                 ->first();
 
             if ($admission) {
+                $year = $admission->year;
+                $builder = Section::whereCourseId($admission->course_id)
+                    ->whereTerm($year->semester)
+                    ->whereLevel($admission->level)
+                    ->whereYearId($year->id)
+                    ->with('students');
+
+                /**
+                 * @var \App\Models\Section|null
+                 */
+                $section = $builder->first();
+
+                if (!$section || $section->students->count() >= 35) {
+                    /**
+                     * @var \App\Models\Section
+                     */
+                    $section = $year->sections()
+                        ->create([
+                            'term' => $year->semester,
+                            'level' => $admission->level,
+                            'name' => sprintf('%s - %s%s', $admission->course->code, $admission->level[0], Section::NAMES[$builder->count()]),
+                            'course_id' => $admission->course_id,
+                        ]);
+                }
+
+                $section->students()->attach($student->id);
+
                 $password = Str::random(5);
 
                 $student->update(['password' => $password]);

@@ -42,6 +42,10 @@ class Year extends Model
             $year->schedules->each(function (Schedule $schedule) {
                 $schedule->delete();
             });
+
+            $year->sections->each(function (Section $section) {
+                return $section->delete();
+            });
         });
     }
 
@@ -58,5 +62,10 @@ class Year extends Model
     public function schedules()
     {
         return $this->hasMany(Schedule::class);
+    }
+
+    public function sections()
+    {
+        return $this->hasMany(Section::class);
     }
 }

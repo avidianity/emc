@@ -18,6 +18,7 @@ class Schedule extends Model
         'payload',
         'year_id',
         'major_id',
+        'term',
     ];
 
     protected $casts = [

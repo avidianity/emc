@@ -22,6 +22,7 @@ export interface ScheduleContract extends ModelContract {
 	payload: ScheduleRow[];
 	year_id: number;
 	major_id?: number;
+	term: string;
 	major?: MajorContract;
 	schoolyear?: YearContract;
 }

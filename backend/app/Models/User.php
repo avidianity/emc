@@ -125,6 +125,11 @@ class User extends Authenticatable
 
     public function schedules()
     {
-        return $this->hasMany(Schedule::class);
+        return $this->hasMany(Schedule::class, 'teacher_id');
+    }
+
+    public function sections()
+    {
+        return $this->belongsToMany(Section::class, 'student_sections')->using(StudentSection::class);
     }
 }

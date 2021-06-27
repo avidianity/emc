@@ -9,6 +9,7 @@ use App\Http\Controllers\LogController;
 use App\Http\Controllers\MailController;
 use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\YearController;
@@ -48,6 +49,7 @@ Route::apiResources([
 ]);
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/sections/current', [SectionController::class, 'current']);
     Route::post('/users/change', [UserController::class, 'change']);
     Route::post('/users/{user}/subjects', [SubjectController::class, 'enroll']);
     Route::post('/admissions/increment', [AdmissionController::class, 'increment']);

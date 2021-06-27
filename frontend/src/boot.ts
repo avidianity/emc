@@ -17,6 +17,7 @@ dayjs.extend(relativeTime);
 dayjs.extend(customParseFormat);
 
 toastr.options.escapeHtml = true;
+toastr.options.extendedTimeOut = 2000;
 
 window.toastr = toastr;
 window.$ = $;

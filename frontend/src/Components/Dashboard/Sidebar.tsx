@@ -2,7 +2,7 @@ import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { NavLink as Link } from 'react-router-dom';
 import { UserContract } from '../../Contracts/user.contract';
-import { useCurrentYear, useURL } from '../../hooks';
+import { useCurrentSection, useCurrentYear, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { routes } from '../../routes';
 import { admissionService } from '../../Services/admission.service';
@@ -15,6 +15,7 @@ const Sidebar: FC<Props> = (props) => {
 	const { data: year } = useCurrentYear();
 
 	const user = State.getInstance().get<UserContract>('user');
+	const section = useCurrentSection();
 
 	const roles: { [key: string]: string[] } = {
 		Admin: [routes.COURSES, routes.STUDENTS, routes.TEACHERS, routes.REGISTRARS, routes.USERS, routes.MAILS, routes.LOGS],
@@ -53,6 +54,7 @@ const Sidebar: FC<Props> = (props) => {
 							S.Y {year.start} - {year.end}
 						</span>
 					) : null}
+					{user.role === 'Student' ? <span className='mx-auto'>{section?.name}</span> : null}
 				</div>
 				<ul className='navbar-nav flex-fill w-100 mb-2'>
 					<li className='nav-item'>

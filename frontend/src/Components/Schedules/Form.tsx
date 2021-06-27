@@ -26,6 +26,7 @@ type Inputs = {
 	year_id: number;
 	major_id?: number;
 	payload: ScheduleRow[];
+	term: string;
 	force: boolean;
 };
 
@@ -41,6 +42,7 @@ const Form: FC<Props> = (props) => {
 	const [major, setMajor] = useNullable<MajorContract>();
 	const [teacher, setTeacher] = useNullable<UserContract>();
 	const [year, setYear] = useNullable<string>();
+	const [term, setTerm] = useNullable<string>();
 	const [rows, setRows] = useArray<ScheduleRow>([
 		{
 			day: '',
@@ -163,7 +165,27 @@ const Form: FC<Props> = (props) => {
 										))}
 								</select>
 							</div>
-							<div className='form-group col-12 col-md-6'>
+							<div className='form-group col-12 col-md-6 col-lg-4'>
+								<label htmlFor='semester'>Semester</label>
+								<select
+									{...register('term')}
+									id='semester'
+									className='form-control'
+									onChange={(e) => {
+										const value = e.target.value;
+										if (value.length > 0) {
+											setTerm(value);
+										} else {
+											setTerm(null);
+										}
+									}}>
+									<option value=''> -- Select -- </option>
+									<option value='1st Semester'>1st Semester</option>
+									<option value='2nd Semester'>2nd Semester</option>
+									<option value='Summer'>Summer</option>
+								</select>
+							</div>
+							<div className='form-group col-12 col-md-6 col-lg-4'>
 								<label htmlFor='year'>Year Level</label>
 								<select
 									{...register('year')}
@@ -186,7 +208,7 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							{course && course.majors && course.majors.length > 0 ? (
-								<div className='form-group col-12 col-md-6'>
+								<div className='form-group col-12 col-md-6 col-lg-4'>
 									<label htmlFor='major_id'>Major</label>
 									<select
 										{...register('major_id')}
@@ -210,7 +232,7 @@ const Form: FC<Props> = (props) => {
 									</select>
 								</div>
 							) : null}
-							<div className={`form-group col-12 col-md-6 ${course && course.majors && course.majors.length > 0 ? '' : ''}`}>
+							<div className={`form-group col-12 ${course && course.majors && course.majors.length > 0 ? '' : 'col-lg-4'}`}>
 								<label htmlFor='subject_id'>Subject</label>
 								<select {...register('subject_id')} id='subject_id' className='form-control'>
 									<option value=''> -- Select -- </option>
@@ -248,6 +270,12 @@ const Form: FC<Props> = (props) => {
 										.filter((subject) => {
 											if (year) {
 												return subject.level === year;
+											}
+											return true;
+										})
+										.filter((subject) => {
+											if (term) {
+												return subject.term === term;
 											}
 											return true;
 										})

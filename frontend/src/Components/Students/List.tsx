@@ -81,6 +81,7 @@ const List: FC<Props> = (props) => {
 						escapeHtml: false,
 					}
 				);
+				refetch();
 			} catch (error) {
 				toastr.error('Unable to process students.');
 				console.log(error);
@@ -89,32 +90,34 @@ const List: FC<Props> = (props) => {
 	};
 
 	const submitGrade = async (data: GradeContract) => {
-		if (addGradeModalRef.current) {
-			$(addGradeModalRef.current).modal('hide');
-		}
 		try {
 			data.student_id = student!;
 			data.teacher_id = user!.id!;
 			await gradeService.create(data);
 			toastr.success('Grade added succesfully.');
+			refetch();
 		} catch (error) {
 			handleError(error);
 		} finally {
+			if (addGradeModalRef.current) {
+				$(addGradeModalRef.current).modal('hide');
+			}
 			setStudent(null);
 			reset();
 		}
 	};
 
 	const submitUser = async (data: UserInput) => {
-		if (updatePaymentModalRef.current) {
-			$(updatePaymentModalRef.current).modal('hide');
-		}
 		try {
 			await userService.update(student, data);
 			toastr.success('Student payment updated succesfully.');
+			refetch();
 		} catch (error) {
 			handleError(error);
 		} finally {
+			if (updatePaymentModalRef.current) {
+				$(updatePaymentModalRef.current).modal('hide');
+			}
 			setStudent(null);
 			resetUser();
 		}
@@ -148,6 +151,10 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Course',
 			accessor: 'course',
+		},
+		{
+			title: 'Section',
+			accessor: 'section',
 		},
 		{
 			title: 'Units Available',
@@ -216,17 +223,33 @@ const List: FC<Props> = (props) => {
 							payment_status: (
 								<span className={`badge badge-${statuses[student.payment_status]}`}>{student.payment_status}</span>
 							),
+							section: <>{student.sections?.find((section) => section.year?.current)?.name}</>,
 							actions: (
-								<div style={{ minWidth: '100px' }}>
+								<div style={{ minWidth: '150px' }}>
 									{user?.role === 'Registrar' ? (
-										<Link
-											to={`/dashboard/admissions/${
-												student.admissions?.find((admission) => admission?.year?.current)?.id
-											}/edit`}
-											className='btn btn-warning btn-sm mx-1'
-											title='Edit'>
-											<i className='fas fa-edit'></i>
-										</Link>
+										<>
+											<Link
+												to={`/dashboard/admissions/${
+													student.admissions?.find((admission) => admission?.year?.current)?.id
+												}/edit`}
+												className='btn btn-warning btn-sm mx-1'
+												title='Edit'>
+												<i className='fas fa-edit'></i>
+											</Link>
+											<button
+												className='btn btn-info btn-sm mx-1'
+												title='Update Payment'
+												onClick={(e) => {
+													e.preventDefault();
+													if (updatePaymentModalRef.current) {
+														setStudent(student.id!);
+														setValueUser('payment_status', student.payment_status);
+														$(updatePaymentModalRef.current).modal('toggle');
+													}
+												}}>
+												<i className='fas fa-money-bill'></i>
+											</button>
+										</>
 									) : null}
 									{['Registrar', 'Admin'].includes(user?.role || '') ? (
 										<Link
@@ -249,19 +272,6 @@ const List: FC<Props> = (props) => {
 													}
 												}}>
 												<i className='fas fa-chart-bar'></i>
-											</button>
-											<button
-												className='btn btn-primary btn-sm mx-1'
-												title='Update Payment'
-												onClick={(e) => {
-													e.preventDefault();
-													if (updatePaymentModalRef.current) {
-														setStudent(student.id!);
-														setValueUser('payment_status', student.payment_status);
-														$(updatePaymentModalRef.current).modal('toggle');
-													}
-												}}>
-												<i className='fas fa-money-bill'></i>
 											</button>
 										</>
 									) : null}
@@ -410,9 +420,8 @@ const List: FC<Props> = (props) => {
 						<form onSubmit={handleSubmitUser(submitUser)}>
 							<div className='modal-body'>
 								<div className='form-group'>
-									<label htmlFor='payment_status'>Subject</label>
+									<label htmlFor='payment_status'>Payment Status</label>
 									<select {...registerUser('payment_status')} id='subject_id' className='form-control'>
-										<option value=''> -- Select -- </option>
 										<option value='Not Paid'>Not Paid</option>
 										<option value='Partially Paid'>Partially Paid</option>
 										<option value='Fully Paid'>Fully Paid</option>
