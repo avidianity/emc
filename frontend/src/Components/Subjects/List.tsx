@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
@@ -97,9 +98,18 @@ const List: FC<Props> = (props) => {
 						actions: (
 							<div style={{ minWidth: '100px' }}>
 								{user?.role === 'Teacher' ? (
-									<Link to={url(`${subject.id}/view`)} className='btn btn-info btn-sm mx-1' title='View'>
-										<i className='fas fa-eye'></i>
-									</Link>
+									<>
+										<Link to={url(`${subject.id}/view`)} className='btn btn-info btn-sm mx-1' title='View'>
+											<i className='fas fa-eye'></i>
+										</Link>
+										<a
+											href={`${axios.defaults.baseURL}/exports/teacher/classlist/${subject.id}`}
+											download
+											className='btn btn-warning btn-sm mx-1'
+											title='Download Classlist'>
+											<i className='fas fa-file-excel'></i>
+										</a>
+									</>
 								) : null}
 								{user?.role === 'Registrar' ? (
 									<>

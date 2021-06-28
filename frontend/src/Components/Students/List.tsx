@@ -207,10 +207,10 @@ const List: FC<Props> = (props) => {
 									{student.last_name}, {student.first_name} {student.middle_name || ''}
 								</>
 							),
-							year: student.admissions?.filter((admission) => admission.year?.current)[0]?.level,
-							course: `${student.admissions?.filter((admission) => admission.year?.current)[0]?.course?.code}${
-								student.admissions?.filter((admission) => admission.year?.current)[0]?.major
-									? ` - Major in ${student.admissions?.filter((admission) => admission.year?.current)[0]?.major?.name}`
+							year: student.admissions?.find((admission) => admission.year?.current)?.level,
+							course: `${student.admissions?.find((admission) => admission.year?.current)?.course?.code}${
+								student.admissions?.find((admission) => admission.year?.current)?.major
+									? ` - Major in ${student.admissions?.find((admission) => admission.year?.current)?.major?.name}`
 									: ''
 							}`,
 							birthday: dayjs(student.birthday).format('MMMM DD, YYYY'),
@@ -344,15 +344,31 @@ const List: FC<Props> = (props) => {
 				buttons={
 					<>
 						{user?.role === 'Registrar' ? (
-							<button
-								className='btn btn-secondary btn-sm mx-1'
-								title='Evaluate Students'
-								onClick={(e) => {
-									e.preventDefault();
-									evaluate();
-								}}>
-								<i className='fas fa-chevron-up'></i>
-							</button>
+							<>
+								<button
+									className='btn btn-secondary btn-sm mx-1'
+									title='Evaluate Students'
+									onClick={(e) => {
+										e.preventDefault();
+										evaluate();
+									}}>
+									<i className='fas fa-chevron-up'></i>
+								</button>
+								<a
+									href={`${axios.defaults.baseURL}/exports/registrar/classlist/course-and-major`}
+									download
+									className='btn btn-primary btn-sm mx-1'
+									title='Download Classlist per Course and Major'>
+									<i className='fas fa-file-excel'></i>
+								</a>
+								<a
+									href={`${axios.defaults.baseURL}/exports/registrar/classlist/subject`}
+									download
+									className='btn btn-success btn-sm mx-1'
+									title='Download Classlist per Subject'>
+									<i className='fas fa-file-excel'></i>
+								</a>
+							</>
 						) : null}
 					</>
 				}
