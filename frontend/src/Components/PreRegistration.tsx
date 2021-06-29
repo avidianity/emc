@@ -61,6 +61,7 @@ const PreRegistration: FC<Props> = (props) => {
 	});
 	const [birthday, setBirthday] = useNullable<Date>();
 	const [course, setCourse] = useNullable<CourseContract>();
+	const [majorID, setMajorID] = useNullable<number>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const { data: years } = useQuery('years', () => yearService.fetch(), {
 		onSuccess(years) {
@@ -79,6 +80,9 @@ const PreRegistration: FC<Props> = (props) => {
 	const { data: year } = useCurrentYear({ onSuccess: () => check() });
 
 	const submit = async (data: Inputs) => {
+		if ((course?.majors?.length || 0) > 0 && !majorID) {
+			return toastr.error('Please pick a major.');
+		}
 		setProcessing(true);
 		try {
 			data.status = 'Regular';
@@ -219,6 +223,7 @@ const PreRegistration: FC<Props> = (props) => {
 							} else {
 								setCourse(null);
 							}
+							setMajorID(null);
 						}}>
 						<option value=''> -- Select -- </option>
 						{courses
@@ -233,7 +238,18 @@ const PreRegistration: FC<Props> = (props) => {
 				{course && course.majors && course.majors.length > 0 ? (
 					<div className='form-group col-12 col-md-6'>
 						<label htmlFor='major_id'>Major</label>
-						<select {...register('major_id')} id='major_id' className='form-control'>
+						<select
+							{...register('major_id')}
+							id='major_id'
+							className='form-control'
+							onChange={(e) => {
+								const value = e.target.value;
+								if (value === '') {
+									setMajorID(null);
+								} else {
+									setMajorID(value.toNumber());
+								}
+							}}>
 							<option value=''> -- Select -- </option>
 							{course?.majors?.map((major, index) => (
 								<option value={major.id} key={index}>

@@ -92,6 +92,9 @@ const Form: FC<Props> = (props) => {
 	};
 
 	const submit = async (data: Inputs) => {
+		if ((course?.majors?.length || 0) > 0 && !majorID) {
+			return toastr.error('Please pick a major.');
+		}
 		setProcessing(true);
 		try {
 			if (majorID) {
