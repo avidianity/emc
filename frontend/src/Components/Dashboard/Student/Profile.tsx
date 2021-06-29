@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { UserContract } from '../../../Contracts/user.contract';
 import { handleError } from '../../../helpers';
 import { State } from '../../../Libraries/State';
+import InputMask from 'react-input-mask';
 
 type Props = {};
 
@@ -32,6 +33,7 @@ const Profile: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const state = State.getInstance();
 	const user = state.get<UserContract>('user');
+	const [number, setNumber] = useState(user?.number || '');
 	const { register, handleSubmit } = useForm<Inputs>({
 		defaultValues: {
 			...user,
@@ -44,6 +46,7 @@ const Profile: FC<Props> = (props) => {
 		}
 		setProcessing(true);
 		try {
+			data.number = number;
 			const { data: user } = await axios.post('/auth/profile', data);
 			state.set('user', user);
 			toastr.success('Profile updated successfully.');
@@ -99,13 +102,14 @@ const Profile: FC<Props> = (props) => {
 						</div>
 						<div className='col-3 my-2 d-flex align-items-center'>Mobile Number</div>
 						<div className='col-9 my-2 d-flex align-items-center'>
-							<input
-								{...register('number')}
+							<InputMask
+								mask='0\999-999-9999'
 								type='text'
+								id='number'
 								className='form-control'
-								pattern='09[0-9]{2}-[0-9]{3}-[0-9]{4}'
-								placeholder='0912-345-6789'
 								disabled={processing}
+								value={number}
+								onChange={(e) => setNumber(e.target.value)}
 							/>
 						</div>
 						<div className='col-3 my-2 d-flex align-items-center'>Email Address</div>

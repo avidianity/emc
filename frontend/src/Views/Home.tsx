@@ -2,12 +2,14 @@ import React, { FC } from 'react';
 import { createRef } from 'react';
 import { Link, useHistory } from 'react-router-dom';
 import background from '../Assets/landing.jpg';
+import { State } from '../Libraries/State';
 import { routes } from '../routes';
 import '../Styles/landing.css';
 
 type Props = {};
 
 const Home: FC<Props> = (props) => {
+	const state = State.getInstance();
 	const ref = createRef<HTMLDivElement>();
 	const history = useHistory();
 
@@ -34,7 +36,9 @@ const Home: FC<Props> = (props) => {
 							style={{ visibility: 'visible', animationDelay: '2.3s', animationName: 'fadeInUp' }}
 							onClick={(e) => {
 								e.preventDefault();
-								if (ref.current) {
+								if (state.has('user')) {
+									history.push(routes.DASHBOARD);
+								} else if (ref.current) {
 									$(ref.current).modal('show');
 								}
 							}}>
