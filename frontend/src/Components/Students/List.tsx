@@ -355,6 +355,13 @@ const List: FC<Props> = (props) => {
 									<i className='fas fa-chevron-up'></i>
 								</button>
 								<a
+									href={`${axios.defaults.baseURL}/exports/registrar/classlist/regular-and-irregular`}
+									download
+									className='btn btn-warning btn-sm mx-1'
+									title='Download Classlist per Regular and Irregular Student'>
+									<i className='fas fa-file-excel'></i>
+								</a>
+								<a
 									href={`${axios.defaults.baseURL}/exports/registrar/classlist/course-and-major`}
 									download
 									className='btn btn-primary btn-sm mx-1'

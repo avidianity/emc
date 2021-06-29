@@ -143,14 +143,13 @@ const Form: FC<Props> = (props) => {
 									<option value='3rd'>3rd</option>
 									<option value='4th'>4th</option>
 									<option value='5th'>5th</option>
-									<option value='6th'>6th</option>
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='units'>Number of Units</label>
 								<select {...register('units')} id='units' className='form-control'>
 									<option value=''> -- Select -- </option>
-									{[1, 2, 3, 4, 5].map((unit, index) => (
+									{[1, 2, 3, 4, 5, 6].map((unit, index) => (
 										<option value={unit} key={index}>
 											{unit}
 										</option>

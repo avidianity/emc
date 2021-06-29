@@ -61,7 +61,7 @@ const Form: FC<Props> = (props) => {
 				} finally {
 					setProcessing(false);
 				}
-				break;
+				return;
 			}
 		}
 		return toastr.error('Course Code does not follow correct format.');
@@ -117,11 +117,16 @@ const Form: FC<Props> = (props) => {
 								className='btn btn-info btn-sm'
 								onClick={(e) => {
 									e.preventDefault();
-									majors.push({ name: '', course_id: 0 });
+									majors.push({ name: '', course_id: 0, short_name: '' });
 									setMajors([...majors]);
 								}}>
 								Add
 							</button>
+							<small className='my-3 form-text text-muted'>
+								Example: <br />
+								Name: 'Mathematics'
+								<br /> Short Name: 'M'
+							</small>
 							<div className='row'>
 								{majors.map((major, index) => (
 									<div className='col-12 col-md-6 col-lg-4 col-xl-3 p-2' key={index}>
@@ -135,10 +140,14 @@ const Form: FC<Props> = (props) => {
 												}}>
 												Remove
 											</button>
+											<div className='my-2'>
+												<h5 className='mb-0'>Major {index + 1}</h5>
+											</div>
 											<div className='form-group'>
-												<label>Major {index + 1}</label>
+												<label htmlFor={`name-${index}`}>Name</label>
 												<input
 													type='text'
+													id={`name-${index}`}
 													className='form-control'
 													onChange={(e) => {
 														major.name = e.target.value;
@@ -146,6 +155,20 @@ const Form: FC<Props> = (props) => {
 														setMajors([...majors]);
 													}}
 													value={major.name}
+												/>
+											</div>
+											<div className='form-group'>
+												<label htmlFor={`short-name-${index}`}>Short Name</label>
+												<input
+													type='text'
+													id={`short-name-${index}`}
+													className='form-control'
+													onChange={(e) => {
+														major.short_name = e.target.value;
+														majors.splice(index, 1, major);
+														setMajors([...majors]);
+													}}
+													value={major.short_name}
 												/>
 											</div>
 										</div>
