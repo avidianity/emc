@@ -102,7 +102,7 @@ class ScheduleController extends Controller
      */
     public function show(Schedule $schedule)
     {
-        $schedule->load('course.majors', 'teacher', 'subject');
+        $schedule->load('course.majors', 'teacher', 'subject', 'major');
         return $schedule;
     }
 

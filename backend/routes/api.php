@@ -4,6 +4,7 @@ use App\Http\Controllers\AdmissionController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\MailController;
@@ -40,6 +41,9 @@ Route::prefix('/auth')->group(function () {
 Route::post('/admission/pre-registration', [AdmissionController::class, 'preRegistration']);
 
 Route::get('/years/current', [YearController::class, 'current']);
+Route::get('/exports/teacher/classlist/{subject}', [ExportController::class, 'teacherClasslist']);
+Route::get('/exports/registrar/classlist/course-and-major', [ExportController::class, 'courseAndMajorClasslist']);
+Route::get('/exports/registrar/classlist/subject', [ExportController::class, 'subjectClasslist']);
 
 Route::apiResources([
     'requirements' => RequirementController::class,

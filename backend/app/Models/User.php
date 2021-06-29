@@ -52,6 +52,10 @@ class User extends Authenticatable
         'enrolled',
     ];
 
+    protected $hidden = [
+        'password',
+    ];
+
     protected static function booted()
     {
         static::creating(function (self $user) {
@@ -103,9 +107,19 @@ class User extends Authenticatable
         });
     }
 
-    public function getEnrolledAttribute()
+    public function getEnrolledAttribute(): bool
     {
         return $this->subjects()->count() > 0;
+    }
+
+    public function getFullNameAttribute()
+    {
+        return sprintf(
+            '%s, %s %s',
+            $this->last_name,
+            $this->first_name,
+            $this->middle_name ? $this->middle_name : '',
+        );
     }
 
     public function subjects()

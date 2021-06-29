@@ -21,6 +21,14 @@ class Section extends Model
         'I',
         'J',
         'K',
+        'L',
+        'M',
+        'N',
+        'O',
+        'P',
+        'Q',
+        'R',
+        'S',
     ];
 
     protected $fillable = [
@@ -29,7 +37,13 @@ class Section extends Model
         'term',
         'course_id',
         'year_id',
+        'major_id',
     ];
+
+    public function major()
+    {
+        return $this->belongsTo(Major::class);
+    }
 
     public function course()
     {

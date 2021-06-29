@@ -1,11 +1,12 @@
 import axios from 'axios';
+import dayjs from 'dayjs';
 import { trim } from 'lodash';
 import React, { FC, useState } from 'react';
 import { useQuery } from 'react-query';
 import { useHistory, useParams } from 'react-router';
 import { UserContract } from '../../Contracts/user.contract';
-import { handleError } from '../../helpers';
-import { useArray } from '../../hooks';
+import { Asker, handleError } from '../../helpers';
+import { useArray, useCurrentYear } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { subjectService } from '../../Services/subject.service';
 import { userService } from '../../Services/user.service';
@@ -29,6 +30,7 @@ const Subjects: FC<Props> = (props) => {
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
 	const admission = student?.admissions?.find((admission) => admission.year?.current);
 	const user = State.getInstance().get<UserContract>('user');
+	const { data: year } = useCurrentYear({ onSuccess: () => check() });
 
 	const submit = async () => {
 		setProcessing(true);
@@ -41,6 +43,22 @@ const Subjects: FC<Props> = (props) => {
 			handleError(error);
 		} finally {
 			setProcessing(false);
+		}
+	};
+
+	const check = async () => {
+		if (year) {
+			const now = dayjs();
+			const start = dayjs(year.registration_start);
+			const end = dayjs(year.registration_end);
+			if (now.isBefore(start)) {
+				await Asker.okay(`Enrollment will start at ${start.format('MMMM DD, YYYY')}. Please wait until the given date.`, 'Notice');
+				return history.goBack();
+			}
+			if (now.isAfter(end)) {
+				await Asker.okay(`Enrollment has already ended. Please enroll at the next enrollment phase.`, 'Notice');
+				return history.goBack();
+			}
 		}
 	};
 

@@ -155,7 +155,7 @@ class SubjectController extends Controller
          */
         $self = $request->user();
 
-        if ($user->payment_status !== 'Fully Paid') {
+        if ($user->payment_status === 'Not Paid') {
             return response(['message' => 'Payment not settled. Current Status: ' . $user->payment_status], 400);
         }
 

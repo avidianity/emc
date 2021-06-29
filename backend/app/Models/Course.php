@@ -37,6 +37,10 @@ class Course extends Model
             $course->subjects->each(function (Subject $subject) {
                 $subject->delete();
             });
+
+            $course->sections->each(function (Section $section) {
+                $section->delete();
+            });
         });
     }
 

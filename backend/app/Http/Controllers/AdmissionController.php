@@ -202,6 +202,15 @@ class AdmissionController extends Controller
         $incremented = 0;
 
         /**
+         * @var \App\Models\Year
+         */
+        $year = Year::whereCurrent(true)->first();
+
+        if (!$year) {
+            return response(['message' => 'No school year currently set.'], 400);
+        }
+
+        /**
          * @var \App\Models\User
          */
         foreach (User::with('admissions')->whereRole('Student')->whereActive(true)->get() as $user) {
@@ -290,11 +299,14 @@ class AdmissionController extends Controller
                     }
                 }
 
+                $data['year_id'] = $year->id;
+
                 $user->admissions()->create($data);
 
                 $user->fill([
                     'active' => false,
                     'allowed_units' => $user->allowed_units - $unitsDeduction,
+                    'payment_status' => 'Not Paid',
                 ]);
 
                 if ($user->type === 'New') {
@@ -303,7 +315,7 @@ class AdmissionController extends Controller
 
                 $user->save();
 
-                $user->subjects()->delete();
+                $user->subjects()->detach();
                 $incremented += 1;
             }
 

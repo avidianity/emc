@@ -28,6 +28,10 @@ class Major extends Model
             $major->subjects->each(function (Subject $subject) {
                 $subject->delete();
             });
+
+            $major->sections->each(function (Section $section) {
+                $section->delete();
+            });
         });
 
         static::created(function () {

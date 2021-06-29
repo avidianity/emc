@@ -169,7 +169,7 @@ class UserController extends Controller
 
         $user->update($data);
 
-        if ($user->role === 'Student' && $user->active && $isPreviouslyInactive) {
+        if ($user->role === 'Student' && $user->active && $isPreviouslyInactive && !$user->enrolled) {
             $student = $user;
 
             /**
@@ -184,17 +184,19 @@ class UserController extends Controller
             if ($admission) {
                 $year = $admission->year;
                 $builder = Section::whereCourseId($admission->course_id)
+                    ->whereMajorId($admission->major_id)
                     ->whereTerm($year->semester)
                     ->whereLevel($admission->level)
                     ->whereYearId($year->id)
-                    ->with('students');
+                    ->withCount('students')
+                    ->latest();
 
                 /**
                  * @var \App\Models\Section|null
                  */
                 $section = $builder->first();
 
-                if (!$section || $section->students->count() >= 35) {
+                if (!$section || $section->students_count >= 35) {
                     /**
                      * @var \App\Models\Section
                      */
@@ -204,6 +206,7 @@ class UserController extends Controller
                             'level' => $admission->level,
                             'name' => sprintf('%s - %s%s', $admission->course->code, $admission->level[0], Section::NAMES[$builder->count()]),
                             'course_id' => $admission->course_id,
+                            'major_id' => $admission->major_id,
                         ]);
                 }
 
