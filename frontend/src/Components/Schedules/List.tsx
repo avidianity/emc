@@ -44,6 +44,10 @@ const List: FC<Props> = (props) => {
 			accessor: 'subject',
 		},
 		{
+			title: 'Section',
+			accessor: 'section',
+		},
+		{
 			title: 'Teacher',
 			accessor: 'teacher',
 		},
@@ -72,6 +76,7 @@ const List: FC<Props> = (props) => {
 			items={
 				items?.map((schedule) => ({
 					...schedule,
+					section: schedule.section?.name,
 					subject: schedule?.subject?.description,
 					course: `${schedule.course?.code}${schedule.major ? ` - Major in ${schedule.major.name}` : ''}`,
 					teacher: `${schedule.teacher?.last_name}, ${schedule.teacher?.first_name} ${schedule.teacher?.middle_name || ''}`,

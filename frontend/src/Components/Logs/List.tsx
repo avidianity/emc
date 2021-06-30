@@ -24,6 +24,18 @@ const List: FC<Props> = (props) => {
 			accessor: 'message',
 		},
 		{
+			title: 'IP Address',
+			accessor: 'ip_address',
+		},
+		{
+			title: 'Device',
+			accessor: 'device',
+		},
+		{
+			title: 'User',
+			accessor: 'user',
+		},
+		{
 			title: 'Date',
 			accessor: 'created_at',
 		},
@@ -38,6 +50,7 @@ const List: FC<Props> = (props) => {
 				items?.map((log) => ({
 					...log,
 					created_at: dayjs(log.created_at).format('MMMM DD, YYYY hh:mm A'),
+					user: `${log.payload?.last_name}, ${log.payload?.first_name} ${log.payload?.middle_name || ''}`,
 				})) || []
 			}
 			columns={columns}

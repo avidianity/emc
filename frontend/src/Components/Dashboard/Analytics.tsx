@@ -121,7 +121,7 @@ const Analytics: FC<Props> = (props) => {
 	return (
 		<div className={`container-fluid ${outIf(user?.role === 'Student', 'd-none')}`}>
 			<div className='row'>
-				<div className='col-12 col-md-6'>
+				<div className={`col-12 col-md-${user?.role === 'Registrar' ? '4' : '6'}`}>
 					<div className='card bg-dark text-white shadow'>
 						<div className='card-body'>
 							<div className='row align-items-center'>
@@ -140,7 +140,7 @@ const Analytics: FC<Props> = (props) => {
 						</div>
 					</div>
 				</div>
-				<div className='col-12 col-md-6'>
+				<div className={`col-12 col-md-${user?.role === 'Registrar' ? '4' : '6'}`}>
 					<div className='card bg-dark text-white shadow'>
 						<div className='card-body'>
 							<div className='row align-items-center'>
@@ -161,7 +161,7 @@ const Analytics: FC<Props> = (props) => {
 				</div>
 				{user?.role === 'Registrar' ? (
 					<>
-						<div className='col-12 col-md-6 mt-5'>
+						<div className='col-12 col-md-4'>
 							<div className='card bg-dark text-white shadow'>
 								<div className='card-body'>
 									<div className='row align-items-center'>
@@ -174,25 +174,6 @@ const Analytics: FC<Props> = (props) => {
 											<p className='small mb-0'>Pending Enrollees</p>
 											<span className='text-white h3 mb-0' id='pending-enrollees'>
 												{data.enrollees.pending}
-											</span>
-										</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div className='col-12 col-md-6 mt-5'>
-							<div className='card bg-dark text-white shadow'>
-								<div className='card-body'>
-									<div className='row align-items-center'>
-										<div className='col-3 text-center'>
-											<span className='circle circle-sm'>
-												<i className='fe fe-16 fe-users mb-0'></i>
-											</span>
-										</div>
-										<div className='col pr-0'>
-											<p className='small mb-0'>Graduates</p>
-											<span className='text-white h3 mb-0' id='graduates'>
-												{data.graduates}
 											</span>
 										</div>
 									</div>

@@ -68,7 +68,7 @@ const List: FC<Props> = (props) => {
 		},
 	];
 
-	if (['Registrar', 'Admin'].includes(user?.role || '')) {
+	if (['Registrar'].includes(user?.role || '')) {
 		columns.unshift({
 			title: '#',
 			accessor: 'toggle',
@@ -146,25 +146,27 @@ const List: FC<Props> = (props) => {
 										}}>
 										<i className='fas fa-eye'></i>
 									</button>
-									<button
-										className={`btn btn-${teacher.active ? 'danger' : 'info'} btn-sm mx-1`}
-										onClick={async (e) => {
-											e.preventDefault();
-											if (
-												await Asker.notice(
-													`Are you sure you want to ${teacher.active ? 'disable' : 'enable'} this teacher? ${
-														teacher.active
-															? 'If you disable this teacher, this teacher can’t access the system. And you can’t distribute subjects to this teacher.'
-															: 'If you enable this teacher, this teacher can access the system. And you can distribute subject to this teacher.'
-													}`
-												)
-											) {
-												update(teacher);
-											}
-										}}
-										title={teacher.active ? 'Disable' : 'Enable'}>
-										<i className={`fas fa-user-${teacher.active ? 'times' : 'check'}`}></i>
-									</button>
+									{user?.role === 'Registrar' ? (
+										<button
+											className={`btn btn-${teacher.active ? 'danger' : 'info'} btn-sm mx-1`}
+											onClick={async (e) => {
+												e.preventDefault();
+												if (
+													await Asker.notice(
+														`Are you sure you want to ${teacher.active ? 'disable' : 'enable'} this teacher? ${
+															teacher.active
+																? 'If you disable this teacher, this teacher can’t access the system. And you can’t distribute subjects to this teacher.'
+																: 'If you enable this teacher, this teacher can access the system. And you can distribute subject to this teacher.'
+														}`
+													)
+												) {
+													update(teacher);
+												}
+											}}
+											title={teacher.active ? 'Disable' : 'Enable'}>
+											<i className={`fas fa-user-${teacher.active ? 'times' : 'check'}`}></i>
+										</button>
+									) : null}
 									<button
 										className='btn btn-danger btn-sm mx-1 d-none'
 										onClick={(e) => {

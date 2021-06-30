@@ -15,6 +15,8 @@ import { yearService } from '../../Services/year.service';
 import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
+import { sectionService } from '../../Services/section.service';
+import { SectionContract } from '../../Contracts/section.contract';
 
 type Props = {};
 
@@ -28,6 +30,7 @@ type Inputs = {
 	payload: ScheduleRow[];
 	term: string;
 	force: boolean;
+	section_id: number;
 };
 
 const Form: FC<Props> = (props) => {
@@ -41,6 +44,7 @@ const Form: FC<Props> = (props) => {
 	const [course, setCourse] = useNullable<CourseContract>();
 	const [major, setMajor] = useNullable<MajorContract>();
 	const [teacher, setTeacher] = useNullable<UserContract>();
+	const [section, setSection] = useNullable<SectionContract>();
 	const [year, setYear] = useNullable<string>();
 	const [term, setTerm] = useNullable<string>();
 	const [rows, setRows] = useArray<ScheduleRow>([
@@ -57,6 +61,7 @@ const Form: FC<Props> = (props) => {
 	const { data: users } = useQuery('users', () => userService.fetch());
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
 	const { data: years } = useQuery('years', () => yearService.fetch());
+	const { data: sections } = useQuery('sections', () => sectionService.fetch());
 
 	const fetch = async (id: any) => {
 		try {
@@ -70,6 +75,9 @@ const Form: FC<Props> = (props) => {
 			}
 			if (data.major) {
 				setMajor(data.major);
+			}
+			if (data.section) {
+				setSection(data.section);
 			}
 			setTerm(data.term);
 		} catch (error) {
@@ -124,7 +132,7 @@ const Form: FC<Props> = (props) => {
 					<h5 className='card-title'>{mode} Schedule</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
-							<div className='form-group col-12 col-md-6'>
+							<div className='form-group col-12 col-md-4'>
 								<label htmlFor='course_id'>Course</label>
 								<select
 									{...register('course_id')}
@@ -141,14 +149,78 @@ const Form: FC<Props> = (props) => {
 										}
 									}}>
 									<option value=''> -- Select -- </option>
-									{courses?.map((course, index) => (
-										<option value={course.id} key={index}>
-											{course.code}
-										</option>
-									))}
+									{courses
+										?.filter((course) => course.open)
+										.map((course, index) => (
+											<option value={course.id} key={index}>
+												{course.code}
+											</option>
+										))}
 								</select>
 							</div>
-							<div className='form-group col-12 col-md-6'>
+							{course && course.majors && course.majors.length > 0 ? (
+								<div className='form-group col-12 col-md-4'>
+									<label htmlFor='major_id'>Major</label>
+									<select
+										{...register('major_id')}
+										id='major_id'
+										className='form-control'
+										onChange={(e) => {
+											const id = e.target.value.toNumber();
+											const major = course?.majors?.find((major) => major.id === id);
+											if (major) {
+												setMajor(major);
+											} else {
+												setMajor(null);
+											}
+										}}>
+										<option value=''> -- Select -- </option>
+										{course.majors.map((major, index) => (
+											<option value={major.id} key={index}>
+												{major.name}
+											</option>
+										))}
+									</select>
+								</div>
+							) : null}
+							<div className='form-group col-12 col-md-4'>
+								<label htmlFor='section_id'>Section</label>
+								<select
+									{...register('section_id')}
+									id='section_id'
+									className='form-control'
+									onChange={(e) => {
+										const id = e.target.value.toNumber();
+										const section = sections?.find((section) => section.id === id);
+										if (section) {
+											setSection(section);
+										} else {
+											setSection(null);
+										}
+									}}>
+									<option value=''> -- Select -- </option>
+									{sections
+										?.filter((section) => {
+											if (course) {
+												return section.course_id === course.id;
+											}
+											return true;
+										})
+										.filter((section) => {
+											if (major) {
+												return section.major_id === major.id;
+											}
+											return true;
+										})
+										.filter((section) => section.year?.current)
+										.map((section, index) => (
+											<option value={section.id} key={index}>
+												{section.name}
+											</option>
+										))}
+								</select>
+							</div>
+							<div className='form-group col-12 col-md-4'>
 								<label htmlFor='teacher_id'>Teacher</label>
 								<select
 									{...register('teacher_id')}
@@ -215,32 +287,7 @@ const Form: FC<Props> = (props) => {
 									<option value='5th'>5th</option>
 								</select>
 							</div>
-							{course && course.majors && course.majors.length > 0 ? (
-								<div className='form-group col-12 col-md-6 col-lg-4'>
-									<label htmlFor='major_id'>Major</label>
-									<select
-										{...register('major_id')}
-										id='major_id'
-										className='form-control'
-										onChange={(e) => {
-											const id = e.target.value.toNumber();
-											const major = course?.majors?.find((major) => major.id === id);
-											if (major) {
-												setMajor(major);
-											} else {
-												setMajor(null);
-											}
-										}}>
-										<option value=''> -- Select -- </option>
-										{course.majors.map((major, index) => (
-											<option value={major.id} key={index}>
-												{major.name}
-											</option>
-										))}
-									</select>
-								</div>
-							) : null}
-							<div className={`form-group col-12 ${course && course.majors && course.majors.length > 0 ? '' : 'col-lg-4'}`}>
+							<div className={`form-group col-12 col-md-4`}>
 								<label htmlFor='subject_id'>Subject</label>
 								<select {...register('subject_id')} id='subject_id' className='form-control'>
 									<option value=''> -- Select -- </option>
@@ -248,14 +295,19 @@ const Form: FC<Props> = (props) => {
 										?.filter((subject) => {
 											const valid =
 												subject.schedules?.find((schedule) => {
-													if (course && major && teacher) {
+													if (course && major && teacher && section) {
 														return (
 															schedule.teacher_id === teacher.id &&
 															schedule.course_id === course.id &&
-															schedule.major_id === major.id
+															schedule.major_id === major.id &&
+															schedule.section_id === section.id
 														);
-													} else if (course && teacher) {
-														return schedule.teacher_id === teacher.id && schedule.course_id === course.id;
+													} else if (course && teacher && section) {
+														return (
+															schedule.teacher_id === teacher.id &&
+															schedule.course_id === course.id &&
+															schedule.section_id === section.id
+														);
 													}
 													return true;
 												}) === undefined;

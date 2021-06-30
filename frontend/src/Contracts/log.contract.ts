@@ -1,6 +1,9 @@
 import { ModelContract } from './model.contract';
+import { UserContract } from './user.contract';
 
-export interface LogContract<T = any> extends ModelContract {
-	payload: T;
+export interface LogContract extends ModelContract {
+	payload: UserContract;
 	message: string;
+	ip_address: string;
+	device: string;
 }
