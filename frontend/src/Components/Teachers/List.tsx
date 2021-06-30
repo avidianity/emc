@@ -190,6 +190,41 @@ const List: FC<Props> = (props) => {
 						{['Registrar'].includes(user?.role || '') ? (
 							<>
 								<button
+									className='btn btn-primary btn-sm ml-2'
+									title='Enable Selected'
+									onClick={async (e) => {
+										e.preventDefault();
+										if (selected.length > 0) {
+											if (
+												await Asker.danger(
+													`Are you sure you want to enable ${selected.length} ${
+														selected.length === 1 ? 'teacher' : 'teachers'
+													}? If you enable ${selected.length === 1 ? 'this' : 'these'} ${
+														selected.length === 1 ? 'teacher' : 'teachers'
+													}, ${selected.length === 1 ? 'this' : 'these'} ${
+														selected.length === 1 ? 'teacher' : 'teachers'
+													} can access the system.`
+												)
+											) {
+												try {
+													await Promise.all(selected.map((id) => userService.update(id, { active: true })));
+													toastr.success(
+														`${selected.length} ${
+															selected.length === 1 ? 'teacher' : 'teachers'
+														} enabled successfully.`
+													);
+													setSelected([]);
+													refetch();
+												} catch (error) {
+													console.log(error);
+													toastr.error('Unable to enable teachers.');
+												}
+											}
+										}
+									}}>
+									<i className={`fas fa-user-check`}></i>
+								</button>
+								<button
 									className='btn btn-danger btn-sm ml-2'
 									title='Disable Selected'
 									onClick={async (e) => {
