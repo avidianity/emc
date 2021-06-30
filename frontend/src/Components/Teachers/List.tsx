@@ -187,7 +187,7 @@ const List: FC<Props> = (props) => {
 								<i className='fas fa-plus'></i>
 							</Link>
 						) : null}
-						{['Registrar', 'Admin'].includes(user?.role || '') ? (
+						{['Registrar'].includes(user?.role || '') ? (
 							<>
 								<button
 									className='btn btn-danger btn-sm ml-2'
