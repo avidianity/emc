@@ -32,6 +32,10 @@ const List: FC<Props> = (props) => {
 			accessor: 'device',
 		},
 		{
+			title: 'Browser',
+			accessor: 'browser',
+		},
+		{
 			title: 'User',
 			accessor: 'user',
 		},

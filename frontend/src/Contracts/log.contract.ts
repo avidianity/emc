@@ -6,4 +6,5 @@ export interface LogContract extends ModelContract {
 	message: string;
 	ip_address: string;
 	device: string;
+	browser: string;
 }
