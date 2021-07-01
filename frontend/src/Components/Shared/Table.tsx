@@ -61,7 +61,11 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 
 		if (table.DataTable) {
 			try {
-				setDatatable(table.DataTable());
+				if (items.length >= 250) {
+					setTimeout(() => setDatatable(table.DataTable()), 100);
+				} else {
+					setDatatable(table.DataTable());
+				}
 			} catch (error) {
 				console.error(error);
 			}
