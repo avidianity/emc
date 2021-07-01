@@ -2,6 +2,10 @@
 	padding-top: 4px;
 }
 
+.clickable:hover {
+	cursor: pointer;
+}
+
 .overflow-hidden {
 	overflow: hidden;
 }

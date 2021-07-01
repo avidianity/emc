@@ -148,13 +148,15 @@ const List: FC<Props> = (props) => {
 							className='custom-select custom-select-sm form-control form-control-sm'
 							onChange={(e) => {
 								const id = e.target.value.toNumber();
-								const course = courses?.find((course) => course.id === id);
-								if (course) {
-									setCourse(course);
-								} else {
+								if (id === 0) {
 									setCourse(null);
+									setMajor(null);
+								} else {
+									const course = courses?.find((course) => course.id === id);
+									if (course) {
+										setCourse(course);
+									}
 								}
-								setMajor(null);
 							}}>
 							<option value='0'>All</option>
 							{courses?.map((course, index) => (
@@ -171,11 +173,13 @@ const List: FC<Props> = (props) => {
 								className='custom-select custom-select-sm form-control form-control-sm'
 								onChange={(e) => {
 									const id = e.target.value.toNumber();
-									const major = course?.majors?.find((major) => major.id === id);
-									if (major) {
-										setMajor(major);
-									} else {
+									if (id === 0) {
 										setMajor(null);
+									} else {
+										const major = course?.majors?.find((major) => major.id === id);
+										if (major) {
+											setMajor(major);
+										}
 									}
 								}}>
 								<option value='0'>All</option>

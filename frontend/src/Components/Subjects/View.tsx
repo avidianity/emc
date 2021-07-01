@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import React, { createRef, FC } from 'react';
+import React, { FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -28,32 +28,29 @@ const View: FC<Props> = (props) => {
 	const params = useParams<{ id: string }>();
 	const id = params.id.toNumber();
 	const history = useHistory();
-	const addGradeModalRef = createRef<HTMLDivElement>();
-	const [student, setStudent] = useNullable<number>();
+	const [studentID, setStudentID] = useNullable<number>();
 	const [subject, setSubject] = useNullable<SubjectContract>();
 	const [loading, setLoading] = useState(false);
-	const { register, handleSubmit, reset, setValue } = useForm<Inputs>({
-		defaultValues: {
-			grade: 65,
-		},
-	});
+	const [setGrade, setSetGrade] = useState(false);
+	const [gradeAmount, setGradeAmount] = useState(0);
+	const { register, handleSubmit, reset, setValue } = useForm<Inputs>();
 	const { data: year } = useCurrentYear();
 	const user = State.getInstance().get<UserContract>('user');
 
 	const submit = async (data: Inputs) => {
-		if (addGradeModalRef.current) {
-			$(addGradeModalRef.current).modal('hide');
-		}
 		try {
-			data.student_id = student!;
+			data.student_id = studentID!;
 			data.teacher_id = user!.id!;
 			data.subject_id = subject?.id || id;
+			data.grade = gradeAmount;
 			await gradeService.create(data);
 			toastr.success('Grade added succesfully.');
+			refetch();
+			setGradeAmount(0);
 		} catch (error) {
 			handleError(error);
 		} finally {
-			setStudent(null);
+			setStudentID(null);
 			reset();
 		}
 	};
@@ -73,6 +70,8 @@ const View: FC<Props> = (props) => {
 			}
 		}
 	};
+
+	const findGrade = (student: UserContract) => student.grades?.find((grade) => grade.teacher_id === user?.id)?.grade;
 
 	useEffect(() => {
 		refetch();
@@ -153,18 +152,60 @@ const View: FC<Props> = (props) => {
 									year: student.admissions?.filter((admission) => admission.year?.current)[0]?.level,
 									actions: (
 										<>
-											<button
-												className='btn btn-primary btn-sm mx-1'
-												title='Add Grade'
-												onClick={(e) => {
-													e.preventDefault();
-													if (addGradeModalRef.current) {
-														setStudent(student.id!);
-														$(addGradeModalRef.current).modal('toggle');
-													}
-												}}>
-												<i className='fas fa-chart-bar'></i>
-											</button>
+											{findGrade(student) || (
+												<>
+													{setGrade && student.id === studentID ? (
+														<form
+															className='form-inline'
+															style={{ minWidth: '100px' }}
+															onSubmit={handleSubmit(submit)}>
+															<input type='hidden' {...register('year_id')} value={year?.id} />
+															<input
+																type='number'
+																id='grade'
+																min={0}
+																max={100}
+																className='form-control form-control-sm mx-1'
+																onChange={(e) => {
+																	const grade = e.target.value.toNumber();
+																	if (grade >= 0 && grade <= 100) {
+																		if (grade >= 75) {
+																			setValue('status', 'Passed');
+																		} else {
+																			setValue('status', 'Failed');
+																		}
+																		setGradeAmount(grade);
+																	}
+																}}
+																value={gradeAmount}
+															/>
+															<input {...register('status')} type='hidden' />
+															<button type='submit' className='btn btn-primary btn-sm mx-1'>
+																Submit
+															</button>
+															<button
+																type='button'
+																className='btn btn-secondary btn-sm mx-1'
+																onClick={(e) => {
+																	e.preventDefault();
+																	setSetGrade(false);
+																	setStudentID(null);
+																}}>
+																Cancel
+															</button>
+														</form>
+													) : (
+														<span
+															onClick={() => {
+																setSetGrade(!setGrade);
+																setStudentID(student.id!);
+															}}
+															className='clickable d-block'>
+															-
+														</span>
+													)}
+												</>
+											)}
 										</>
 									),
 								})) || []
@@ -188,54 +229,6 @@ const View: FC<Props> = (props) => {
 							},
 						]}
 					/>
-					<div ref={addGradeModalRef} className='modal fade' tabIndex={-1}>
-						<div className='modal-dialog modal-dialog-centered modal-lg'>
-							<div className='modal-content'>
-								<div className='modal-header'>
-									<h5 className='modal-title'>Add Grade</h5>
-									<button type='button' className='close' data-dismiss='modal'>
-										<span aria-hidden='true'>&times;</span>
-									</button>
-								</div>
-								<form onSubmit={handleSubmit(submit)}>
-									<input type='hidden' {...register('year_id')} value={year?.id} />
-									<div className='modal-body'>
-										<div className='form-group'>
-											<label htmlFor='grade'>Grade</label>
-											<input
-												{...register('grade')}
-												type='number'
-												id='grade'
-												min={0}
-												max={100}
-												className='form-control'
-												onChange={(e) => {
-													const grade = e.target.value.toNumber();
-													if (grade >= 75) {
-														setValue('status', 'Passed');
-													} else {
-														setValue('status', 'Failed');
-													}
-												}}
-											/>
-										</div>
-										<div className='form-group'>
-											<label htmlFor='status'>Status</label>
-											<input {...register('status')} type='text' id='status' className='form-control' />
-										</div>
-									</div>
-									<div className='modal-footer'>
-										<button type='submit' className='btn btn-primary btn-sm'>
-											Submit
-										</button>
-										<button type='button' className='btn btn-secondary btn-sm' data-dismiss='modal'>
-											Close
-										</button>
-									</div>
-								</form>
-							</div>
-						</div>
-					</div>
 				</div>
 			</div>
 		</div>
