@@ -29,20 +29,6 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 	};
 
 	useEffect(() => {
-		const table = $(`#${id}`);
-
-		if (datatable) {
-			datatable.destroy();
-		}
-
-		if (table.DataTable) {
-			try {
-				setDatatable(table.DataTable());
-			} catch (error) {
-				console.error(error);
-			}
-		}
-
 		setTimeout(() => {
 			$('.dataTables_length')
 				.find('select')
@@ -65,6 +51,24 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 		};
 		// eslint-disable-next-line
 	}, []);
+
+	useEffect(() => {
+		const table = $(`#${id}`);
+
+		if (datatable) {
+			datatable.destroy();
+		}
+
+		if (table.DataTable) {
+			try {
+				setDatatable(table.DataTable());
+			} catch (error) {
+				console.error(error);
+			}
+		}
+
+		// eslint-disable-next-line
+	}, [items]);
 
 	useEffect(() => {
 		const message = $('.dataTables_empty');
