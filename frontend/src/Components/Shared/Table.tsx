@@ -55,22 +55,25 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 	useEffect(() => {
 		const table = $(`#${id}`);
 
-		if (datatable) {
-			datatable.destroy();
-		}
-
-		if (table.DataTable) {
-			try {
+		try {
+			if (!loading) {
 				if (items.length >= 250) {
-					setTimeout(() => setDatatable(table.DataTable()), 100);
+					setTimeout(() => {
+						if (datatable) {
+							datatable.destroy();
+						}
+						setDatatable(table.DataTable());
+					}, 100);
 				} else {
+					if (datatable) {
+						datatable.destroy();
+					}
 					setDatatable(table.DataTable());
 				}
-			} catch (error) {
-				console.error(error);
 			}
+		} catch (error) {
+			console.error(error);
 		}
-
 		// eslint-disable-next-line
 	}, [items]);
 

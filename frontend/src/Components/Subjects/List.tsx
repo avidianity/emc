@@ -1,9 +1,11 @@
 import axios from 'axios';
-import React, { FC } from 'react';
+import React, { FC, useMemo } from 'react';
+import { useCallback } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
+import { SubjectContract } from '../../Contracts/subject.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
 import { useNullable, useURL } from '../../hooks';
@@ -15,10 +17,10 @@ import Table from '../Shared/Table';
 type Props = {};
 
 const List: FC<Props> = (props) => {
+	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('subjects', () => subjectService.fetch());
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const [course, setCourse] = useNullable<CourseContract>();
 	const [major, setMajor] = useNullable<MajorContract>();
-	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('subjects', () => subjectService.fetch());
 
 	const url = useURL();
 
@@ -74,62 +76,68 @@ const List: FC<Props> = (props) => {
 		});
 	}
 
+	const refine = (items: SubjectContract[]) =>
+		items
+			.filter((subject) => {
+				if (course && major) {
+					return subject.course_id === course.id && subject.major_id === major.id;
+				} else if (course) {
+					return subject.course_id === course.id;
+				} else if (major) {
+					return subject.major_id === major.id;
+				}
+
+				return true;
+			})
+			.map((subject) => ({
+				...subject,
+				course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
+				actions: (
+					<div style={{ minWidth: '100px' }}>
+						{user?.role === 'Teacher' ? (
+							<>
+								<Link to={url(`${subject.id}/view`)} className='btn btn-info btn-sm mx-1' title='View'>
+									<i className='fas fa-eye'></i>
+								</Link>
+								<a
+									href={`${axios.defaults.baseURL}/exports/teacher/classlist/${subject.id}`}
+									download
+									className='btn btn-warning btn-sm mx-1'
+									title='Download Classlist'>
+									<i className='fas fa-file-excel'></i>
+								</a>
+							</>
+						) : null}
+						{user?.role === 'Registrar' ? (
+							<>
+								<Link to={url(`${subject.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
+									<i className='fas fa-edit'></i>
+								</Link>
+								<button
+									className='btn btn-danger btn-sm mx-1'
+									onClick={(e) => {
+										e.preventDefault();
+										deleteItem(subject.id);
+									}}>
+									<i className='fas fa-trash'></i>
+								</button>
+							</>
+						) : null}
+					</div>
+				),
+			}));
+
+	const memoizedRefine = useCallback(refine, [refine]);
+
+	const memoized = useMemo(() => memoizedRefine(items || []), [items, memoizedRefine]);
+	const raw = refine(items || []);
+
 	return (
 		<Table
 			onRefresh={() => refetch()}
 			title='Subjects'
 			loading={loading}
-			items={
-				items
-					?.filter((subject) => {
-						if (course && major) {
-							return subject.course_id === course.id && subject.major_id === major.id;
-						} else if (course) {
-							return subject.course_id === course.id;
-						} else if (major) {
-							return subject.major_id === major.id;
-						}
-
-						return true;
-					})
-					.map((subject) => ({
-						...subject,
-						course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
-						actions: (
-							<div style={{ minWidth: '100px' }}>
-								{user?.role === 'Teacher' ? (
-									<>
-										<Link to={url(`${subject.id}/view`)} className='btn btn-info btn-sm mx-1' title='View'>
-											<i className='fas fa-eye'></i>
-										</Link>
-										<a
-											href={`${axios.defaults.baseURL}/exports/teacher/classlist/${subject.id}`}
-											download
-											className='btn btn-warning btn-sm mx-1'
-											title='Download Classlist'>
-											<i className='fas fa-file-excel'></i>
-										</a>
-									</>
-								) : null}
-								{user?.role === 'Registrar' ? (
-									<>
-										<Link to={url(`${subject.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-											<i className='fas fa-edit'></i>
-										</Link>
-										<button
-											className='btn btn-danger btn-sm mx-1'
-											onClick={(e) => {
-												e.preventDefault();
-												deleteItem(subject.id);
-											}}>
-											<i className='fas fa-trash'></i>
-										</button>
-									</>
-								) : null}
-							</div>
-						),
-					})) || []
-			}
+			items={items && items.length >= 250 ? memoized : raw}
 			columns={columns}
 			buttons={
 				<>
