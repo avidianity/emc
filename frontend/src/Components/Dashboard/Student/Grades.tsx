@@ -39,7 +39,7 @@ const Grades: FC<Props> = (props) => {
 					<p>Bongabong, Oriental Mindoro</p>
 				</div>
 			</div>
-			{admissions.map((admission, index) => (
+			{admissions.reverse().map((admission, index) => (
 				<Fragment key={index}>
 					<div className='d-flex mt-5'>
 						<span className='mr-auto'>
@@ -68,30 +68,61 @@ const Grades: FC<Props> = (props) => {
 					<table className='table table-bordered mt-3'>
 						<thead>
 							<tr>
-								<th>Subject Code</th>
-								<th>Description</th>
-								<th>Units</th>
-								<th>Grades</th>
-								<th>Grade Status</th>
+								<th className='text-center'>Subject Code</th>
+								<th className='text-center'>Description</th>
+								<th className='text-center'>Units</th>
+								<th className='text-center'>Grades</th>
+								<th className='text-center'>Grade Status</th>
 							</tr>
 						</thead>
 						<tbody>
 							{admission.student?.grades?.map((grade, index) => (
 								<tr key={index}>
-									<td>{grade.subject?.code}</td>
-									<td style={{ minWidth: '100px' }}>{grade.subject?.description}</td>
-									<td>{grade.subject?.units}</td>
-									<td>{grade.grade}%</td>
-									<td>{grade.status}</td>
+									<td className='text-center'>{grade.subject?.code}</td>
+									<td className='text-center' style={{ minWidth: '100px' }}>
+										{grade.subject?.description}
+									</td>
+									<td className='text-center'>{grade.subject?.units}</td>
+									<td className='text-center'>{grade.grade}%</td>
+									<td className='text-center'>{grade.status}</td>
 								</tr>
 							))}
+							{admission.student?.subjects
+								?.filter((subject) => {
+									const grade = admission.student?.grades?.find((grade) => grade?.subject?.id === subject.id);
+									if (grade) {
+										return false;
+									}
+									return true;
+								})
+								.map((subject) => (
+									<tr key={index}>
+										<td className='text-center'>{subject?.code}</td>
+										<td className='text-center' style={{ minWidth: '100px' }}>
+											{subject?.description}
+										</td>
+										<td className='text-center'>{subject?.units}</td>
+										<td className='text-center'>-</td>
+										<td className='text-center'>{admission.year?.current ? '-' : 'INC'}</td>
+									</tr>
+								))}
 							<tr>
-								<td>
+								<td className='text-center'>
 									<b>Total Units</b>
 								</td>
 								<td></td>
-								<td>
-									{admission.student?.grades?.reduce((previous, next) => previous + next.subject!.units.toNumber(), 0)}
+								<td className='text-center'>
+									{(admission.student?.grades?.reduce((previous, next) => previous + next.subject!.units.toNumber(), 0) ||
+										0) +
+										(admission.student?.subjects
+											?.filter((subject) => {
+												const grade = admission.student?.grades?.find((grade) => grade?.subject?.id === subject.id);
+												if (grade) {
+													return false;
+												}
+												return true;
+											})
+											.reduce((previous, next) => previous + next!.units.toNumber(), 0) || 0)}
 								</td>
 								<td></td>
 								<td></td>

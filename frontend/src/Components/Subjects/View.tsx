@@ -32,7 +32,7 @@ const View: FC<Props> = (props) => {
 	const [student, setStudent] = useNullable<number>();
 	const [subject, setSubject] = useNullable<SubjectContract>();
 	const [loading, setLoading] = useState(false);
-	const { register, handleSubmit, reset } = useForm<Inputs>({
+	const { register, handleSubmit, reset, setValue } = useForm<Inputs>({
 		defaultValues: {
 			grade: 65,
 		},
@@ -209,6 +209,14 @@ const View: FC<Props> = (props) => {
 												min={0}
 												max={100}
 												className='form-control'
+												onChange={(e) => {
+													const grade = e.target.value.toNumber();
+													if (grade >= 75) {
+														setValue('status', 'Passed');
+													} else {
+														setValue('status', 'Failed');
+													}
+												}}
 											/>
 										</div>
 										<div className='form-group'>
