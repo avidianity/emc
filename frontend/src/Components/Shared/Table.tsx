@@ -53,24 +53,10 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 	}, []);
 
 	useEffect(() => {
-		const table = $(`#${id}`);
+		// const table = $(`#${id}`);
 
 		try {
-			if (!loading) {
-				if (items.length >= 250) {
-					setTimeout(() => {
-						if (datatable) {
-							datatable.destroy();
-						}
-						setDatatable(table.DataTable());
-					}, 100);
-				} else {
-					if (datatable) {
-						datatable.destroy();
-					}
-					setDatatable(table.DataTable());
-				}
-			}
+			//
 		} catch (error) {
 			console.error(error);
 		}
