@@ -1,8 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import { v4 } from 'uuid';
 import { outIf } from '../../helpers';
-import { useNullable } from '../../hooks';
-import { State } from '../../Libraries/State';
 
 export type TableProps = {
 	title: string;
@@ -17,8 +15,6 @@ export type TableProps = {
 
 const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefresh, items, misc }) => {
 	const id = v4();
-	const [datatable, setDatatable] = useNullable<DataTables.Api>();
-	const state = State.getInstance();
 
 	const cast = (key: string, value: any) => {
 		if (casts && key in casts) {
@@ -27,41 +23,6 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 
 		return value;
 	};
-
-	useEffect(() => {
-		setTimeout(() => {
-			$('.dataTables_length')
-				.find('select')
-				.on('input', function () {
-					const select = $(this);
-					const value = select.val();
-					state.set(`${title.trim().toLowerCase()}-entries`, value);
-				});
-		}, 500);
-
-		const entries = state.get<string>(`${title.trim().toLowerCase()}-entries`) || '10';
-
-		$('.dataTables_length').find('select').val(entries).trigger('change');
-
-		return () => {
-			if (datatable) {
-				datatable.destroy();
-				setDatatable(null);
-			}
-		};
-		// eslint-disable-next-line
-	}, []);
-
-	useEffect(() => {
-		// const table = $(`#${id}`);
-
-		try {
-			//
-		} catch (error) {
-			console.error(error);
-		}
-		// eslint-disable-next-line
-	}, [items]);
 
 	useEffect(() => {
 		const message = $('.dataTables_empty');
