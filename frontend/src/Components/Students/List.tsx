@@ -1,10 +1,10 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { createRef, FC } from 'react';
-import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { v4 } from 'uuid';
 import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
@@ -51,7 +51,7 @@ const List: FC<Props> = (props) => {
 	const { register: registerUser, handleSubmit: handleSubmitUser, reset: resetUser, setValue: setValueUser } = useForm<UserInput>();
 	const [student, setStudent] = useNullable<number>();
 	const addGradeModalRef = createRef<HTMLDivElement>();
-	const updatePaymentModalRef = createRef<HTMLDivElement>();
+	const updatePaymentModalRef = v4();
 	const url = useURL();
 	const { data: year } = useCurrentYear();
 	const user = State.getInstance().get<UserContract>('user');
@@ -116,9 +116,7 @@ const List: FC<Props> = (props) => {
 		} catch (error) {
 			handleError(error);
 		} finally {
-			if (updatePaymentModalRef.current) {
-				$(updatePaymentModalRef.current).modal('hide');
-			}
+			$(`#${updatePaymentModalRef}`).modal('hide');
 			setStudent(null);
 			resetUser();
 		}
@@ -175,121 +173,118 @@ const List: FC<Props> = (props) => {
 		columns.push({ title: 'Actions', accessor: 'actions' });
 	}
 
-	const data = useMemo(
-		() =>
-			items
-				?.filter((user) => user.role === 'Student' && user.active)
-				.filter((student) => {
-					const admission = student.admissions?.find((admission) => admission.year?.current);
-
-					if (!admission) {
-						return false;
-					}
-
-					if (course && major) {
-						return admission.course_id === course.id && admission.major_id === major.id;
-					} else if (course) {
-						return admission.course_id === course.id;
-					} else if (major) {
-						return admission.major_id === major.id;
-					}
-
-					return true;
-				})
-				.map((student) => ({
-					...student,
-					name: (
-						<>
-							{student.last_name}, {student.first_name} {student.middle_name || ''}
-						</>
-					),
-					year: student.admissions?.find((admission) => admission.year?.current)?.level,
-					course: `${student.admissions?.find((admission) => admission.year?.current)?.course?.code}${
-						student.admissions?.find((admission) => admission.year?.current)?.major
-							? ` - Major in ${student.admissions?.find((admission) => admission.year?.current)?.major?.name}`
-							: ''
-					}`,
-					birthday: dayjs(student.birthday).format('MMMM DD, YYYY'),
-					age: new Date().getFullYear() - dayjs(student.birthday).year(),
-					status: student.active ? (
-						<span className='badge badge-success'>Confirmed</span>
-					) : (
-						<span className='badge badge-danger'>Unconfirmed</span>
-					),
-					payment_status: <span className={`badge badge-${statuses[student.payment_status]}`}>{student.payment_status}</span>,
-					section: <>{student.sections?.find((section) => section.year?.current)?.name}</>,
-					actions: (
-						<div style={{ minWidth: '150px' }}>
-							{user?.role === 'Registrar' ? (
-								<>
-									<Link
-										to={`/dashboard/admissions/${
-											student.admissions?.find((admission) => admission?.year?.current)?.id
-										}/edit`}
-										className='btn btn-warning btn-sm mx-1'
-										title='Edit'>
-										<i className='fas fa-edit'></i>
-									</Link>
-									<button
-										className='btn btn-info btn-sm mx-1'
-										title='Update Payment'
-										onClick={(e) => {
-											e.preventDefault();
-											if (updatePaymentModalRef.current) {
-												setStudent(student.id!);
-												setValueUser('payment_status', student.payment_status);
-												$(updatePaymentModalRef.current).modal('toggle');
-											}
-										}}>
-										<i className='fas fa-money-bill'></i>
-									</button>
-								</>
-							) : null}
-							{['Registrar', 'Admin'].includes(user?.role || '') ? (
-								<Link to={url(`${student.id}/subjects`)} className='btn btn-primary btn-sm mx-1' title='Add Subjects'>
-									<i className='fas fa-book'></i>
-								</Link>
-							) : null}
-							{user?.role === 'Teacher' ? (
-								<>
-									<button
-										className='btn btn-primary btn-sm mx-1'
-										title='Add Grade'
-										onClick={(e) => {
-											e.preventDefault();
-											if (addGradeModalRef.current) {
-												setStudent(student.id!);
-												$(addGradeModalRef.current).modal('toggle');
-											}
-										}}>
-										<i className='fas fa-chart-bar'></i>
-									</button>
-								</>
-							) : null}
-							<button
-								className='btn btn-danger btn-sm mx-1 d-none'
-								onClick={(e) => {
-									e.preventDefault();
-									deleteItem(student.id);
-								}}>
-								<i className='fas fa-trash'></i>
-							</button>
-						</div>
-					),
-				})) || [],
-		// eslint-disable-next-line
-		[items, course, major]
-	);
-
-	console.log(data);
-
 	return (
 		<>
 			<Table
 				onRefresh={() => refetch()}
 				title='Students'
 				loading={loading}
-				items={data}
+				items={
+					items
+						?.filter((user) => user.role === 'Student' && user.active)
+						.filter((student) => {
+							const admission = student.admissions?.find((admission) => admission.year?.current);
+
+							if (admission) {
+								if (course && major) {
+									return admission.course_id === course.id && admission.major_id === major.id;
+								} else if (course) {
+									return admission.course_id === course.id;
+								} else if (major) {
+									return admission.major_id === major.id;
+								}
+							}
+
+							return true;
+						})
+						.map((student) => ({
+							...student,
+							name: (
+								<>
+									{student.last_name}, {student.first_name} {student.middle_name || ''}
+								</>
+							),
+							year: student.admissions?.find((admission) => admission.year?.current)?.level,
+							course: `${student.admissions?.find((admission) => admission.year?.current)?.course?.code}${
+								student.admissions?.find((admission) => admission.year?.current)?.major
+									? ` - Major in ${student.admissions?.find((admission) => admission.year?.current)?.major?.name}`
+									: ''
+							}`,
+							birthday: dayjs(student.birthday).format('MMMM DD, YYYY'),
+							age: new Date().getFullYear() - dayjs(student.birthday).year(),
+							status: student.active ? (
+								<span className='badge badge-success'>Confirmed</span>
+							) : (
+								<span className='badge badge-danger'>Unconfirmed</span>
+							),
+							payment_status: (
+								<span className={`badge badge-${statuses[student.payment_status]}`}>{student.payment_status}</span>
+							),
+							section: <>{student.sections?.find((section) => section.year?.current)?.name}</>,
+							actions: (
+								<div style={{ minWidth: '350px' }}>
+									{user?.role === 'Registrar' ? (
+										<>
+											<Link
+												to={`/dashboard/admissions/${
+													student.admissions?.find((admission) => admission?.year?.current)?.id
+												}/edit`}
+												className='btn btn-warning btn-sm mx-1'
+												title='Edit'>
+												<i className='fas fa-edit'></i>
+											</Link>
+											<button
+												className='btn btn-info btn-sm mx-1'
+												title='Update Payment'
+												onClick={(e) => {
+													e.preventDefault();
+													const modal = $(`#${updatePaymentModalRef}`);
+													if (modal.length > 0) {
+														setStudent(student.id!);
+														setValueUser('payment_status', student.payment_status);
+														modal.modal('toggle');
+													}
+												}}>
+												<i className='fas fa-money-bill'></i>
+											</button>
+										</>
+									) : null}
+									{['Registrar', 'Admin'].includes(user?.role || '') ? (
+										<Link
+											to={url(`${student.id}/subjects`)}
+											className='btn btn-primary btn-sm mx-1'
+											title='Add Subjects'>
+											<i className='fas fa-book'></i>
+										</Link>
+									) : null}
+									{user?.role === 'Teacher' ? (
+										<>
+											<button
+												className='btn btn-primary btn-sm mx-1'
+												title='Add Grade'
+												onClick={(e) => {
+													e.preventDefault();
+													if (addGradeModalRef.current) {
+														setStudent(student.id!);
+														$(addGradeModalRef.current).modal('toggle');
+													}
+												}}>
+												<i className='fas fa-chart-bar'></i>
+											</button>
+										</>
+									) : null}
+									<button
+										className='btn btn-danger btn-sm mx-1 d-none'
+										onClick={(e) => {
+											e.preventDefault();
+											deleteItem(student.id);
+										}}>
+										<i className='fas fa-trash'></i>
+									</button>
+								</div>
+							),
+						})) || []
+				}
 				columns={columns}
 				misc={
 					<>
@@ -434,7 +429,7 @@ const List: FC<Props> = (props) => {
 					</div>
 				</div>
 			</div>
-			<div ref={updatePaymentModalRef} className='modal fade' tabIndex={-1}>
+			<div id={updatePaymentModalRef} className='modal fade' tabIndex={-1}>
 				<div className='modal-dialog modal-dialog-centered modal-lg'>
 					<div className='modal-content'>
 						<div className='modal-header'>

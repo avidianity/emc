@@ -27,6 +27,7 @@ export class Asker {
 export function outIf<T>(condition: boolean, output: T, defaultValue: any = ''): T {
 	return condition ? output : (defaultValue as T);
 }
+
 export function toBool(data: any) {
 	return data ? true : false;
 }

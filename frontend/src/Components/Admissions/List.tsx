@@ -89,7 +89,7 @@ const List: FC<Props> = (props) => {
 			loading={loading}
 			items={
 				items
-					?.filter((admission) => !admission.student?.active && admission.year?.current && !admission.done)
+					?.filter((admission) => !admission.student?.active && !admission.done)
 					.map((admission) => ({
 						...admission,
 						id_number: admission.student?.uuid,
@@ -105,7 +105,7 @@ const List: FC<Props> = (props) => {
 						)),
 						actions:
 							user?.role === 'Registrar' ? (
-								<div style={{ minWidth: '100px' }}>
+								<div style={{ minWidth: '350px' }}>
 									<Link to={url(`${admission.id}/edit`)} className='btn btn-warning btn-sm mx-1' title='Edit'>
 										<i className='fas fa-edit'></i>
 									</Link>

@@ -93,7 +93,7 @@ const List: FC<Props> = (props) => {
 				...subject,
 				course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
 				actions: (
-					<div style={{ minWidth: '100px' }}>
+					<div style={{ minWidth: '350px' }}>
 						{user?.role === 'Teacher' ? (
 							<>
 								<Link to={url(`${subject.id}/view`)} className='btn btn-info btn-sm mx-1' title='View'>

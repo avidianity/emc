@@ -92,7 +92,7 @@ const List: FC<Props> = (props) => {
 						</>
 					),
 					actions: (
-						<div style={{ minWidth: '100px' }}>
+						<div style={{ minWidth: '250px' }}>
 							{user?.role === 'Registrar' ? (
 								<>
 									<Link to={url(`${schedule.id}/edit`)} className='btn btn-warning btn-sm mx-1'>

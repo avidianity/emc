@@ -1,38 +1,36 @@
 import React, { FC, useEffect } from 'react';
-import { v4 } from 'uuid';
+import Datatable from 'react-data-table-component';
+import { useState } from 'react';
+import { State } from '../../Libraries/State';
 import { outIf } from '../../helpers';
 
 export type TableProps = {
 	title: string;
 	columns: { title: string; accessor: string }[];
 	buttons?: any;
-	casts?: { [key: string]: (value: any) => any };
 	loading: boolean;
 	onRefresh: () => void;
 	items: any[];
 	misc?: any;
 };
 
-const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefresh, items, misc }) => {
-	const id = v4();
-
-	const cast = (key: string, value: any) => {
-		if (casts && key in casts) {
-			return casts[key](value);
-		}
-
-		return value;
-	};
+const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, items, misc }) => {
+	const state = State.getInstance();
+	const [mode, setMode] = useState(state.get<string>('mode') || 'dark');
+	const [data, setData] = useState(items);
 
 	useEffect(() => {
-		const message = $('.dataTables_empty');
-		if (items.length > 0 || loading) {
-			message.addClass('d-none');
-		}
-		if (!loading && items.length === 0) {
-			message.removeClass('d-none');
-		}
-	});
+		setData(items);
+	}, [items]);
+
+	useEffect(() => {
+		const key = state.listen<string>('mode', (mode) => setMode(mode));
+
+		return () => {
+			state.unlisten(key);
+		};
+		// eslint-disable-next-line
+	}, []);
 
 	return (
 		<div className='container-fluid'>
@@ -59,24 +57,47 @@ const Table: FC<TableProps> = ({ columns, title, buttons, casts, loading, onRefr
 					</div>
 				</div>
 				<div className={`card-body table-responsive`}>
-					<table id={id} className='table table-hover'>
-						<thead>
-							<tr>
-								{columns.map((column, index) => (
-									<th key={index}>{column.title}</th>
-								))}
-							</tr>
-						</thead>
-						<tbody>
-							{items.map((item, index) => (
-								<tr key={index}>
-									{columns.map(({ accessor }, index) => (
-										<td key={index}>{cast(accessor, item[accessor])}</td>
-									))}
-								</tr>
-							))}
-						</tbody>
-					</table>
+					<Datatable
+						columns={columns.map((column) => ({
+							name: column.title,
+							selector: ((row: any) => row[column.accessor]) as any,
+							sortable: true,
+						}))}
+						data={data}
+						pagination
+						fixedHeader
+						subHeader
+						subHeaderComponent={
+							<div className='d-flex align-items-center'>
+								<input
+									type='text'
+									placeholder='Search'
+									className='form-control'
+									onChange={(e) => {
+										const text = e.target.value;
+
+										if (text.length > 0) {
+											setData(
+												items.filter((item) => {
+													for (const key of Object.keys(item)) {
+														const value = item[key];
+														if (value && value.toString().includes(text)) {
+															return true;
+														}
+													}
+
+													return false;
+												})
+											);
+										} else {
+											setData(items);
+										}
+									}}
+								/>
+							</div>
+						}
+						theme={mode === 'dark' ? 'dark' : 'default'}
+					/>
 				</div>
 			</div>
 		</div>

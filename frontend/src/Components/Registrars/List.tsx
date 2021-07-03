@@ -91,7 +91,7 @@ const List: FC<Props> = (props) => {
 							<span className='badge badge-danger'>Inactive</span>
 						),
 						actions: (
-							<div style={{ minWidth: '100px' }}>
+							<div style={{ minWidth: '350px' }}>
 								<Link to={url(`${registrar.id}/edit`)} className='btn btn-warning btn-sm mx-1' title='Edit'>
 									<i className='fas fa-edit'></i>
 								</Link>
