@@ -155,10 +155,12 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'ID Number',
 			accessor: 'uuid',
+			minWidth: '160px',
 		},
 		{
 			title: 'Name',
 			accessor: 'name',
+			minWidth: '200px',
 		},
 		{
 			title: 'Year',
@@ -167,6 +169,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Course',
 			accessor: 'course',
+			minWidth: '250px',
 		},
 		{
 			title: 'Section',

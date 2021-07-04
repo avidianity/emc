@@ -61,6 +61,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Email',
 			accessor: 'email',
+			minWidth: '225px',
 		},
 		{
 			title: 'Status',

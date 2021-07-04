@@ -113,21 +113,11 @@ const Dashboard: FC<Props> = (props) => {
 				<Navbar />
 				<Sidebar />
 				<main role='main' className='main-content'>
-					<div className='container-fluid'>
-						<div className='row justify-content-center'>
-							<div className='col-12'>
-								<div className='row align-items-center mb-2'>
-									<div className='col'>
-										<Switch>
-											{localRoutes.map((route, index) => (
-												<Route {...route} key={index} />
-											))}
-										</Switch>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
+					<Switch>
+						{localRoutes.map((route, index) => (
+							<Route {...route} key={index} />
+						))}
+					</Switch>
 				</main>
 			</div>
 		</div>

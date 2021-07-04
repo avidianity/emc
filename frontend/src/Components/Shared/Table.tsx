@@ -62,6 +62,7 @@ const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, it
 							name: column.title,
 							selector: ((row: any) => row[column.accessor]) as any,
 							sortable: true,
+							...column,
 						}))}
 						data={data}
 						pagination

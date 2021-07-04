@@ -41,6 +41,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Course Description',
 			accessor: 'description',
+			minWidth: '350px',
 		},
 		{
 			title: 'Majors',
@@ -49,6 +50,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Status',
 			accessor: 'open',
+			minWidth: '150px',
 		},
 	];
 
@@ -56,6 +58,7 @@ const List: FC<Props> = (props) => {
 		columns.push({
 			title: 'Actions',
 			accessor: 'actions',
+			minWidth: '150px',
 		});
 	}
 

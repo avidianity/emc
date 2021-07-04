@@ -48,10 +48,12 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Student ID Number',
 			accessor: 'id_number',
+			minWidth: '160px',
 		},
 		{
 			title: 'Student',
 			accessor: 'student',
+			minWidth: '250px',
 		},
 		{
 			title: 'Gender',
@@ -60,6 +62,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Course',
 			accessor: 'course',
+			minWidth: '250px',
 		},
 		{
 			title: 'Year Level',
@@ -72,6 +75,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Requirements',
 			accessor: 'requirements',
+			minWidth: '200px',
 		},
 	];
 

@@ -50,6 +50,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Teacher',
 			accessor: 'teacher',
+			minWidth: '250px',
 		},
 		{
 			title: 'Year',
@@ -58,6 +59,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Times',
 			accessor: 'times',
+			minWidth: '250px',
 		},
 	];
 
