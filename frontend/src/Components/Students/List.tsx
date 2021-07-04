@@ -122,6 +122,23 @@ const List: FC<Props> = (props) => {
 		}
 	};
 
+	const findAdmission = (student: UserContract) => {
+		const admission = student.admissions?.find((admission) => admission.year?.current);
+		if (admission) {
+			return admission;
+		}
+
+		return student.admissions?.last();
+	};
+
+	const findSection = (student: UserContract) => {
+		const section = student.sections?.find((section) => section.year?.current);
+		if (section) {
+			return section;
+		}
+		return student.sections?.last();
+	};
+
 	const deleteItem = async (id: any) => {
 		try {
 			if (await Asker.danger('Are you sure you want to delete this Student?')) {
@@ -204,11 +221,9 @@ const List: FC<Props> = (props) => {
 									{student.last_name}, {student.first_name} {student.middle_name || ''}
 								</>
 							),
-							year: student.admissions?.find((admission) => admission.year?.current)?.level,
-							course: `${student.admissions?.find((admission) => admission.year?.current)?.course?.code}${
-								student.admissions?.find((admission) => admission.year?.current)?.major
-									? ` - Major in ${student.admissions?.find((admission) => admission.year?.current)?.major?.name}`
-									: ''
+							year: findAdmission(student)?.level,
+							course: `${findAdmission(student)?.course?.code}${
+								findAdmission(student)?.major ? ` - Major in ${findAdmission(student)?.major?.name}` : ''
 							}`,
 							birthday: dayjs(student.birthday).format('MMMM DD, YYYY'),
 							age: new Date().getFullYear() - dayjs(student.birthday).year(),
@@ -220,7 +235,7 @@ const List: FC<Props> = (props) => {
 							payment_status: (
 								<span className={`badge badge-${statuses[student.payment_status]}`}>{student.payment_status}</span>
 							),
-							section: <>{student.sections?.find((section) => section.year?.current)?.name}</>,
+							section: <>{findSection(student)?.name}</>,
 							actions: (
 								<div style={{ minWidth: '350px' }}>
 									{user?.role === 'Registrar' ? (
