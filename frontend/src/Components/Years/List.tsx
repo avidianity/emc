@@ -63,14 +63,17 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Start',
 			accessor: 'semester_start',
+			minWidth: '200px',
 		},
 		{
 			title: 'End',
 			accessor: 'semester_end',
+			minWidth: '200px',
 		},
 		{
 			title: 'Registration Date',
 			accessor: 'registration',
+			minWidth: '250px',
 		},
 		{
 			title: '',

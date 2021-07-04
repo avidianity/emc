@@ -46,6 +46,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Majors',
 			accessor: 'majors',
+			minWidth: '250px',
 		},
 		{
 			title: 'Status',

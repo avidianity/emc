@@ -38,6 +38,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Course',
 			accessor: 'course',
+			minWidth: '375px',
 		},
 		{
 			title: 'Subject',
