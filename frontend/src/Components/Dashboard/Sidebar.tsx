@@ -142,15 +142,9 @@ const Sidebar: FC<Props> = (props) => {
 								<span className='ml-3 item-text'>
 									Admissions
 									{admissions &&
-									admissions.filter(
-										(admission) => admission.year?.current && !admission.done && !admission.student?.active
-									).length > 0 ? (
+									admissions.filter((admission) => !admission.done && !admission.student?.active).length > 0 ? (
 										<span className='ml-1 badge badge-danger'>
-											{
-												admissions.filter(
-													(admission) => admission.year?.current && !admission.done && !admission.student?.active
-												).length
-											}
+											{admissions.filter((admission) => !admission.done && !admission.student?.active).length}
 										</span>
 									) : null}
 								</span>
