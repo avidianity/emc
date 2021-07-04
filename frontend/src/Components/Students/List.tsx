@@ -222,8 +222,8 @@ const List: FC<Props> = (props) => {
 								</>
 							),
 							year: findAdmission(student)?.level,
-							course: `${findAdmission(student)?.course?.code}${
-								findAdmission(student)?.major ? ` - Major in ${findAdmission(student)?.major?.name}` : ''
+							course: `${findAdmission(student)?.course?.code || ''}${
+								findAdmission(student)?.major ? ` - Major in ${findAdmission(student)?.major?.name || 'N/A'}` : ''
 							}`,
 							birthday: dayjs(student.birthday).format('MMMM DD, YYYY'),
 							age: new Date().getFullYear() - dayjs(student.birthday).year(),

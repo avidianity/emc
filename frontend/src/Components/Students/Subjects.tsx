@@ -28,7 +28,7 @@ const Subjects: FC<Props> = (props) => {
 		},
 	});
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
-	const admission = student?.admissions?.find((admission) => admission.year?.current);
+	const admission = student?.admissions?.find((admission) => admission.year?.current) || student?.admissions?.last();
 	const user = State.getInstance().get<UserContract>('user');
 	const { data: year } = useCurrentYear({ onSuccess: () => check() });
 
