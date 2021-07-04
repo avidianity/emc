@@ -85,6 +85,7 @@ const List: FC<Props> = (props) => {
 		columns.push({
 			title: 'Actions',
 			accessor: 'actions',
+			minWidth: '200px',
 		});
 	}
 
