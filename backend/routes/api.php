@@ -42,8 +42,10 @@ Route::post('/admission/pre-registration', [AdmissionController::class, 'preRegi
 
 Route::get('/years/current', [YearController::class, 'current']);
 Route::get('/exports/teacher/classlist/{subject}', [ExportController::class, 'teacherClasslist']);
+Route::get('/exports/teacher/classlist/{subject}/by-section', [ExportController::class, 'subjectClasslistBySection']);
 Route::get('/exports/registrar/classlist/course-and-major', [ExportController::class, 'courseAndMajorClasslist']);
 Route::get('/exports/registrar/classlist/subject', [ExportController::class, 'subjectClasslist']);
+Route::get('/exports/registrar/classlist/regular-and-irregular', [ExportController::class, 'regularAndIrregularClasslist']);
 
 Route::apiResources([
     'requirements' => RequirementController::class,
@@ -65,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'schedules' => ScheduleController::class,
         'subjects' => SubjectController::class,
         'logs' => LogController::class,
+        'sections' => SectionController::class,
     ]);
 
     Route::prefix('/analytics')->group(function () {

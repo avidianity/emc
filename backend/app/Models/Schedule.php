@@ -14,6 +14,7 @@ class Schedule extends Model
         'course_id',
         'subject_id',
         'teacher_id',
+        'section_id',
         'year',
         'payload',
         'year_id',
@@ -24,6 +25,11 @@ class Schedule extends Model
     protected $casts = [
         'payload' => JSON::class,
     ];
+
+    public function section()
+    {
+        return $this->belongsTo(Section::class);
+    }
 
     public function course()
     {
@@ -42,7 +48,7 @@ class Schedule extends Model
 
     public function schoolyear()
     {
-        return $this->belongsTo(Year::class);
+        return $this->belongsTo(Year::class, 'year_id');
     }
 
     public function major()

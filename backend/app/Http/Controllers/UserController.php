@@ -8,7 +8,9 @@ use App\Models\Log;
 use App\Models\Mail;
 use App\Models\Schedule;
 use App\Models\Section;
+use App\Models\Subject;
 use App\Models\User;
+use App\Models\Year;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -57,7 +59,7 @@ class UserController extends Controller
             });
         }
 
-        return $builder->get();
+        return $builder->latest()->get();
     }
 
     /**
@@ -204,7 +206,13 @@ class UserController extends Controller
                         ->create([
                             'term' => $year->semester,
                             'level' => $admission->level,
-                            'name' => sprintf('%s - %s%s', $admission->course->code, $admission->level[0], Section::NAMES[$builder->count()]),
+                            'name' => sprintf(
+                                '%s%s %s%s',
+                                $admission->course->code,
+                                $admission->major ? ' - ' . $admission->major->short_name : '',
+                                $admission->level[0],
+                                Section::NAMES[$builder->count()]
+                            ),
                             'course_id' => $admission->course_id,
                             'major_id' => $admission->major_id,
                         ]);
@@ -271,6 +279,129 @@ class UserController extends Controller
         }
 
         User::findOrFail($data['user_id'])->update(['password' => $data['new_password']]);
+
+        return response('', 204);
+    }
+
+    public function reincrement(User $user)
+    {
+        $user->load([
+            'admissions.year',
+            'subjects',
+        ]);
+
+        if ($user->payment_status === 'Not Paid') {
+            continue;
+        }
+
+        /**
+         * @var \App\Models\Admission|null
+         */
+        $admission = $user->admissions->last();
+        $year = Year::whereCurrent(true)->firstOrFail();
+
+        if (!$admission) {
+            return response(['message' => 'No admission found on student.'], 404);
+        }
+
+        $subjects = $user->subjects;
+
+        $missing = collect([]);
+
+        foreach ($subjects as $subject) {
+            if ($subject->grades()->where('student_id', $user->id)->count() === 0) {
+                $missing->push($subject->code);
+            }
+        }
+
+        if ($missing->count() > 0) {
+            return response(['message' => 'Student has missing grades.'], 400);
+        }
+
+        $failed = collect([]);
+
+        foreach ($subjects as $subject) {
+            /**
+             * @var \App\Models\Grade
+             */
+            $grade = $subject->grades()->where('student_id', $user->id)->firstOrFail();
+
+            if ($grade->grade < 75) {
+                $failed->push($subject);
+            }
+        }
+
+        $unitsDeduction = 0;
+
+        if ($failed->count() > 0) {
+            $unitsDeduction = $failed->reduce(function ($previous, Subject $subject) {
+                $units = (int)$subject->units;
+                return $previous + $units;
+            }, 0);
+        }
+
+        $map = [
+            '1st Semester' => [
+                '1st' => ['1st', '2nd Semester'],
+                '2nd' => ['2nd', '2nd Semester'],
+                '3rd' => ['3rd', '2nd Semester'],
+                '4th' => ['4th', '2nd Semester'],
+                '5th' => ['5th', '2nd Semester'],
+            ],
+            '2nd Semester' => [
+                '1st' => ['2nd', '1st Semester'],
+                '2nd' => ['3rd', '1st Semester'],
+                '3rd' => ['3rd', 'Summer'],
+                '4th' => ['5th', '1st Semester'],
+            ],
+            'Summer' => [
+                '3rd' => ['4th', '1st Semester'],
+            ]
+        ];
+
+        if (isset($map[$admission->term]) && isset($map[$admission->term][$admission->level])) {
+            [$level, $term] = $map[$admission->term][$admission->level];
+
+            $data = $admission->toArray();
+
+            $data['term'] = $term;
+            $data['level'] = $level;
+
+            // To increment or no?
+            // if ($failed->count() === 0) {
+            //     $data['level'] = $level;
+            // } else {
+            //     if ($admission->term === '2nd Semester') {
+            //         return response(['message' => 'Student currently has failed subjects.'], 400);
+            //     }
+            // }
+
+            $data['year_id'] = $year->id;
+
+            $allowedUnits = $user->allowed_units - $unitsDeduction;
+
+            if ($allowedUnits < 28) {
+                $data['status'] = 'Irregular';
+            }
+
+            $user->admissions()->create($data);
+
+            $user->fill([
+                'active' => false,
+                'allowed_units' => $allowedUnits,
+                'payment_status' => 'Not Paid',
+            ]);
+
+            if ($user->type === 'New') {
+                $user->type === 'Old';
+            }
+
+            $user->save();
+        }
+
+        $user->subjects()->detach();
+
+        $admission->update(['done' => true]);
 
         return response('', 204);
     }

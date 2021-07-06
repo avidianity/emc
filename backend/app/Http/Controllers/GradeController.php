@@ -19,7 +19,14 @@ class GradeController extends Controller
      */
     public function index()
     {
-        return Grade::all();
+        return Grade::with([
+            'student',
+            'subject',
+            'teacher',
+            'year' => function ($builder) {
+                return $builder->where('current', true);
+            },
+        ])->get();
     }
 
     /**

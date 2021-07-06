@@ -36,6 +36,11 @@ class AuthController extends Controller
 
         $token = $user->createToken(Str::random());
 
+        Log::create([
+            'payload' => $user,
+            'message' => sprintf('%s has logged in.', $user->role),
+        ]);
+
         return [
             'user' => $user,
             'token' => $token->plainTextToken,
@@ -68,6 +73,7 @@ class AuthController extends Controller
                 'year',
                 'student.grades.subject',
                 'student.grades.teacher',
+                'student.subjects'
             ])
             ->get();
     }
@@ -88,7 +94,7 @@ class AuthController extends Controller
 
         Log::create([
             'payload' => $user,
-            'message' => 'User has updated their profile.',
+            'message' => sprintf('%s has updated their profile.', $user->role),
         ]);
 
         return $user;

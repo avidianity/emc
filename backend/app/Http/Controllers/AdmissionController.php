@@ -2,9 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SendMail;
-use App\Mail\Admission as MailAdmission;
-use App\Mail\PreRegistration;
 use App\Models\Admission;
 use App\Models\Course;
 use App\Models\Log;
@@ -13,7 +10,6 @@ use App\Models\Major;
 use App\Models\Subject;
 use App\Models\User;
 use App\Models\Year;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -27,7 +23,9 @@ class AdmissionController extends Controller
      */
     public function index()
     {
-        return Admission::with('student', 'course', 'major', 'year')->get();
+        return Admission::with('student', 'course', 'major', 'year')
+            ->latest()
+            ->get();
     }
 
     /**
@@ -210,11 +208,20 @@ class AdmissionController extends Controller
             return response(['message' => 'No school year currently set.'], 400);
         }
 
+        $users = User::with('admissions.year')
+            ->with('subjects')
+            ->whereRole('Student')
+            ->whereActive(true)
+            ->get()
+            ->filter(function (User $user) {
+                return $user->enrolled;
+            });
+
         /**
          * @var \App\Models\User
          */
-        foreach (User::with('admissions')->whereRole('Student')->whereActive(true)->get() as $user) {
-            if ($user->payment_status !== 'Fully Paid') {
+        foreach ($users as $user) {
+            if ($user->payment_status === 'Not Paid') {
                 continue;
             }
 
@@ -250,7 +257,7 @@ class AdmissionController extends Controller
                  */
                 $grade = $subject->grades()->where('student_id', $user->id)->firstOrFail();
 
-                if ($grade->grade < 65) {
+                if ($grade->grade < 75) {
                     $failed->push($subject);
                 }
             }
@@ -301,11 +308,17 @@ class AdmissionController extends Controller
 
                 $data['year_id'] = $year->id;
 
+                $allowedUnits = $user->allowed_units - $unitsDeduction;
+
+                if ($allowedUnits < 28) {
+                    $data['status'] = 'Irregular';
+                }
+
                 $user->admissions()->create($data);
 
                 $user->fill([
                     'active' => false,
-                    'allowed_units' => $user->allowed_units - $unitsDeduction,
+                    'allowed_units' => $allowedUnits,
                     'payment_status' => 'Not Paid',
                 ]);
 
@@ -315,9 +328,10 @@ class AdmissionController extends Controller
 
                 $user->save();
 
-                $user->subjects()->detach();
                 $incremented += 1;
             }
+
+            $user->subjects()->detach();
 
             $admission->update(['done' => true]);
         }
@@ -403,7 +417,7 @@ class AdmissionController extends Controller
         $admission->load(['course']);
 
         Log::create([
-            'payload' => null,
+            'payload' => $student,
             'message' => 'Student submitted a pre-registration.',
         ]);
 

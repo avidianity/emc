@@ -53,6 +53,7 @@ class CourseController extends Controller
             'open' => ['required', 'boolean'],
             'majors' => ['nullable', 'array'],
             'majors.*.name' => ['required', 'string'],
+            'majors.*.short_name' => ['required', 'string'],
             'force' => ['required', 'boolean'],
         ]);
 
@@ -107,16 +108,42 @@ class CourseController extends Controller
             'open' => ['nullable', 'boolean'],
             'majors' => ['nullable', 'array'],
             'majors.*.name' => ['required', 'string'],
+            'majors.*.short_name' => ['required', 'string'],
         ]);
 
-        $course->update($data);
-
         if (isset($data['majors'])) {
+            if (empty($data['majors'])) {
+                $course->majors->each(function (Major $major) {
+                    return $major->delete();
+                });
+            }
+
+            $names = collect($data['majors'])->map(function ($major) {
+                return $major['name'];
+            })->toArray();
+
+            $majors = $course->majors()->whereNotIn('name', $names)->get();
+
+            $majors->each(function (Major $major) {
+                $major->delete();
+            });
+
+            $left = $course->majors()->get()->map(function (Major $major) {
+                return $major->name;
+            })->toArray();
+
+            $majors = collect($data['majors'])->filter(function ($major) use ($left) {
+                return !in_array($major['name'], $left);
+            })->toArray();
+
+            $course->majors()->createMany($majors);
+        } else {
             $course->majors->each(function (Major $major) {
                 $major->delete();
             });
-            $course->majors()->createMany($data['majors']);
         }
+
+        $course->update($data);
 
         $user = $request->user();
 

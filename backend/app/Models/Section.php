@@ -9,27 +9,7 @@ class Section extends Model
 {
     use HasFactory;
 
-    const NAMES = [
-        'A',
-        'B',
-        'C',
-        'D',
-        'E',
-        'F',
-        'G',
-        'H',
-        'I',
-        'J',
-        'K',
-        'L',
-        'M',
-        'N',
-        'O',
-        'P',
-        'Q',
-        'R',
-        'S',
-    ];
+    const NAMES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
     protected $fillable = [
         'name',
@@ -39,6 +19,16 @@ class Section extends Model
         'year_id',
         'major_id',
     ];
+
+    protected static function booted()
+    {
+        static::deleting(function (self $section) {
+            $section->students()->detach();
+            $section->schedules->each(function (Schedule $schedule) {
+                $schedule->delete();
+            });
+        });
+    }
 
     public function major()
     {
@@ -58,5 +48,10 @@ class Section extends Model
     public function students()
     {
         return $this->belongsToMany(User::class, 'student_sections')->using(StudentSection::class);
+    }
+
+    public function schedules()
+    {
+        return $this->hasMany(Schedule::class);
     }
 }

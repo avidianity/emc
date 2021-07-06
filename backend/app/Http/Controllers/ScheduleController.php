@@ -6,6 +6,7 @@ use App\Models\Course;
 use App\Models\Log;
 use App\Models\Major;
 use App\Models\Schedule;
+use App\Models\Section;
 use App\Models\Subject;
 use App\Models\User;
 use App\Models\Year;
@@ -22,25 +23,39 @@ class ScheduleController extends Controller
      */
     public function index(Request $request)
     {
-        $builder = Schedule::with('course', 'teacher', 'subject', 'major');
+        $builder = Schedule::with('course', 'teacher', 'subject', 'major', 'section')
+            ->whereHas('schoolyear', function (Builder $builder) {
+                return $builder->where('current', true);
+            });
+
         /**
          * @var \App\Models\User
          */
         $user = $request->user();
-        $admission = $user->admissions()->whereHas('year', function (Builder $builder) {
-            return $builder->where('current', true);
-        })->first();
 
         if ($user->role === 'Student') {
+            $sections = $user->sections->map(function (Section $section) {
+                return $section->id;
+            });
+
             $subjects = $user->subjects->map(function (Subject $subject) {
                 return $subject->id;
             });
 
+            /**
+             * @var \App\Models\Admission
+             */
+            $admission = $user->admissions()->whereHas('year', function (Builder $builder) {
+                return $builder->where('current', true);
+            })->first();
+
             if ($admission) {
-                $builder = $builder->where('year', $admission->level);
+                $builder = $builder->where('year', $admission->level)
+                    ->where('term', $admission->term);
             }
 
-            $builder = $builder->whereIn('subject_id', $subjects->toArray());
+            $builder = $builder->whereIn('section_id', $sections->toArray())
+                ->whereIn('subject_id', $subjects->toArray());
         } else if ($user->role === 'Teacher') {
             $builder = $builder->where('teacher_id', $user->id);
         }
@@ -67,6 +82,7 @@ class ScheduleController extends Controller
             'payload.*.end_time' => ['required', 'string'],
             'year_id' => ['required', 'numeric', Rule::exists(Year::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
+            'section_id' => ['required', 'numeric', Rule::exists(Section::class, 'id')],
             'term' => ['required', 'string'],
             'force' => ['required', 'boolean'],
         ]);
@@ -78,6 +94,7 @@ class ScheduleController extends Controller
                 ->whereSubjectId($data['subject_id'])
                 ->whereYear('year', $data['year'])
                 ->whereYearId($data['year_id'])
+                ->whereSectionId($data['section_id'])
                 ->count() > 0
             ) {
                 return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
@@ -102,7 +119,7 @@ class ScheduleController extends Controller
      */
     public function show(Schedule $schedule)
     {
-        $schedule->load('course.majors', 'teacher', 'subject', 'major');
+        $schedule->load('course.majors', 'teacher', 'subject', 'major', 'section');
         return $schedule;
     }
 
@@ -127,6 +144,7 @@ class ScheduleController extends Controller
             'year_id' => ['nullable', 'numeric', Rule::exists(Year::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'term' => ['required', 'string'],
+            'section_id' => ['nullable', 'numeric', Rule::exists(Section::class, 'id')],
         ]);
 
         $schedule->update($data);

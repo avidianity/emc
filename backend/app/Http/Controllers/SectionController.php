@@ -15,7 +15,11 @@ class SectionController extends Controller
      */
     public function index()
     {
-        //
+        return Section::with([
+            'schedules',
+            'course',
+            'year',
+        ])->get();
     }
 
     /**
@@ -26,7 +30,7 @@ class SectionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return response('', 400);
     }
 
     /**
@@ -37,7 +41,13 @@ class SectionController extends Controller
      */
     public function show(Section $section)
     {
-        //
+        $section->load([
+            'schedules',
+            'course',
+            'year',
+        ]);
+
+        return $section;
     }
 
     /**
@@ -49,7 +59,7 @@ class SectionController extends Controller
      */
     public function update(Request $request, Section $section)
     {
-        //
+        return response('', 400);
     }
 
     /**
@@ -60,7 +70,7 @@ class SectionController extends Controller
      */
     public function destroy(Section $section)
     {
-        //
+        return response('', 400);
     }
 
     public function current(Request $request)

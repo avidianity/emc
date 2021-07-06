@@ -12,6 +12,7 @@ class Major extends Model
     protected $fillable = [
         'name',
         'course_id',
+        'short_name',
     ];
 
     protected static function booted()
@@ -80,5 +81,10 @@ class Major extends Model
     public function subjects()
     {
         return $this->hasMany(Subject::class);
+    }
+
+    public function sections()
+    {
+        return $this->hasMany(Section::class);
     }
 }

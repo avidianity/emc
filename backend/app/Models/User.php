@@ -50,6 +50,7 @@ class User extends Authenticatable
 
     protected $appends = [
         'enrolled',
+        'regular',
     ];
 
     protected $hidden = [
@@ -81,7 +82,7 @@ class User extends Authenticatable
         static::updating(function (self $user) {
             if ($user->isDirty(['password'])) {
                 $password = $user->password;
-                $user->notify(new PasswordChanged($password));
+                // $user->notify(new PasswordChanged($password));
                 $user->password = Hash::make($password);
                 Log::create([
                     'payload' => $user,
@@ -104,7 +105,13 @@ class User extends Authenticatable
             });
 
             $user->subjects()->detach();
+            $user->sections()->detach();
         });
+    }
+
+    public function getRegularAttribute(): bool
+    {
+        return $this->allowed_units >= 28;
     }
 
     public function getEnrolledAttribute(): bool

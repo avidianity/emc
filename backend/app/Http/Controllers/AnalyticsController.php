@@ -6,23 +6,28 @@ use App\Models\Admission;
 use App\Models\Course;
 use App\Models\Subject;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {
     public function students()
     {
-        $builder = User::whereRole('student');
-
         return [
-            'old' => $builder->whereType('Old')->count(),
-            'new' => $builder->whereType('New')->count(),
+            'total' => User::whereRole('student')->whereActive(true)->count(),
+            'old' => User::whereRole('student')->whereActive(true)->whereType('Old')->count(),
+            'new' => User::whereRole('student')->whereActive(true)->whereType('New')->count(),
         ];
     }
 
     public function courses()
     {
-        return Course::withCount('admissions')->get();
+        return Course::whereHas('admissions.year', function (Builder $builder) {
+            return $builder->where('current', true);
+        })
+            ->withCount('admissions')
+            ->with('admissions.year')
+            ->get();
     }
 
     public function genders()
@@ -30,9 +35,11 @@ class AnalyticsController extends Controller
         return [
             'males' => User::whereRole('student')
                 ->whereGender('Male')
+                ->whereActive(true)
                 ->count(),
             'females' => User::whereRole('student')
                 ->whereGender('Female')
+                ->whereActive(true)
                 ->count(),
         ];
     }
@@ -56,6 +63,10 @@ class AnalyticsController extends Controller
 
     public function subjects()
     {
-        return Subject::withCount('students')->get();
+        return Subject::whereHas('students.admissions.year', function (Builder $builder) {
+            return $builder->where('current', true);
+        })
+            ->withCount('students')
+            ->get();
     }
 }

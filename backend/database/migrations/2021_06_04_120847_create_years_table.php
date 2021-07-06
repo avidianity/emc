@@ -22,7 +22,6 @@ class CreateYearsTable extends Migration
             $table->boolean('current');
             $table->timestamps();
         });
-        Schema::enableForeignKeyConstraints();
     }
 
     /**
