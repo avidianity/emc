@@ -110,6 +110,17 @@ class AdmissionController extends Controller
 
         if ($unit) {
             $student->allowed_units = $unit->units;
+        } else {
+            $subjects = Subject::whereCourseId($data['course_id'])
+                ->whereMajorId($data['major_id'])
+                ->whereTerm($data['term'])
+                ->whereLevel($data['level'])
+                ->get();
+
+            $student->allowed_units = $subjects->reduce(function ($previous, Subject $subject) {
+                $units = (int)$subject->units;
+                return $previous + $units;
+            }, 0);
         }
 
         $student->save();
@@ -437,6 +448,17 @@ class AdmissionController extends Controller
 
         if ($unit) {
             $student->allowed_units = $unit->units;
+        } else {
+            $subjects = Subject::whereCourseId($data['course_id'])
+                ->whereMajorId($data['major_id'])
+                ->whereTerm($data['term'])
+                ->whereLevel($data['level'])
+                ->get();
+
+            $student->allowed_units = $subjects->reduce(function ($previous, Subject $subject) {
+                $units = (int)$subject->units;
+                return $previous + $units;
+            }, 0);
         }
 
         $student->save();

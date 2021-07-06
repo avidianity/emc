@@ -20,4 +20,5 @@ export const routes = {
 	PROFILE: '/profile',
 	ADMISSION_REQUIREMENTS: '/admission-requirements',
 	LOGS: '/logs',
+	UNITS: '/units',
 };

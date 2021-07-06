@@ -17,6 +17,7 @@ import Schedules from '../Components/Schedules';
 import Students from '../Components/Students';
 import Subjects from '../Components/Subjects';
 import Teachers from '../Components/Teachers';
+import Units from '../Components/Units';
 import Users from '../Components/Users';
 import Years from '../Components/Years';
 import { useURL } from '../hooks';
@@ -99,6 +100,10 @@ const Dashboard: FC<Props> = (props) => {
 		{
 			path: url(routes.LOGS),
 			component: Logs,
+		},
+		{
+			path: url(routes.UNITS),
+			component: Units,
 		},
 	];
 
