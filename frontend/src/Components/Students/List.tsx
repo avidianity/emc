@@ -208,10 +208,6 @@ const List: FC<Props> = (props) => {
 			accessor: 'payment_status',
 		},
 		{
-			title: 'Is Behind',
-			accessor: 'is_behind',
-		},
-		{
 			title: 'Status',
 			accessor: 'status',
 		},
@@ -263,11 +259,6 @@ const List: FC<Props> = (props) => {
 								<span className='badge badge-success'>Confirmed</span>
 							) : (
 								<span className='badge badge-danger'>Unconfirmed</span>
-							),
-							is_behind: isBehind(student) ? (
-								<span className='badge badge-danger'>Yes</span>
-							) : (
-								<span className='badge badge-light'>No</span>
 							),
 							payment_status: (
 								<span className={`badge badge-${statuses[student.payment_status]}`}>{student.payment_status}</span>

@@ -7,6 +7,7 @@ export interface UnitContract extends ModelContract {
 	course_id: number;
 	major_id?: number;
 	level: string;
+	term: string;
 	course?: CourseContract;
 	major?: MajorContract;
 }

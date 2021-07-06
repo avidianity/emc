@@ -48,6 +48,10 @@ const List: FC<Props> = (props) => {
 			accessor: 'units',
 		},
 		{
+			title: 'Semester',
+			accessor: 'term',
+		},
+		{
 			title: 'level',
 			accessor: 'level',
 		},

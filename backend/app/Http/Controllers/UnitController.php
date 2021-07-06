@@ -36,6 +36,7 @@ class UnitController extends Controller
             'course_id' => ['required', 'numeric', Rule::exists(Course::class, 'id')],
             'major_id' => ['required', 'numeric', Rule::exists(Major::class, 'id')],
             'level' => ['required', 'string'],
+            'term' => ['required', 'string'],
         ]);
 
         /**
@@ -44,6 +45,7 @@ class UnitController extends Controller
         $unit = Unit::whereCourseId($data['course_id'])
             ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
             ->whereLevel($data['level'])
+            ->whereTerm($data['term'])
             ->first();
 
         if ($unit) {
@@ -82,6 +84,7 @@ class UnitController extends Controller
             'course_id' => ['nullable', 'numeric', Rule::exists(Course::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'level' => ['nullable', 'string'],
+            'term' => ['nullable', 'string'],
         ]);
 
         $unit->update($data);

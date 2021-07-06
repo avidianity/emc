@@ -16,6 +16,7 @@ type Inputs = {
 	course_id: number;
 	major_id?: number;
 	level: string;
+	term: string;
 	force: boolean;
 };
 
@@ -151,6 +152,53 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='units'>Units</label>
 								<input {...register('units')} type='number' id='units' className='form-control' />
+							</div>
+							<div className='form-group col-12 col-md-6'>
+								<label htmlFor='term'>Term</label>
+								<div className='row'>
+									<div className='col-12 col-md-4'>
+										<div className='custom-control custom-radio'>
+											<input
+												{...register('term')}
+												type='radio'
+												id='1st-semester'
+												className='custom-control-input'
+												value='1st Semester'
+											/>
+											<label className='custom-control-label' htmlFor='1st-semester'>
+												1st Semester
+											</label>
+										</div>
+									</div>
+									<div className='col-12 col-md-4'>
+										<div className='custom-control custom-radio'>
+											<input
+												{...register('term')}
+												type='radio'
+												id='2nd-semester'
+												className='custom-control-input'
+												value='2nd Semester'
+											/>
+											<label className='custom-control-label' htmlFor='2nd-semester'>
+												2nd Semester
+											</label>
+										</div>
+									</div>
+									<div className='col-12 col-md-4'>
+										<div className='custom-control custom-radio'>
+											<input
+												{...register('term')}
+												type='radio'
+												id='summer'
+												className='custom-control-input'
+												value='Summer'
+											/>
+											<label className='custom-control-label' htmlFor='summer'>
+												Summer
+											</label>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
 						<div className='form-group d-flex'>

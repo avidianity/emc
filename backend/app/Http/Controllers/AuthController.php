@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Log;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -18,8 +19,10 @@ class AuthController extends Controller
          * @var User
          */
         $user = User::where('role', ucfirst($data['role']))
-            ->whereEmail($data['email'])
-            ->orWhere('uuid', $data['email'])
+            ->where(function (Builder $builder) use ($data) {
+                return $builder->where('email', $data['email'])
+                    ->orWhere('uuid', $data['email']);
+            })
             ->first();
 
         if (!$user) {

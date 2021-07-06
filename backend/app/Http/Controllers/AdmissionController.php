@@ -106,6 +106,7 @@ class AdmissionController extends Controller
         $unit = Unit::whereCourseId($data['course_id'])
             ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
             ->whereLevel($data['level'])
+            ->whereTerm($data['term'])
             ->first();
 
         if ($unit) {
@@ -288,15 +289,6 @@ class AdmissionController extends Controller
                 }
             }
 
-            $unitsDeduction = 0;
-
-            if ($failed->count() > 0) {
-                $unitsDeduction = $failed->reduce(function ($previous, Subject $subject) {
-                    $units = (int)$subject->units;
-                    return $previous + $units;
-                }, 0);
-            }
-
             $map = [
                 '1st Semester' => [
                     '1st' => ['1st', '2nd Semester'],
@@ -334,27 +326,40 @@ class AdmissionController extends Controller
 
                 $data['year_id'] = $year->id;
 
-                $allowedUnits = $user->allowed_units - $unitsDeduction;
-
-                $subjects = Subject::whereCourseId($data['course_id'])
+                /**
+                 * @var \App\Models\Unit|null
+                 */
+                $unit = Unit::whereCourseId($data['course_id'])
                     ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
-                    ->whereTerm($data['term'])
                     ->whereLevel($data['level'])
-                    ->get()
-                    ->reduce(function ($previous, Subject $subject) {
+                    ->whereTerm($data['term'])
+                    ->first();
+
+                if ($unit) {
+                    $user->allowed_units = $unit->units;
+                } else {
+                    $subjects = Subject::whereCourseId($data['course_id'])
+                        ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
+                        ->whereTerm($data['term'])
+                        ->whereLevel($data['level'])
+                        ->get();
+
+                    $user->allowed_units = $subjects->reduce(function ($previous, Subject $subject) {
                         $units = (int)$subject->units;
                         return $previous + $units;
                     }, 0);
+                }
 
-                if ($allowedUnits < $subjects) {
+                if ($failed->count() > 0) {
                     $data['status'] = 'Irregular';
+                } else {
+                    $data['status'] = 'Regular';
                 }
 
                 $user->admissions()->create($data);
 
                 $user->fill([
                     'active' => false,
-                    'allowed_units' => $allowedUnits,
                     'payment_status' => 'Not Paid',
                 ]);
 
@@ -454,6 +459,7 @@ class AdmissionController extends Controller
         $unit = Unit::whereCourseId($data['course_id'])
             ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
             ->whereLevel($data['level'])
+            ->whereTerm($data['term'])
             ->first();
 
         if ($unit) {

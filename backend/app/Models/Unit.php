@@ -14,6 +14,7 @@ class Unit extends Model
         'course_id',
         'major_id',
         'level',
+        'term',
     ];
 
     public function course()
