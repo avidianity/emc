@@ -16,7 +16,7 @@ type Inputs = {
 	course_id: number;
 	level: string;
 	term: string;
-	units: string;
+	units: number;
 	force: boolean;
 	major_id?: number;
 };

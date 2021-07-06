@@ -10,7 +10,7 @@ export interface SubjectContract extends ModelContract {
 	course_id: number;
 	level: string;
 	term: string;
-	units: string;
+	units: number;
 	major_id?: number;
 	course?: CourseContract;
 	schedules?: ScheduleContract[];

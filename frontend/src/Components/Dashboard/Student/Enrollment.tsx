@@ -296,7 +296,7 @@ const Enrollment: FC<Props> = (props) => {
 										}
 										return enrolled.includes(subject.id!);
 									})
-									.reduce((previous, next) => next.units.toNumber() + previous, 0)}
+									.reduce((previous, next) => next.units + previous, 0)}
 							</td>
 						</tr>
 					</tbody>
