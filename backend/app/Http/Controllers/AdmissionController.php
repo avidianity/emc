@@ -336,7 +336,17 @@ class AdmissionController extends Controller
 
                 $allowedUnits = $user->allowed_units - $unitsDeduction;
 
-                if ($allowedUnits < 28) {
+                $subjects = Subject::whereCourseId($data['course_id'])
+                    ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
+                    ->whereTerm($data['term'])
+                    ->whereLevel($data['level'])
+                    ->get()
+                    ->reduce(function ($previous, Subject $subject) {
+                        $units = (int)$subject->units;
+                        return $previous + $units;
+                    }, 0);
+
+                if ($allowedUnits < $subjects) {
                     $data['status'] = 'Irregular';
                 }
 

@@ -19,6 +19,10 @@ class Subject extends Model
         'units',
     ];
 
+    protected $casts = [
+        'units' => 'integer',
+    ];
+
     protected static function booted()
     {
         static::deleting(function (self $subject) {
