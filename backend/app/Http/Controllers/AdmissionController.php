@@ -8,6 +8,7 @@ use App\Models\Log;
 use App\Models\Mail;
 use App\Models\Major;
 use App\Models\Subject;
+use App\Models\Unit;
 use App\Models\User;
 use App\Models\Year;
 use Illuminate\Http\Request;
@@ -97,7 +98,21 @@ class AdmissionController extends Controller
             }
         }
 
-        $student = User::create($data['student']);
+        $student = User::make($data['student']);
+
+        /**
+         * @var \App\Models\Unit|null
+         */
+        $unit = Unit::whereCourseId($data['course_id'])
+            ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
+            ->whereLevel($data['level'])
+            ->first();
+
+        if ($unit) {
+            $student->allowed_units = $unit->units;
+        }
+
+        $student->save();
 
         $admission = $student->admissions()->create($data);
 
@@ -410,7 +425,21 @@ class AdmissionController extends Controller
         $data['student']['active'] = false;
         $data['student']['password'] = $password;
 
-        $student = User::create($data['student']);
+        $student = User::make($data['student']);
+
+        /**
+         * @var \App\Models\Unit|null
+         */
+        $unit = Unit::whereCourseId($data['course_id'])
+            ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
+            ->whereLevel($data['level'])
+            ->first();
+
+        if ($unit) {
+            $student->allowed_units = $unit->units;
+        }
+
+        $student->save();
 
         $admission = $student->admissions()->create($data);
 

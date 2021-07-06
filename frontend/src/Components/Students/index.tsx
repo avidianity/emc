@@ -11,8 +11,11 @@ const Students: FC<Props> = (props) => {
 
 	const routes: RouteProps[] = [
 		{
-			path: url('/'),
-			exact: true,
+			path: url('/new'),
+			component: List,
+		},
+		{
+			path: url('/old'),
 			component: List,
 		},
 		{

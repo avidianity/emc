@@ -41,7 +41,16 @@ class Course extends Model
             $course->sections->each(function (Section $section) {
                 $section->delete();
             });
+
+            $course->units->each(function (Unit $unit) {
+                $unit->delete();
+            });
         });
+    }
+
+    public function units()
+    {
+        return $this->hasMany(Unit::class);
     }
 
     public function admissions()

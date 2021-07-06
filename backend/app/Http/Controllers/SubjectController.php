@@ -89,7 +89,7 @@ class SubjectController extends Controller
     {
         $subject->load([
             'course.majors',
-            'students.grades',
+            'students.grades.year',
             'students.admissions.year',
             'major',
             'schedules',

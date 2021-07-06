@@ -57,11 +57,19 @@ const Form: FC<Props> = (props) => {
 	const [id, setID] = useState(-1);
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
-	const { data: courses } = useQuery('courses', () => courseService.fetch());
-	const { data: users } = useQuery('users', () => userService.fetch());
-	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
-	const { data: years } = useQuery('years', () => yearService.fetch());
-	const { data: sections } = useQuery('sections', () => sectionService.fetch());
+	const { data: courses, refetch: refetchCourses } = useQuery('courses', () => courseService.fetch());
+	const { data: users, refetch: refetchUsers } = useQuery('users', () => userService.fetch());
+	const { data: subjects, refetch: refetchSubjects } = useQuery('subjects', () => subjectService.fetch());
+	const { data: years, refetch: refetchYears } = useQuery('years', () => yearService.fetch());
+	const { data: sections, refetch: refetchSections } = useQuery('sections', () => sectionService.fetch());
+
+	const refetchAll = async () => {
+		try {
+			await Promise.all([refetchCourses(), refetchSections(), refetchSubjects(), refetchUsers(), refetchYears()]);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 
 	const fetch = async (id: any) => {
 		try {
@@ -98,6 +106,7 @@ const Form: FC<Props> = (props) => {
 			data.payload = rows;
 			await (mode === 'Add' ? scheduleService.create(data) : scheduleService.update(id, data));
 			toastr.success('Schedule has been saved successfully.');
+			await refetchAll();
 			reset();
 			setRows([]);
 			setCourse(null);

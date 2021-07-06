@@ -85,11 +85,31 @@ const Sidebar: FC<Props> = (props) => {
 							</a>
 							<ul className='collapse list-unstyled pl-4 w-100' id='users'>
 								{roles[user.role].includes(routes.STUDENTS) ? (
-									<li className='nav-item'>
-										<Link to={url(routes.STUDENTS)} className='nav-link' activeClassName='active'>
+									<li className='nav-item dropdown'>
+										<a
+											href={url(routes.STUDENTS)}
+											className='nav-link dropdown-toggle collapsed'
+											onClick={(e) => {
+												e.preventDefault();
+												$('#students').collapse('toggle');
+											}}>
 											<i className='fe fe-user fe-16'></i>
 											<span className='ml-3 item-text'>Students</span>
-										</Link>
+										</a>
+										<ul className='collapse list-unstyled pl-4 w-100' id='students'>
+											<li className='nav-item'>
+												<Link to={url(`${routes.STUDENTS}/new`)} className='nav-link' activeClassName='active'>
+													<i className='fe fe-user fe-16'></i>
+													<span className='ml-3 item-text'>New</span>
+												</Link>
+											</li>
+											<li className='nav-item'>
+												<Link to={url(`${routes.STUDENTS}/old`)} className='nav-link' activeClassName='active'>
+													<i className='fe fe-user fe-16'></i>
+													<span className='ml-3 item-text'>Old</span>
+												</Link>
+											</li>
+										</ul>
 									</li>
 								) : null}
 								{roles[user.role].includes(routes.TEACHERS) ? (

@@ -1,9 +1,11 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { createRef, FC } from 'react';
+import { useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
@@ -54,6 +56,8 @@ const List: FC<Props> = (props) => {
 	const updatePaymentModalRef = v4();
 	const url = useURL();
 	const { data: year } = useCurrentYear();
+	const history = useHistory();
+	const [old, setOld] = useState(history.location.pathname.includes('old'));
 	const user = State.getInstance().get<UserContract>('user');
 	const statuses = {
 		'Not Paid': 'danger',
@@ -151,6 +155,26 @@ const List: FC<Props> = (props) => {
 		}
 	};
 
+	const isBehind = (student: UserContract) => {
+		const admission = student.admissions?.last();
+
+		return admission && admission.year && !admission.year.current;
+	};
+
+	const reincrement = async (student: UserContract) => {
+		try {
+			await axios.post(`/users/${student.id}/reincrement`);
+			toastr.success('Student reincremented successfully.');
+			await refetch();
+		} catch (error) {
+			handleError(error);
+		}
+	};
+
+	useEffect(() => {
+		setOld(history.location.pathname.includes('old'));
+	}, [history.location.pathname]);
+
 	const columns = [
 		{
 			title: 'ID Number',
@@ -184,24 +208,29 @@ const List: FC<Props> = (props) => {
 			accessor: 'payment_status',
 		},
 		{
+			title: 'Is Behind',
+			accessor: 'is_behind',
+		},
+		{
 			title: 'Status',
 			accessor: 'status',
 		},
 	];
 
 	if (['Registrar', 'Teacher'].includes(user?.role || '')) {
-		columns.push({ title: 'Actions', accessor: 'actions' });
+		columns.push({ title: 'Actions', accessor: 'actions', minWidth: '350px' });
 	}
 
 	return (
 		<>
 			<Table
 				onRefresh={() => refetch()}
-				title='Students'
+				title={`${old ? 'Old' : 'New'} Students`}
 				loading={loading}
 				items={
 					items
 						?.filter((user) => user.role === 'Student' && user.active)
+						.filter((student) => (old ? !student.admissions?.last()?.year?.current : student.admissions?.last()?.year?.current))
 						.filter((student) => {
 							const admission = student.admissions?.find((admission) => admission.year?.current);
 
@@ -235,12 +264,17 @@ const List: FC<Props> = (props) => {
 							) : (
 								<span className='badge badge-danger'>Unconfirmed</span>
 							),
+							is_behind: isBehind(student) ? (
+								<span className='badge badge-danger'>Yes</span>
+							) : (
+								<span className='badge badge-light'>No</span>
+							),
 							payment_status: (
 								<span className={`badge badge-${statuses[student.payment_status]}`}>{student.payment_status}</span>
 							),
 							section: <>{findSection(student)?.name}</>,
 							actions: (
-								<div style={{ minWidth: '350px' }}>
+								<>
 									{user?.role === 'Registrar' ? (
 										<>
 											<Link
@@ -265,6 +299,19 @@ const List: FC<Props> = (props) => {
 												}}>
 												<i className='fas fa-money-bill'></i>
 											</button>
+											{isBehind(student) ? (
+												<button
+													className='btn btn-primary btn-sm'
+													title='Re-Increment Student'
+													onClick={async (e) => {
+														e.preventDefault();
+														if (await Asker.notice('Are you sure to reincrement this student?')) {
+															await reincrement(student);
+														}
+													}}>
+													<i className='fas fa-university'></i>
+												</button>
+											) : null}
 										</>
 									) : null}
 									{['Registrar', 'Admin'].includes(user?.role || '') ? (
@@ -299,7 +346,7 @@ const List: FC<Props> = (props) => {
 										}}>
 										<i className='fas fa-trash'></i>
 									</button>
-								</div>
+								</>
 							),
 						})) || []
 				}

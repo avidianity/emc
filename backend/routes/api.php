@@ -12,6 +12,7 @@ use App\Http\Controllers\RequirementController;
 use App\Http\Controllers\ScheduleController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SubjectController;
+use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\YearController;
 use Illuminate\Http\Request;
@@ -59,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users/change', [UserController::class, 'change']);
     Route::post('/users/{user}/subjects', [SubjectController::class, 'enroll']);
     Route::post('/admissions/increment', [AdmissionController::class, 'increment']);
+    Route::post('/users/{user}/reincrement', [UserController::class, 'reincrement']);
 
     Route::apiResources([
         'admissions' => AdmissionController::class,
@@ -68,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'subjects' => SubjectController::class,
         'logs' => LogController::class,
         'sections' => SectionController::class,
+        'units' => UnitController::class,
     ]);
 
     Route::prefix('/analytics')->group(function () {

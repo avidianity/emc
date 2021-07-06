@@ -33,6 +33,10 @@ class Major extends Model
             $major->sections->each(function (Section $section) {
                 $section->delete();
             });
+
+            $major->units->each(function (Unit $unit) {
+                $unit->delete();
+            });
         });
 
         static::created(function () {
@@ -61,6 +65,11 @@ class Major extends Model
                 'message' => sprintf('%s has deleted a major.', $user->role),
             ]);
         });
+    }
+
+    public function units()
+    {
+        return $this->hasMany(Unit::class);
     }
 
     public function course()

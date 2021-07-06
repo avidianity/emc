@@ -291,7 +291,7 @@ class UserController extends Controller
         ]);
 
         if ($user->payment_status === 'Not Paid') {
-            continue;
+            return response(['message' => 'Student\'s payment status not settled. Current Status: Not Paid'], 400);
         }
 
         /**
@@ -302,6 +302,10 @@ class UserController extends Controller
 
         if (!$admission) {
             return response(['message' => 'No admission found on student.'], 404);
+        }
+
+        if ($admission->year->current) {
+            return response(['message' => 'Student is currently enrolled to current school year.'], 400);
         }
 
         $subjects = $user->subjects;
