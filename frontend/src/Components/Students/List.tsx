@@ -226,7 +226,7 @@ const List: FC<Props> = (props) => {
 				items={
 					items
 						?.filter((user) => user.role === 'Student' && user.active)
-						.filter((student) => (old ? !student.admissions?.last()?.year?.current : student.admissions?.last()?.year?.current))
+						.filter((student) => (old ? isBehind(student) : !isBehind(student)))
 						.filter((student) => {
 							const admission = student.admissions?.find((admission) => admission.year?.current);
 
