@@ -44,8 +44,8 @@ const View: FC<Props> = (props) => {
 			data.subject_id = subject?.id || id;
 			data.grade = gradeAmount;
 			await gradeService.create(data);
+			await refetch();
 			toastr.success('Grade added succesfully.');
-			refetch();
 			setGradeAmount(0);
 		} catch (error) {
 			handleError(error);
