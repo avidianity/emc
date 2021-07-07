@@ -1,4 +1,5 @@
 import axios from 'axios';
+import dayjs from 'dayjs';
 import React, { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useHistory, useParams } from 'react-router-dom';
@@ -15,6 +16,7 @@ type Inputs = {
 };
 
 const Form: FC<Props> = (props) => {
+	const [tries, setTries] = useState(0);
 	const [processing, setProcessing] = useState(false);
 	const { register, handleSubmit } = useForm<Inputs>();
 	const history = useHistory();
@@ -23,6 +25,16 @@ const Form: FC<Props> = (props) => {
 	const role = params.role;
 
 	const submit = async (payload: Inputs) => {
+		if (state.has('block')) {
+			const block = dayjs(state.get<string>('block') || undefined);
+			if (block.isValid() && dayjs().isAfter(block)) {
+				state.remove('block');
+				setTries(0);
+			}
+		}
+		if (tries >= 3) {
+			return toastr.info('Login currently blocked. Please try again after 5 minutes.');
+		}
 		setProcessing(true);
 		try {
 			const {
@@ -33,6 +45,11 @@ const Form: FC<Props> = (props) => {
 			toastr.success(`Welcome back, ${user?.first_name}.`);
 			history.push(routes.DASHBOARD);
 		} catch (error) {
+			if (tries >= 3) {
+				state.set('block', dayjs().add(5, 'minutes').toJSON());
+			} else {
+				setTries(tries + 1);
+			}
 			handleError(error, false);
 		} finally {
 			setProcessing(false);

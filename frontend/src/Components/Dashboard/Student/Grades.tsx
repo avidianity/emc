@@ -76,20 +76,24 @@ const Grades: FC<Props> = (props) => {
 							</tr>
 						</thead>
 						<tbody>
-							{admission.student?.grades?.map((grade, index) => (
-								<tr key={index}>
-									<td className='text-center'>{grade.subject?.code}</td>
-									<td className='text-center' style={{ minWidth: '100px' }}>
-										{grade.subject?.description}
-									</td>
-									<td className='text-center'>{grade.subject?.units}</td>
-									<td className='text-center'>{grade.grade}%</td>
-									<td className='text-center'>{grade.status}</td>
-								</tr>
-							))}
+							{admission.student?.grades
+								?.filter((grade) => grade.year_id === admission.year_id)
+								.map((grade, index) => (
+									<tr key={index}>
+										<td className='text-center'>{grade.subject?.code}</td>
+										<td className='text-center' style={{ minWidth: '100px' }}>
+											{grade.subject?.description}
+										</td>
+										<td className='text-center'>{grade.subject?.units}</td>
+										<td className='text-center'>{grade.grade}%</td>
+										<td className='text-center'>{grade.status}</td>
+									</tr>
+								))}
 							{admission.student?.subjects
 								?.filter((subject) => {
-									const grade = admission.student?.grades?.find((grade) => grade?.subject?.id === subject.id);
+									const grade = admission.student?.grades?.find(
+										(grade) => grade?.subject?.id === subject.id && grade.year_id === admission.year_id
+									);
 									if (grade) {
 										return false;
 									}
@@ -112,10 +116,14 @@ const Grades: FC<Props> = (props) => {
 								</td>
 								<td></td>
 								<td className='text-center'>
-									{(admission.student?.grades?.reduce((previous, next) => previous + next.subject!.units, 0) || 0) +
+									{(admission.student?.grades
+										?.filter((grade) => grade.year_id === admission.year_id)
+										.reduce((previous, next) => previous + next.subject!.units, 0) || 0) +
 										(admission.student?.subjects
 											?.filter((subject) => {
-												const grade = admission.student?.grades?.find((grade) => grade?.subject?.id === subject.id);
+												const grade = admission.student?.grades?.find(
+													(grade) => grade?.subject?.id === subject.id && grade.year_id === admission.year_id
+												);
 												if (grade) {
 													return false;
 												}
