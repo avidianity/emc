@@ -72,7 +72,7 @@ const View: FC<Props> = (props) => {
 	};
 
 	const findGrade = (student: UserContract) =>
-		student.grades?.find((grade) => grade.teacher_id === user?.id && grade.year?.current)?.grade;
+		student.grades?.find((grade) => grade.teacher_id === user?.id && grade.year?.current && grade.subject_id === subject?.id)?.grade;
 
 	useEffect(() => {
 		refetch();
