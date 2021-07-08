@@ -27,6 +27,8 @@ const Form: FC<Props> = (props) => {
 	const [semesterEnd, setSemesterEnd] = useNullable<Date>();
 	const [registrationStart, setRegistrationStart] = useNullable<Date>();
 	const [registrationEnd, setRegistrationEnd] = useNullable<Date>();
+	const [gradeStart, setGradeStart] = useNullable<Date>();
+	const [gradeEnd, setGradeEnd] = useNullable<Date>();
 
 	const fetch = async (id: any) => {
 		try {
@@ -37,6 +39,8 @@ const Form: FC<Props> = (props) => {
 			setSemesterEnd(dayjs(data.semester_end).toDate());
 			setRegistrationStart(dayjs(data.registration_start).toDate());
 			setRegistrationEnd(dayjs(data.registration_end).toDate());
+			setGradeStart(dayjs(data.grade_start).toDate());
+			setGradeEnd(dayjs(data.grade_end).toDate());
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -51,6 +55,8 @@ const Form: FC<Props> = (props) => {
 			data.semester_end = semesterEnd?.toJSON() || '';
 			data.registration_start = registrationStart?.toJSON() || '';
 			data.registration_end = registrationEnd?.toJSON() || '';
+			data.grade_start = gradeStart?.toJSON() || '';
+			data.grade_end = gradeEnd?.toJSON() || '';
 			await (mode === 'Add' ? yearService.create(data) : yearService.update(id, data));
 			toastr.success('School Year has been saved successfully.');
 			reset();
@@ -162,6 +168,46 @@ const Form: FC<Props> = (props) => {
 									}}
 									className='form-control'
 									disabled={processing}
+								/>
+							</div>
+							<div className='form-group col-12 col-md-6'>
+								<label htmlFor='grade_start'>Grade Encoding Start</label>
+								<Flatpickr
+									value={gradeStart || undefined}
+									id='grade_start'
+									onChange={(dates) => {
+										if (dates.length > 0) {
+											setGradeStart(dates[0]);
+										}
+									}}
+									className='form-control'
+									disabled={processing}
+									options={{
+										altInput: true,
+										altFormat: 'F j, Y G:i K',
+										enableTime: true,
+										dateFormat: 'F j, Y G:i K',
+									}}
+								/>
+							</div>
+							<div className='form-group col-12 col-md-6'>
+								<label htmlFor='grade_end'>Grade Encoding End</label>
+								<Flatpickr
+									value={gradeEnd || undefined}
+									id='grade_end'
+									onChange={(dates) => {
+										if (dates.length > 0) {
+											setGradeEnd(dates[0]);
+										}
+									}}
+									className='form-control'
+									disabled={processing}
+									options={{
+										altInput: true,
+										altFormat: 'F j, Y G:i K',
+										enableTime: true,
+										dateFormat: 'F j, Y G:i K',
+									}}
 								/>
 							</div>
 							<div className='form-group col-12'>

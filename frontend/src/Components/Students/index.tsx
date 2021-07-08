@@ -19,6 +19,10 @@ const Students: FC<Props> = (props) => {
 			component: List,
 		},
 		{
+			path: url('/behind'),
+			component: List,
+		},
+		{
 			path: url('/:id/subjects'),
 			component: Subjects,
 		},

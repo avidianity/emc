@@ -110,6 +110,12 @@ const Sidebar: FC<Props> = (props) => {
 													<span className='ml-3 item-text'>Old</span>
 												</Link>
 											</li>
+											<li className='nav-item'>
+												<Link to={url(`${routes.STUDENTS}/behind`)} className='nav-link' activeClassName='active'>
+													<i className='fe fe-user fe-16'></i>
+													<span className='ml-3 item-text'>Behind</span>
+												</Link>
+											</li>
 										</ul>
 									</li>
 								) : null}
@@ -223,7 +229,7 @@ const Sidebar: FC<Props> = (props) => {
 					{roles[user.role].includes(routes.UNITS) ? (
 						<li className='nav-item'>
 							<Link to={url(routes.UNITS)} className='nav-link' activeClassName='active'>
-								<i className='fe fe-graduation-cap fe-16'></i>
+								<i className='fas fa-graduation-cap fe-16'></i>
 								<span className='ml-3 item-text'>Student Units</span>
 							</Link>
 						</li>

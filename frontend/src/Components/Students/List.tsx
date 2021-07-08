@@ -2,6 +2,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { createRef, FC } from 'react';
 import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
@@ -57,7 +58,19 @@ const List: FC<Props> = (props) => {
 	const url = useURL();
 	const { data: year } = useCurrentYear();
 	const history = useHistory();
-	const [old, setOld] = useState(history.location.pathname.includes('old'));
+
+	const determine = useCallback(() => {
+		if (history.location.pathname.includes('old')) {
+			return 'Old';
+		} else if (history.location.pathname.includes('new')) {
+			return 'New';
+		} else if (history.location.pathname.includes('behind')) {
+			return 'Behind';
+		}
+		throw new Error();
+	}, [history.location.pathname]);
+
+	const [type, setType] = useState(determine());
 	const user = State.getInstance().get<UserContract>('user');
 	const statuses = {
 		'Not Paid': 'danger',
@@ -172,8 +185,8 @@ const List: FC<Props> = (props) => {
 	};
 
 	useEffect(() => {
-		setOld(history.location.pathname.includes('old'));
-	}, [history.location.pathname]);
+		setType(determine());
+	}, [determine]);
 
 	const columns = [
 		{
@@ -221,12 +234,18 @@ const List: FC<Props> = (props) => {
 		<>
 			<Table
 				onRefresh={() => refetch()}
-				title={`${old ? 'Old' : 'New'} Students`}
+				title={`${type} Students`}
 				loading={loading}
 				items={
 					items
 						?.filter((user) => user.role === 'Student' && user.active)
-						.filter((student) => (old ? isBehind(student) : !isBehind(student)))
+						.filter((student) => {
+							if (type !== 'Behind') {
+								return student.type === type;
+							} else {
+								return isBehind(student);
+							}
+						})
 						.filter((student) => {
 							const admission = student.admissions?.find((admission) => admission.year?.current);
 

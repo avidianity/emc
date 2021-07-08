@@ -9,6 +9,7 @@ use App\Models\Mail;
 use App\Models\Schedule;
 use App\Models\Section;
 use App\Models\Subject;
+use App\Models\Unit;
 use App\Models\User;
 use App\Models\Year;
 use Illuminate\Database\Eloquent\Builder;
@@ -283,7 +284,7 @@ class UserController extends Controller
         return response('', 204);
     }
 
-    public function reincrement(User $user)
+    public function reincrement(Request $request, User $user)
     {
         $user->load([
             'admissions.year',
@@ -371,36 +372,104 @@ class UserController extends Controller
             $data['term'] = $term;
             $data['level'] = $level;
 
-            // To increment or no?
-            // if ($failed->count() === 0) {
-            //     $data['level'] = $level;
-            // } else {
-            //     if ($admission->term === '2nd Semester') {
-            //         return response(['message' => 'Student currently has failed subjects.'], 400);
-            //     }
-            // }
-
             $data['year_id'] = $year->id;
 
-            $allowedUnits = $user->allowed_units - $unitsDeduction;
+            /**
+             * @var \App\Models\Unit|null
+             */
+            $unit = Unit::whereCourseId($data['course_id'])
+                ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
+                ->whereLevel($data['level'])
+                ->whereTerm($data['term'])
+                ->first();
 
-            if ($allowedUnits < 28) {
-                $data['status'] = 'Irregular';
+            if ($unit) {
+                $user->allowed_units = $unit->units;
+            } else {
+                $subjects = Subject::whereCourseId($data['course_id'])
+                    ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
+                    ->whereTerm($data['term'])
+                    ->whereLevel($data['level'])
+                    ->get();
+
+                $user->allowed_units = $subjects->reduce(function ($previous, Subject $subject) {
+                    $units = (int)$subject->units;
+                    return $previous + $units;
+                }, 0);
             }
 
-            $user->admissions()->create($data);
+            if ($failed->count() > 0) {
+                $data['status'] = 'Irregular';
+            } else {
+                $data['status'] = 'Regular';
+            }
+
+            /**
+             * @var \App\Models\Admission
+             */
+            $admission = $user->admissions()->create($data);
+
+            $year = $admission->year;
+            $builder = Section::whereCourseId($admission->course_id)
+                ->whereMajorId($admission->major_id)
+                ->whereTerm($year->semester)
+                ->whereLevel($admission->level)
+                ->whereYearId($year->id)
+                ->withCount('students')
+                ->latest();
+
+            /**
+             * @var \App\Models\Section|null
+             */
+            $section = $builder->first();
+
+            if (!$section || $section->students_count >= 35) {
+                /**
+                 * @var \App\Models\Section
+                 */
+                $section = $year->sections()
+                    ->create([
+                        'term' => $year->semester,
+                        'level' => $admission->level,
+                        'name' => sprintf(
+                            '%s%s %s%s',
+                            $admission->course->code,
+                            $admission->major ? ' - ' . $admission->major->short_name : '',
+                            $admission->level[0],
+                            Section::NAMES[$builder->count()]
+                        ),
+                        'course_id' => $admission->course_id,
+                        'major_id' => $admission->major_id,
+                    ]);
+            }
+
+            $section->students()->attach($user->id);
+
+            $password = Str::random(5);
 
             $user->fill([
-                'active' => false,
-                'allowed_units' => $allowedUnits,
+                'active' => true,
                 'payment_status' => 'Not Paid',
+                'password' => $password,
+            ]);
+
+            $user->save();
+
+            $recipes = [$user, $request->user(), $admission, $password];
+
+            $mail = Mail::create([
+                'uuid' => $user->uuid,
+                'to' => $user->email,
+                'subject' => 'Student Admission',
+                'status' => 'Pending',
+                'body' => (new Admission(...$recipes))->render(),
             ]);
 
             if ($user->type === 'New') {
                 $user->type === 'Old';
             }
 
-            $user->save();
+            SendMail::dispatch($mail, $recipes, Admission::class);
         }
 
         $user->subjects()->detach();

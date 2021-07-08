@@ -18,6 +18,8 @@ class Year extends Model
         'semester',
         'registration_start',
         'registration_end',
+        'grade_start',
+        'grade_end',
     ];
 
     protected $casts = [
@@ -26,6 +28,8 @@ class Year extends Model
         'current' => 'boolean',
         'registration_start' => 'datetime',
         'registration_end' => 'datetime',
+        'grade_start' => 'datetime',
+        'grade_end' => 'datetime',
     ];
 
     protected static function booted()

@@ -9,4 +9,6 @@ export interface YearContract extends ModelContract {
 	registration_start: string;
 	registration_end: string;
 	current: boolean;
+	grade_start: string;
+	grade_end: string;
 }

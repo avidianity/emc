@@ -215,10 +215,14 @@ const PreRegistration: FC<Props> = (props) => {
 						{...register('course_id')}
 						id='course_id'
 						className='form-control'
-						onChange={(e) => {
+						onChange={async (e) => {
 							const id = e.target.value.toNumber();
 							const course = courses?.find((course) => course.id === id);
 							if (course) {
+								if (!course.open) {
+									await Asker.okay('Sorry, this course is not open for enrollment.');
+									return history.goBack();
+								}
 								setCourse(course);
 							} else {
 								setCourse(null);
@@ -226,13 +230,11 @@ const PreRegistration: FC<Props> = (props) => {
 							setMajorID(null);
 						}}>
 						<option value=''> -- Select -- </option>
-						{courses
-							?.filter((course) => course.open)
-							.map((course, index) => (
-								<option value={course.id} key={index}>
-									{course.description}
-								</option>
-							))}
+						{courses?.map((course, index) => (
+							<option value={course.id} key={index}>
+								{course.description}
+							</option>
+						))}
 					</select>
 				</div>
 				{course && course.majors && course.majors.length > 0 ? (

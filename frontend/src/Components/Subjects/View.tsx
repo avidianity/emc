@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { useHistory, useParams } from 'react-router-dom';
 import { SubjectContract } from '../../Contracts/subject.contract';
 import { UserContract } from '../../Contracts/user.contract';
-import { handleError } from '../../helpers';
+import { Asker, handleError } from '../../helpers';
 import { useCurrentYear, useNullable } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { gradeService } from '../../Services/grade.service';
@@ -101,8 +101,12 @@ const View: FC<Props> = (props) => {
 					</div>
 					<p className='card-text mb-0'>Code: {subject.code}</p>
 					<p className='card-text mb-0'>Description: {subject.description}</p>
-					<p className='card-text'>
+					<p className='card-text mb-0'>
 						Course: {`${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`}
+					</p>
+					<p className='card-text'>
+						Grade Encoding Deadline: {dayjs(year?.grade_start).format('MMMM DD, YYYY hh:mm A')} -{' '}
+						{dayjs(year?.grade_end).format('MMMM DD, YYYY hh:mm A')}
 					</p>
 				</div>
 				<div className='card-body'>
@@ -150,7 +154,7 @@ const View: FC<Props> = (props) => {
 											{student.last_name}, {student.first_name} {student.middle_name || ''}
 										</>
 									),
-									year: student.admissions?.filter((admission) => admission.year?.current)[0]?.level,
+									year: student.admissions?.find((admission) => admission.year?.current)?.level,
 									actions: (
 										<>
 											{findGrade(student) || (
@@ -197,7 +201,25 @@ const View: FC<Props> = (props) => {
 														</form>
 													) : (
 														<span
-															onClick={() => {
+															onClick={async () => {
+																if (year) {
+																	const now = dayjs();
+																	const start = dayjs(year.grade_start);
+																	const end = dayjs(year.grade_end);
+																	if (now.isBefore(start)) {
+																		await Asker.okay(
+																			`Encoding of grades will start at ${start.format(
+																				'MMMM DD, YYYY hh:mm A'
+																			)}. Please wait until the given date.`,
+																			'Notice'
+																		);
+																		return history.goBack();
+																	}
+																	if (now.isAfter(end)) {
+																		await Asker.okay(`Encoding of grades has already ended.`, 'Notice');
+																		return history.goBack();
+																	}
+																}
 																setSetGrade(!setGrade);
 																setStudentID(student.id!);
 															}}

@@ -55,10 +55,12 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Year',
 			accessor: 'year',
+			minWidth: '200px',
 		},
 		{
 			title: 'Semester',
 			accessor: 'semester',
+			minWidth: '150px',
 		},
 		{
 			title: 'Start',
@@ -76,8 +78,9 @@ const List: FC<Props> = (props) => {
 			minWidth: '250px',
 		},
 		{
-			title: '',
-			accessor: 'current',
+			title: 'Grade Encoding Date',
+			accessor: 'grade',
+			minWidth: '400px',
 		},
 	];
 
@@ -97,13 +100,20 @@ const List: FC<Props> = (props) => {
 			items={
 				items?.map((year) => ({
 					...year,
-					year: `${year.start} - ${year.end}`,
+					year: (
+						<>
+							{`${year.start} - ${year.end}`}{' '}
+							{year.current ? <span className='badge badge-success mb-1 ml-1'>Current</span> : ''}
+						</>
+					),
 					semester_start: dayjs(year.semester_start).format('MMMM DD, YYYY'),
 					semester_end: dayjs(year.semester_end).format('MMMM DD, YYYY'),
 					registration: `${dayjs(year.registration_start).format('MMMM DD, YYYY')} to ${dayjs(year.registration_end).format(
 						'MMMM DD, YYYY'
 					)}`,
-					current: year.current ? <span className='badge badge-success'>Current</span> : '',
+					grade: `${dayjs(year.grade_start).format('MMMM DD, YYYY hh:mm A')} to ${dayjs(year.grade_end).format(
+						'MMMM DD, YYYY hh:mm A'
+					)}`,
 					actions:
 						user?.role === 'Registrar' ? (
 							<>
