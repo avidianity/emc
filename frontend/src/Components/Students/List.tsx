@@ -239,7 +239,7 @@ const List: FC<Props> = (props) => {
 						?.filter((user) => user.role === 'Student' && user.active)
 						.filter((student) => {
 							if (type !== 'Behind') {
-								return student.type === type;
+								return student.type === type && !isBehind(student);
 							} else {
 								return isBehind(student);
 							}
