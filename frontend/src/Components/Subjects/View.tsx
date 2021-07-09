@@ -161,6 +161,10 @@ const View: FC<Props> = (props) => {
 												<span
 													onClick={(e) => {
 														e.preventDefault();
+														const grade = findGrade(student);
+														if (grade) {
+															setGradeAmount(grade.grade);
+														}
 														setSetGrade(!setGrade);
 														setStudentID(student.id!);
 													}}
