@@ -169,9 +169,7 @@ const List: FC<Props> = (props) => {
 	};
 
 	const isBehind = (student: UserContract) => {
-		const admission = student.admissions?.last();
-
-		return admission && admission.year && !admission.year.current;
+		return student.admissions?.find((admission) => admission.year?.current) === undefined;
 	};
 
 	const reincrement = async (student: UserContract) => {
