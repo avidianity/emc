@@ -157,7 +157,7 @@ const View: FC<Props> = (props) => {
 									year: student.admissions?.find((admission) => admission.year?.current)?.level,
 									actions: (
 										<>
-											{findGrade(student) ? (
+											{findGrade(student) && !setGrade ? (
 												<span
 													onClick={(e) => {
 														e.preventDefault();

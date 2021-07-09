@@ -248,10 +248,8 @@ const Enrollment: FC<Props> = (props) => {
 									enrolled.includes(subject.id!) &&
 									subject.level === admission.level &&
 									subject.term === admission.term &&
-									subject.course_id === admission.course_id;
-								if (admission.major_id) {
-									return valid && admission.major_id === subject.major_id;
-								}
+									subject.course_id === admission.course_id &&
+									subject.major_id === admission.major_id;
 								return valid;
 							})
 							.map((subject, index) => (
