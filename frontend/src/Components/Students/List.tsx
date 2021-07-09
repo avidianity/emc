@@ -12,8 +12,9 @@ import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
-import { useCurrentYear, useNullable, useURL } from '../../hooks';
+import { useCurrentYear, useNullable } from '../../hooks';
 import { State } from '../../Libraries/State';
+import { routes } from '../../routes';
 import { courseService } from '../../Services/course.service';
 import { gradeService } from '../../Services/grade.service';
 import { subjectService } from '../../Services/subject.service';
@@ -55,7 +56,6 @@ const List: FC<Props> = (props) => {
 	const [student, setStudent] = useNullable<number>();
 	const addGradeModalRef = createRef<HTMLDivElement>();
 	const updatePaymentModalRef = v4();
-	const url = useURL();
 	const { data: year } = useCurrentYear();
 	const history = useHistory();
 
@@ -326,7 +326,7 @@ const List: FC<Props> = (props) => {
 									) : null}
 									{['Registrar', 'Admin'].includes(user?.role || '') ? (
 										<Link
-											to={url(`${student.id}/subjects`)}
+											to={`${routes.DASHBOARD}${routes.STUDENTS}${student.id}/subjects`}
 											className='btn btn-primary btn-sm mx-1'
 											title='Add Subjects'>
 											<i className='fas fa-book'></i>
