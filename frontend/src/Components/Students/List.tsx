@@ -324,7 +324,7 @@ const List: FC<Props> = (props) => {
 									) : null}
 									{['Registrar', 'Admin'].includes(user?.role || '') ? (
 										<Link
-											to={`${routes.DASHBOARD}${routes.STUDENTS}${student.id}/subjects`}
+											to={`${routes.DASHBOARD}${routes.STUDENTS}/${student.id}/subjects`}
 											className='btn btn-primary btn-sm mx-1'
 											title='Add Subjects'>
 											<i className='fas fa-book'></i>

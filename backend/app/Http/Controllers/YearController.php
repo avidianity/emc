@@ -99,6 +99,8 @@ class YearController extends Controller
             'registration_end' => ['nullable', 'date'],
             'semester_start' => ['nullable', 'date'],
             'semester_end' => ['nullable', 'date'],
+            'grade_start' => ['nullable', 'date'],
+            'grade_end' => ['nullable', 'date'],
             'current' => ['nullable', 'boolean'],
         ]);
 
