@@ -165,7 +165,7 @@ const View: FC<Props> = (props) => {
 														if (grade) {
 															setGradeAmount(grade.grade);
 														}
-														setSetGrade(!setGrade);
+														setSetGrade(true);
 														setStudentID(student.id!);
 													}}
 													className='clickable'>
@@ -214,32 +214,53 @@ const View: FC<Props> = (props) => {
 															</button>
 														</form>
 													) : (
-														<span
-															onClick={async () => {
-																if (year) {
-																	const now = dayjs();
-																	const start = dayjs(year.grade_start);
-																	const end = dayjs(year.grade_end);
-																	if (now.isBefore(start)) {
-																		await Asker.okay(
-																			`Encoding of grades will start at ${start.format(
-																				'MMMM DD, YYYY hh:mm A'
-																			)}. Please wait until the given date.`,
-																			'Notice'
-																		);
-																		return history.goBack();
-																	}
-																	if (now.isAfter(end)) {
-																		await Asker.okay(`Encoding of grades has already ended.`, 'Notice');
-																		return history.goBack();
-																	}
-																}
-																setSetGrade(!setGrade);
-																setStudentID(student.id!);
-															}}
-															className='clickable d-block'>
-															-
-														</span>
+														<>
+															{findGrade(student) ? (
+																<span
+																	onClick={(e) => {
+																		e.preventDefault();
+																		const grade = findGrade(student);
+																		if (grade) {
+																			setGradeAmount(grade.grade);
+																		}
+																		setSetGrade(true);
+																		setStudentID(student.id!);
+																	}}
+																	className='clickable'>
+																	{findGrade(student)?.grade}%
+																</span>
+															) : (
+																<span
+																	onClick={async () => {
+																		if (year) {
+																			const now = dayjs();
+																			const start = dayjs(year.grade_start);
+																			const end = dayjs(year.grade_end);
+																			if (now.isBefore(start)) {
+																				await Asker.okay(
+																					`Encoding of grades will start at ${start.format(
+																						'MMMM DD, YYYY hh:mm A'
+																					)}. Please wait until the given date.`,
+																					'Notice'
+																				);
+																				return history.goBack();
+																			}
+																			if (now.isAfter(end)) {
+																				await Asker.okay(
+																					`Encoding of grades has already ended.`,
+																					'Notice'
+																				);
+																				return history.goBack();
+																			}
+																		}
+																		setSetGrade(!setGrade);
+																		setStudentID(student.id!);
+																	}}
+																	className='clickable d-block'>
+																	-
+																</span>
+															)}
+														</>
 													)}
 												</>
 											)}
