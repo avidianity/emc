@@ -45,7 +45,7 @@ const View: FC<Props> = (props) => {
 			data.grade = gradeAmount;
 			await gradeService.create(data);
 			await refetch();
-			toastr.success('Grade added succesfully.');
+			toastr.success('Grade saved succesfully.');
 			setGradeAmount(0);
 		} catch (error) {
 			handleError(error);
@@ -72,7 +72,7 @@ const View: FC<Props> = (props) => {
 	};
 
 	const findGrade = (student: UserContract) =>
-		student.grades?.find((grade) => grade.teacher_id === user?.id && grade.year?.current && grade.subject_id === subject?.id)?.grade;
+		student.grades?.find((grade) => grade.teacher_id === user?.id && grade.year?.current && grade.subject_id === subject?.id);
 
 	useEffect(() => {
 		refetch();
@@ -157,7 +157,17 @@ const View: FC<Props> = (props) => {
 									year: student.admissions?.find((admission) => admission.year?.current)?.level,
 									actions: (
 										<>
-											{findGrade(student) || (
+											{findGrade(student) ? (
+												<span
+													onClick={(e) => {
+														e.preventDefault();
+														setSetGrade(!setGrade);
+														setStudentID(student.id!);
+													}}
+													className='clickable'>
+													{findGrade(student)?.grade}%
+												</span>
+											) : (
 												<>
 													{setGrade && student.id === studentID ? (
 														<form
