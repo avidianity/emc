@@ -16,7 +16,7 @@ const Grades: FC<Props> = (props) => {
 	const fetch = async () => {
 		try {
 			const { data: admissions } = await axios.get<AdmissionContract[]>('/auth/admissions');
-			setAdmissions(admissions);
+			setAdmissions([...admissions.reverse()]);
 		} catch (error) {
 			handleError(error);
 		}
@@ -39,7 +39,7 @@ const Grades: FC<Props> = (props) => {
 					<p>Bongabong, Oriental Mindoro</p>
 				</div>
 			</div>
-			{admissions.reverse().map((admission, index) => (
+			{admissions.map((admission, index) => (
 				<Fragment key={index}>
 					<div className='d-flex mt-5'>
 						<span className='mr-auto'>
@@ -71,8 +71,8 @@ const Grades: FC<Props> = (props) => {
 								<th className='text-center'>Subject Code</th>
 								<th className='text-center'>Description</th>
 								<th className='text-center'>Units</th>
-								<th className='text-center'>Grades</th>
-								<th className='text-center'>Grade Status</th>
+								<th className='text-center'>Grade</th>
+								<th className='text-center'>Status</th>
 							</tr>
 						</thead>
 						<tbody>

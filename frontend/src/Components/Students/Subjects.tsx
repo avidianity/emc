@@ -120,7 +120,7 @@ const Subjects: FC<Props> = (props) => {
 										subject.major_id === admission.major_id
 								)
 								.map((subject, index) => (
-									<div className='form-group col-12 col-md-4 col-lg-3' key={index}>
+									<div className='form-group col-12 col-md-4' key={index}>
 										<div className='custom-control custom-checkbox'>
 											<input
 												type='checkbox'

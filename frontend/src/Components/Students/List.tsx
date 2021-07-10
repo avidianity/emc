@@ -40,6 +40,9 @@ type UserInput = {
 
 type Props = {};
 
+const incrementModalRef = v4();
+const updatePaymentModalRef = v4();
+
 const List: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('users', () => userService.fetch());
@@ -59,8 +62,6 @@ const List: FC<Props> = (props) => {
 	const { register: registerUser, handleSubmit: handleSubmitUser, reset: resetUser, setValue: setValueUser } = useForm<UserInput>();
 	const [student, setStudent] = useNullable<number>();
 	const addGradeModalRef = createRef<HTMLDivElement>();
-	const incrementModalRef = v4();
-	const updatePaymentModalRef = v4();
 	const { data: year } = useCurrentYear();
 	const history = useHistory();
 	const [semesterStart, setSemesterStart] = useNullable<Date>();
@@ -115,9 +116,9 @@ const List: FC<Props> = (props) => {
 				data.grade_start = gradeStart?.toJSON() || '';
 				data.grade_end = gradeEnd?.toJSON() || '';
 				data.current = true;
+				$(`#${incrementModalRef}`).modal('hide');
 				await yearService.create(data);
 				await evaluate();
-				$(`#${incrementModalRef}`).modal('hide');
 				reset();
 			} catch (error) {
 				handleError(error);
@@ -245,6 +246,11 @@ const List: FC<Props> = (props) => {
 			accessor: 'year',
 		},
 		{
+			title: 'Semester',
+			accessor: 'semester',
+			minWidth: '150px',
+		},
+		{
 			title: 'Course',
 			accessor: 'course',
 			minWidth: '375px',
@@ -326,6 +332,7 @@ const List: FC<Props> = (props) => {
 								<span className={`badge badge-${statuses[student.payment_status]}`}>{student.payment_status}</span>
 							),
 							section: <>{findSection(student)?.name}</>,
+							semester: findAdmission(student)?.year?.semester,
 							actions: (
 								<>
 									{user?.role === 'Registrar' ? (

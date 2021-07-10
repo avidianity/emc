@@ -344,7 +344,7 @@ class AdmissionController extends Controller
                         ->get();
 
                     $user->allowed_units = $subjects->reduce(function ($previous, Subject $subject) {
-                        $units = (int)$subject->units;
+                        $units = $subject->units;
                         return $previous + $units;
                     }, 0);
                 }
@@ -361,6 +361,8 @@ class AdmissionController extends Controller
                  * @var \App\Models\Admission
                  */
                 $admission = $user->admissions()->create($data);
+
+                $user->subjects()->detach();
 
                 $admission->load('year');
 
@@ -425,8 +427,6 @@ class AdmissionController extends Controller
                 ]);
 
                 SendMail::dispatch($mail, $recipes, MailAdmission::class);
-
-                $user->subjects()->detach();
             }
         }
 

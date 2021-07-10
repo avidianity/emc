@@ -142,6 +142,10 @@ class YearController extends Controller
             'message' => sprintf('%s has deleted a school year.', $user->role),
         ]);
 
+        if (Year::count() === 1) {
+            Year::firstOrFail()->update(['current' => true]);
+        }
+
         return response('', 204);
     }
 

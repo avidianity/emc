@@ -323,6 +323,10 @@ class UserController extends Controller
             return response(['message' => 'Student has missing grades.'], 400);
         }
 
+        if (!$user->enrolled) {
+            return response(['message' => 'Student is not enrolled to any subjects.'], 400);
+        }
+
         $failed = collect([]);
 
         foreach ($subjects as $subject) {

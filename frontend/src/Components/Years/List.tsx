@@ -147,7 +147,7 @@ const List: FC<Props> = (props) => {
 			columns={columns}
 			buttons={
 				<>
-					{user?.role === 'Registrar' ? (
+					{user?.role === 'Registrar' && items && items.length === 0 ? (
 						<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
 							<i className='fas fa-plus'></i>
 						</Link>

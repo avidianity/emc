@@ -51,9 +51,12 @@ const Sidebar: FC<Props> = (props) => {
 						<img src='/logo.jpg' alt='EMC' className='shadow border rounded-circle' style={{ height: '50px', width: '50px' }} />
 					</Link>
 					{year ? (
-						<span className='mx-auto'>
-							S.Y {year.start} - {year.end}
-						</span>
+						<>
+							<span className='mx-auto d-block'>
+								S.Y {year.start} - {year.end}
+							</span>
+							<span className='mx-auto d-block'>{year.semester}</span>
+						</>
 					) : null}
 					{user.role === 'Student' ? <span className='mx-auto'>{section?.name}</span> : null}
 				</div>

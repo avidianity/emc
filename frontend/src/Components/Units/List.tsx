@@ -50,6 +50,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Semester',
 			accessor: 'term',
+			minWidth: '150px',
 		},
 		{
 			title: 'level',
