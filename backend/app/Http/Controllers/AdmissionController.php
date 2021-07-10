@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMail;
 use App\Models\Admission;
+use App\Mail\Admission as MailAdmission;
 use App\Models\Course;
 use App\Models\Log;
 use App\Models\Mail;
 use App\Models\Major;
+use App\Models\Section;
 use App\Models\Subject;
 use App\Models\Unit;
 use App\Models\User;
@@ -352,22 +355,78 @@ class AdmissionController extends Controller
                     $data['status'] = 'Regular';
                 }
 
-                $user->admissions()->create($data);
+                $admission->update(['done' => true]);
 
-                $user->fill([
-                    'active' => false,
-                    'payment_status' => 'Not Paid',
-                ]);
+                /**
+                 * @var \App\Models\Admission
+                 */
+                $admission = $user->admissions()->create($data);
+
+                $admission->load('year');
 
                 $user->type === 'Old';
 
-                $user->save();
-
                 $incremented += 1;
 
-                $user->subjects()->detach();
+                $year = $admission->year;
+                $builder = Section::whereCourseId($admission->course_id)
+                    ->whereMajorId($admission->major_id)
+                    ->whereTerm($year->semester)
+                    ->whereLevel($admission->level)
+                    ->whereYearId($year->id)
+                    ->withCount('students')
+                    ->latest();
 
-                $admission->update(['done' => true]);
+                /**
+                 * @var \App\Models\Section|null
+                 */
+                $section = $builder->first();
+
+                if (!$section || $section->students_count >= 35) {
+                    /**
+                     * @var \App\Models\Section
+                     */
+                    $section = $year->sections()
+                        ->create([
+                            'term' => $year->semester,
+                            'level' => $admission->level,
+                            'name' => sprintf(
+                                '%s%s %s%s',
+                                $admission->course->code,
+                                $admission->major ? ' - ' . $admission->major->short_name : '',
+                                $admission->level[0],
+                                Section::NAMES[$builder->count()]
+                            ),
+                            'course_id' => $admission->course_id,
+                            'major_id' => $admission->major_id,
+                        ]);
+                }
+
+                $section->students()->attach($user->id);
+
+                $password = Str::random(5);
+
+                $user->fill([
+                    'active' => true,
+                    'payment_status' => 'Not Paid',
+                    'password' => $password,
+                ]);
+
+                $user->save();
+
+                $recipes = [$user, $request->user(), $admission, $password];
+
+                $mail = Mail::create([
+                    'uuid' => $user->uuid,
+                    'to' => $user->email,
+                    'subject' => 'Student Admission',
+                    'status' => 'Pending',
+                    'body' => (new MailAdmission(...$recipes))->render(),
+                ]);
+
+                SendMail::dispatch($mail, $recipes, MailAdmission::class);
+
+                $user->subjects()->detach();
             }
         }
 
