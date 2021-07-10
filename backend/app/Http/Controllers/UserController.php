@@ -336,15 +336,6 @@ class UserController extends Controller
             }
         }
 
-        $unitsDeduction = 0;
-
-        if ($failed->count() > 0) {
-            $unitsDeduction = $failed->reduce(function ($previous, Subject $subject) {
-                $units = (int)$subject->units;
-                return $previous + $units;
-            }, 0);
-        }
-
         $map = [
             '1st Semester' => [
                 '1st' => ['1st', '2nd Semester'],
@@ -370,7 +361,14 @@ class UserController extends Controller
             $data = $admission->toArray();
 
             $data['term'] = $term;
-            $data['level'] = $level;
+
+            if ($failed->count() === 0) {
+                $data['level'] = $level;
+            } else {
+                if ($admission->term === '2nd Semester') {
+                    return response(['message' => 'Student currently has failed grades.'], 400);
+                }
+            }
 
             $data['year_id'] = $year->id;
 
@@ -403,6 +401,8 @@ class UserController extends Controller
             } else {
                 $data['status'] = 'Regular';
             }
+
+            $admission->update(['done' => true]);
 
             /**
              * @var \App\Models\Admission
@@ -453,6 +453,10 @@ class UserController extends Controller
                 'password' => $password,
             ]);
 
+            if ($user->type === 'New') {
+                $user->type === 'Old';
+            }
+
             $user->save();
 
             $recipes = [$user, $request->user(), $admission, $password];
@@ -465,16 +469,10 @@ class UserController extends Controller
                 'body' => (new Admission(...$recipes))->render(),
             ]);
 
-            if ($user->type === 'New') {
-                $user->type === 'Old';
-            }
-
             SendMail::dispatch($mail, $recipes, Admission::class);
+
+            $user->subjects()->detach();
         }
-
-        $user->subjects()->detach();
-
-        $admission->update(['done' => true]);
 
         return response('', 204);
     }

@@ -34,7 +34,7 @@ class UnitController extends Controller
         $data = $request->validate([
             'units' => ['required', 'numeric'],
             'course_id' => ['required', 'numeric', Rule::exists(Course::class, 'id')],
-            'major_id' => ['required', 'numeric', Rule::exists(Major::class, 'id')],
+            'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'level' => ['required', 'string'],
             'term' => ['required', 'string'],
         ]);

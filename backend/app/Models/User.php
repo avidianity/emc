@@ -7,6 +7,7 @@ use App\Mail\AccountCreated;
 use App\Mail\Admission;
 use App\Models\Admission as ModelsAdmission;
 use App\Notifications\PasswordChanged;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -111,7 +112,25 @@ class User extends Authenticatable
 
     public function getRegularAttribute(): bool
     {
-        return $this->allowed_units >= 28;
+        /**
+         * @var \App\Models\Admission
+         */
+        $admission = $this->admissions()->whereHas('year', function (Builder $builder) {
+            return $builder->where('current', true);
+        })->first();
+
+        if (!$admission) {
+            /**
+             * @var \App\Models\Admission
+             */
+            $admission = $this->admissions()->latest()->first();
+        }
+
+        if (!$admission) {
+            return true;
+        }
+
+        return $admission->status === 'Regular';
     }
 
     public function getEnrolledAttribute(): bool

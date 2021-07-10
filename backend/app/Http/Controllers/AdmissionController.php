@@ -113,7 +113,7 @@ class AdmissionController extends Controller
             $student->allowed_units = $unit->units;
         } else {
             $subjects = Subject::whereCourseId($data['course_id'])
-                ->whereMajorId($data['major_id'])
+                ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
                 ->whereTerm($data['term'])
                 ->whereLevel($data['level'])
                 ->get();
@@ -284,9 +284,14 @@ class AdmissionController extends Controller
                  */
                 $grade = $subject->grades()->where('student_id', $user->id)->firstOrFail();
 
-                if ($grade->grade < 75) {
+                if ($grade->status === 'Failed') {
                     $failed->push($subject);
                 }
+            }
+
+            if ($failed->count() > 0) {
+                $failedStudents += 1;
+                continue;
             }
 
             $map = [
@@ -314,15 +319,6 @@ class AdmissionController extends Controller
                 $data = $admission->toArray();
 
                 $data['term'] = $term;
-
-                if ($failed->count() === 0) {
-                    $data['level'] = $level;
-                } else {
-                    if ($admission->term === '2nd Semester') {
-                        $failedStudents += 1;
-                        continue;
-                    }
-                }
 
                 $data['year_id'] = $year->id;
 
@@ -363,18 +359,16 @@ class AdmissionController extends Controller
                     'payment_status' => 'Not Paid',
                 ]);
 
-                if ($user->type === 'New') {
-                    $user->type === 'Old';
-                }
+                $user->type === 'Old';
 
                 $user->save();
 
                 $incremented += 1;
+
+                $user->subjects()->detach();
+
+                $admission->update(['done' => true]);
             }
-
-            $user->subjects()->detach();
-
-            $admission->update(['done' => true]);
         }
 
         Log::create([
@@ -386,6 +380,7 @@ class AdmissionController extends Controller
             'failed' => $failedStudents,
             'missing' => $missingGrades,
             'passed' => $incremented,
+            'students' => $users,
         ];
     }
 

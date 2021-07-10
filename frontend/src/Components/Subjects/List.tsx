@@ -105,7 +105,7 @@ const List: FC<Props> = (props) => {
 									href={`${axios.defaults.baseURL}/exports/teacher/classlist/${subject.id}`}
 									download
 									className={`btn btn-warning btn-sm mx-1 ${
-										subject.students && subject.students.length > 0 ? '' : 'disabled'
+										subject.students_count && subject.students_count > 0 ? '' : 'disabled'
 									}`}
 									title='Download Classlist'>
 									<i className='fas fa-file-excel'></i>

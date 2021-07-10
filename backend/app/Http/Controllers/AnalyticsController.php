@@ -14,9 +14,26 @@ class AnalyticsController extends Controller
     public function students()
     {
         return [
-            'total' => User::whereRole('student')->whereActive(true)->count(),
-            'old' => User::whereRole('student')->whereActive(true)->whereType('Old')->count(),
-            'new' => User::whereRole('student')->whereActive(true)->whereType('New')->count(),
+            'total' => User::whereRole('Student')
+                ->whereActive(true)
+                ->whereHas('admissions.year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })
+                ->count(),
+            'old' => User::whereRole('Student')
+                ->whereActive(true)
+                ->whereType('Old')
+                ->whereHas('admissions.year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })
+                ->count(),
+            'new' => User::whereRole('Student')
+                ->whereActive(true)
+                ->whereType('New')
+                ->whereHas('admissions.year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })
+                ->count(),
         ];
     }
 

@@ -24,7 +24,8 @@ class SubjectController extends Controller
          * @var \App\Models\User
          */
         $user = $request->user();
-        $builder = Subject::with('course', 'schedules', 'major');
+        $builder = Subject::with('course', 'schedules', 'major')
+            ->withCount('students');
 
         if ($user->role === 'Teacher' && !$request->has('all')) {
             $builder = $builder->whereHas('schedules', function (Builder $builder) use ($user) {

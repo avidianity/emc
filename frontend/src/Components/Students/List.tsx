@@ -11,6 +11,7 @@ import { v4 } from 'uuid';
 import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
+import { YearContract } from '../../Contracts/year.contract';
 import { handleError, Asker } from '../../helpers';
 import { useCurrentYear, useNullable } from '../../hooks';
 import { State } from '../../Libraries/State';
@@ -19,6 +20,8 @@ import { courseService } from '../../Services/course.service';
 import { gradeService } from '../../Services/grade.service';
 import { subjectService } from '../../Services/subject.service';
 import { userService } from '../../Services/user.service';
+import { yearService } from '../../Services/year.service';
+import Flatpickr from 'react-flatpickr';
 
 import Table from '../Shared/Table';
 
@@ -38,6 +41,7 @@ type UserInput = {
 type Props = {};
 
 const List: FC<Props> = (props) => {
+	const [processing, setProcessing] = useState(false);
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('users', () => userService.fetch());
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
@@ -55,9 +59,27 @@ const List: FC<Props> = (props) => {
 	const { register: registerUser, handleSubmit: handleSubmitUser, reset: resetUser, setValue: setValueUser } = useForm<UserInput>();
 	const [student, setStudent] = useNullable<number>();
 	const addGradeModalRef = createRef<HTMLDivElement>();
+	const incrementModalRef = v4();
 	const updatePaymentModalRef = v4();
 	const { data: year } = useCurrentYear();
 	const history = useHistory();
+	const [semesterStart, setSemesterStart] = useNullable<Date>();
+	const [semesterEnd, setSemesterEnd] = useNullable<Date>();
+	const [registrationStart, setRegistrationStart] = useNullable<Date>();
+	const [registrationEnd, setRegistrationEnd] = useNullable<Date>();
+	const [gradeStart, setGradeStart] = useNullable<Date>();
+	const [gradeEnd, setGradeEnd] = useNullable<Date>();
+	const {
+		register,
+		handleSubmit: yearHandleSubmit,
+		reset: yearReset,
+	} = useForm<YearContract>({
+		defaultValues: {
+			start: new Date().getFullYear(),
+			end: new Date().getFullYear() + 1,
+			current: true,
+		},
+	});
 
 	const determine = useCallback(() => {
 		if (history.location.pathname.includes('old')) {
@@ -82,28 +104,48 @@ const List: FC<Props> = (props) => {
 		handleError(error);
 	}
 
-	const evaluate = async () => {
-		if (await Asker.notice('Are you sure you want to evaluate all students?', 'Notice')) {
+	const submitYear = async (data: YearContract) => {
+		if (await Asker.notice('Are you sure you want to evaluate all students into a new school year?', 'Notice')) {
+			setProcessing(true);
 			try {
-				toastr.info('Processing students. Please wait.', 'Notice');
-				const {
-					data: { missing, failed, passed },
-				} = await axios.post<{ missing: number; failed: number; passed: number }>('/admissions/increment');
-				toastr.success(
-					`Processing done. 
+				data.semester_start = semesterStart?.toJSON() || '';
+				data.semester_end = semesterEnd?.toJSON() || '';
+				data.registration_start = registrationStart?.toJSON() || '';
+				data.registration_end = registrationEnd?.toJSON() || '';
+				data.grade_start = gradeStart?.toJSON() || '';
+				data.grade_end = gradeEnd?.toJSON() || '';
+				data.current = true;
+				await yearService.create(data);
+				await evaluate();
+				reset();
+			} catch (error) {
+				handleError(error);
+			} finally {
+				setProcessing(false);
+			}
+		}
+	};
+
+	const evaluate = async () => {
+		try {
+			toastr.info('Processing students. Please wait.', 'Notice');
+			const {
+				data: { missing, failed, passed },
+			} = await axios.post<{ missing: number; failed: number; passed: number }>('/admissions/increment');
+			toastr.success(
+				`Processing done. 
                     <br />Passed Students: ${passed}
                     <br />Failed Students: ${failed} 
                     <br />Subjects with missing grades: ${missing}`,
-					'Success',
-					{
-						escapeHtml: false,
-					}
-				);
-				refetch();
-			} catch (error) {
-				toastr.error('Unable to process students.');
-				console.log(error);
-			}
+				'Success',
+				{
+					escapeHtml: false,
+				}
+			);
+			refetch();
+		} catch (error) {
+			toastr.error('Unable to process students.');
+			console.log(error);
 		}
 	};
 
@@ -213,6 +255,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Units Available',
 			accessor: 'allowed_units',
+			minWidth: '150px',
 		},
 		{
 			title: 'Payment Status',
@@ -322,7 +365,7 @@ const List: FC<Props> = (props) => {
 											) : null}
 										</>
 									) : null}
-									{['Registrar', 'Admin'].includes(user?.role || '') ? (
+									{['Registrar', 'Admin'].includes(user?.role || '') && !isBehind(student) ? (
 										<Link
 											to={`${routes.DASHBOARD}${routes.STUDENTS}/${student.id}/subjects`}
 											className='btn btn-primary btn-sm mx-1'
@@ -416,15 +459,17 @@ const List: FC<Props> = (props) => {
 					<>
 						{user?.role === 'Registrar' ? (
 							<>
-								<button
-									className='btn btn-secondary btn-sm mx-1'
-									title='Evaluate Students'
-									onClick={(e) => {
-										e.preventDefault();
-										evaluate();
-									}}>
-									<i className='fas fa-chevron-up'></i>
-								</button>
+								{type !== 'Behind' ? (
+									<button
+										className='btn btn-secondary btn-sm mx-1'
+										title='Evaluate Students'
+										onClick={(e) => {
+											e.preventDefault();
+											$(`#${incrementModalRef}`).modal('show');
+										}}>
+										<i className='fas fa-chevron-up'></i>
+									</button>
+								) : null}
 								<a
 									href={`${axios.defaults.baseURL}/exports/registrar/classlist/regular-and-irregular`}
 									download
@@ -528,6 +573,182 @@ const List: FC<Props> = (props) => {
 								</button>
 								<button type='button' className='btn btn-secondary btn-sm' data-dismiss='modal'>
 									Close
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div id={incrementModalRef} className='modal fade' tabIndex={-1}>
+				<div className='modal-dialog modal-dialog-centered modal-lg'>
+					<div className='modal-content'>
+						<form onSubmit={yearHandleSubmit(submitYear)}>
+							<div className='modal-header'>
+								<h5 className='modal-title'>Increment to new School Year</h5>
+								<button
+									type='button'
+									className='close'
+									onClick={(e) => {
+										e.preventDefault();
+										$(`#${incrementModalRef}`).modal('hide');
+										yearReset();
+									}}>
+									<span>&times;</span>
+								</button>
+							</div>
+							<div className='modal-body'>
+								<div className='mb-3'>
+									<p>
+										Current Year: {year?.start} - {year?.end}
+									</p>
+									<p>Current Semester: {year?.semester}</p>
+								</div>
+								<div className='form-row'>
+									<div className='form-group col-12 col-md-6'>
+										<label htmlFor='start'>Start</label>
+										<input
+											{...register('start')}
+											type='number'
+											id='start'
+											min={new Date().getFullYear()}
+											max={new Date().getFullYear() + 10}
+											className='form-control'
+											disabled={processing}
+										/>
+									</div>
+									<div className='form-group col-12 col-md-6'>
+										<label htmlFor='end'>End</label>
+										<input
+											{...register('end')}
+											type='number'
+											id='end'
+											min={new Date().getFullYear()}
+											max={new Date().getFullYear() + 10}
+											className='form-control'
+											disabled={processing}
+										/>
+									</div>
+									<div className='form-group col-12'>
+										<label htmlFor='semester'>Semester</label>
+										<select {...register('semester')} id='semester' className='form-control'>
+											<option value=''> -- Select -- </option>
+											<option value='1st Semester'>1st Semester</option>
+											<option value='2nd Semester'>2nd Semester</option>
+											<option value='Summer'>Summer</option>
+										</select>
+									</div>
+									<div className='form-group col-12 col-md-6'>
+										<label htmlFor='semester_start'>Semester Start</label>
+										<Flatpickr
+											value={semesterStart || undefined}
+											id='semester_start'
+											onChange={(dates) => {
+												if (dates.length > 0) {
+													setSemesterStart(dates[0]);
+												}
+											}}
+											className='form-control'
+											disabled={processing}
+										/>
+									</div>
+									<div className='form-group col-12 col-md-6'>
+										<label htmlFor='semester_end'>Semester End</label>
+										<Flatpickr
+											value={semesterEnd || undefined}
+											id='semester_end'
+											onChange={(dates) => {
+												if (dates.length > 0) {
+													setSemesterEnd(dates[0]);
+												}
+											}}
+											className='form-control'
+											disabled={processing}
+										/>
+									</div>
+									<div className='form-group col-12 col-md-6'>
+										<label htmlFor='registration_start'>Registration Start</label>
+										<Flatpickr
+											value={registrationStart || undefined}
+											id='registration_start'
+											onChange={(dates) => {
+												if (dates.length > 0) {
+													setRegistrationStart(dates[0]);
+												}
+											}}
+											className='form-control'
+											disabled={processing}
+										/>
+									</div>
+									<div className='form-group col-12 col-md-6'>
+										<label htmlFor='registration_end'>Registration End</label>
+										<Flatpickr
+											value={registrationEnd || undefined}
+											id='registration_end'
+											onChange={(dates) => {
+												if (dates.length > 0) {
+													setRegistrationEnd(dates[0]);
+												}
+											}}
+											className='form-control'
+											disabled={processing}
+										/>
+									</div>
+									<div className='form-group col-12 col-md-6'>
+										<label htmlFor='grade_start'>Grade Encoding Start</label>
+										<Flatpickr
+											value={gradeStart || undefined}
+											id='grade_start'
+											onChange={(dates) => {
+												if (dates.length > 0) {
+													setGradeStart(dates[0]);
+												}
+											}}
+											className='form-control'
+											disabled={processing}
+											options={{
+												altInput: true,
+												altFormat: 'F j, Y G:i K',
+												enableTime: true,
+												dateFormat: 'F j, Y G:i K',
+											}}
+										/>
+									</div>
+									<div className='form-group col-12 col-md-6'>
+										<label htmlFor='grade_end'>Grade Encoding End</label>
+										<Flatpickr
+											value={gradeEnd || undefined}
+											id='grade_end'
+											onChange={(dates) => {
+												if (dates.length > 0) {
+													setGradeEnd(dates[0]);
+												}
+											}}
+											className='form-control'
+											disabled={processing}
+											options={{
+												altInput: true,
+												altFormat: 'F j, Y G:i K',
+												enableTime: true,
+												dateFormat: 'F j, Y G:i K',
+											}}
+										/>
+									</div>
+								</div>
+							</div>
+							<div className='modal-footer d-flex'>
+								<button
+									type='button'
+									className='btn btn-secondary'
+									onClick={(e) => {
+										e.preventDefault();
+										$(`#${incrementModalRef}`).modal('hide');
+										yearReset();
+									}}
+									disabled={processing}>
+									Return
+								</button>
+								<button type='submit' className='btn btn-primary ml-auto' disabled={processing}>
+									Submit
 								</button>
 							</div>
 						</form>

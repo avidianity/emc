@@ -159,10 +159,32 @@ const View: FC<Props> = (props) => {
 										<>
 											{findGrade(student) && !setGrade ? (
 												<span
-													onClick={(e) => {
-														e.preventDefault();
+													onClick={async () => {
+														if (year) {
+															const now = dayjs();
+															const start = dayjs(year.grade_start);
+															const end = dayjs(year.grade_end);
+															if (now.isBefore(start)) {
+																await Asker.okay(
+																	`Encoding of grades will start at ${start.format(
+																		'MMMM DD, YYYY hh:mm A'
+																	)}. Please wait until the given date.`,
+																	'Notice'
+																);
+																return history.goBack();
+															}
+															if (now.isAfter(end)) {
+																await Asker.okay(`Encoding of grades has already ended.`, 'Notice');
+																return history.goBack();
+															}
+														}
 														const grade = findGrade(student);
 														if (grade) {
+															if (grade.grade >= 75) {
+																setValue('status', 'Passed');
+															} else {
+																setValue('status', 'Failed');
+															}
 															setGradeAmount(grade.grade);
 														}
 														setSetGrade(true);
@@ -217,10 +239,35 @@ const View: FC<Props> = (props) => {
 														<>
 															{findGrade(student) ? (
 																<span
-																	onClick={(e) => {
-																		e.preventDefault();
+																	onClick={async () => {
+																		if (year) {
+																			const now = dayjs();
+																			const start = dayjs(year.grade_start);
+																			const end = dayjs(year.grade_end);
+																			if (now.isBefore(start)) {
+																				await Asker.okay(
+																					`Encoding of grades will start at ${start.format(
+																						'MMMM DD, YYYY hh:mm A'
+																					)}. Please wait until the given date.`,
+																					'Notice'
+																				);
+																				return history.goBack();
+																			}
+																			if (now.isAfter(end)) {
+																				await Asker.okay(
+																					`Encoding of grades has already ended.`,
+																					'Notice'
+																				);
+																				return history.goBack();
+																			}
+																		}
 																		const grade = findGrade(student);
 																		if (grade) {
+																			if (grade.grade >= 75) {
+																				setValue('status', 'Passed');
+																			} else {
+																				setValue('status', 'Failed');
+																			}
 																			setGradeAmount(grade.grade);
 																		}
 																		setSetGrade(true);
