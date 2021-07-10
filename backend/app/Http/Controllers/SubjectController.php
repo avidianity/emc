@@ -176,11 +176,6 @@ class SubjectController extends Controller
         $user->subjects()->sync($data['subjects']);
         $user->load(['subjects']);
 
-        if ($user->type === 'New') {
-            $user->type = 'Old';
-            $user->save();
-        }
-
         return $user;
     }
 }

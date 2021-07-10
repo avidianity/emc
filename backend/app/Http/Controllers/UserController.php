@@ -454,7 +454,7 @@ class UserController extends Controller
             ]);
 
             if ($user->type === 'New') {
-                $user->type === 'Old';
+                $user->type = 'Old';
             }
 
             $user->save();

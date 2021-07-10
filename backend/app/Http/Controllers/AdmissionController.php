@@ -364,7 +364,7 @@ class AdmissionController extends Controller
 
                 $admission->load('year');
 
-                $user->type === 'Old';
+                $user->type = 'Old';
 
                 $incremented += 1;
 

@@ -251,6 +251,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Section',
 			accessor: 'section',
+			minWidth: '200px',
 		},
 		{
 			title: 'Units Available',
