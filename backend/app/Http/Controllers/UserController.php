@@ -306,7 +306,7 @@ class UserController extends Controller
         }
 
         if ($admission->year->current) {
-            return response(['message' => 'Student is currently enrolled to current school year.'], 400);
+            return response(['message' => 'Student is already currently enrolled to current school year.'], 400);
         }
 
         $subjects = $user->subjects;

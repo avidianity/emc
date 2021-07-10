@@ -117,6 +117,7 @@ const List: FC<Props> = (props) => {
 				data.current = true;
 				await yearService.create(data);
 				await evaluate();
+				$(`#${incrementModalRef}`).modal('hide');
 				reset();
 			} catch (error) {
 				handleError(error);
