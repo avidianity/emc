@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\SendMail;
 use App\Models\Admission;
-use App\Mail\Admission as MailAdmission;
 use App\Models\Course;
 use App\Models\Log;
-use App\Models\Mail;
 use App\Models\Major;
 use App\Models\Section;
 use App\Models\Subject;
@@ -406,27 +403,12 @@ class AdmissionController extends Controller
 
                 $section->students()->attach($user->id);
 
-                $password = Str::random(5);
-
                 $user->fill([
                     'active' => true,
                     'payment_status' => 'Not Paid',
-                    'password' => $password,
                 ]);
 
                 $user->save();
-
-                $recipes = [$user, $request->user(), $admission, $password];
-
-                $mail = Mail::create([
-                    'uuid' => $user->uuid,
-                    'to' => $user->email,
-                    'subject' => 'Student Admission',
-                    'status' => 'Pending',
-                    'body' => (new MailAdmission(...$recipes))->render(),
-                ]);
-
-                SendMail::dispatch($mail, $recipes, MailAdmission::class);
             }
         }
 

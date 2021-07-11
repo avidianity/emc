@@ -449,12 +449,9 @@ class UserController extends Controller
 
             $section->students()->attach($user->id);
 
-            $password = Str::random(5);
-
             $user->fill([
                 'active' => true,
                 'payment_status' => 'Not Paid',
-                'password' => $password,
             ]);
 
             if ($user->type === 'New') {
@@ -462,18 +459,6 @@ class UserController extends Controller
             }
 
             $user->save();
-
-            $recipes = [$user, $request->user(), $admission, $password];
-
-            $mail = Mail::create([
-                'uuid' => $user->uuid,
-                'to' => $user->email,
-                'subject' => 'Student Admission',
-                'status' => 'Pending',
-                'body' => (new Admission(...$recipes))->render(),
-            ]);
-
-            SendMail::dispatch($mail, $recipes, Admission::class);
 
             $user->subjects()->detach();
         }
