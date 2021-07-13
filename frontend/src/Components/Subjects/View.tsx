@@ -43,6 +43,7 @@ const View: FC<Props> = (props) => {
 			data.teacher_id = user!.id!;
 			data.subject_id = subject?.id || id;
 			data.grade = gradeAmount;
+			data.status = gradeAmount >= 75 ? 'Passed' : 'Failed';
 			await gradeService.create(data);
 			await refetch();
 			toastr.success('Grade saved succesfully.');
