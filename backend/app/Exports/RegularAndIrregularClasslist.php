@@ -16,7 +16,6 @@ class RegularAndIrregularClasslist implements FromView
     {
         foreach (User::whereRole('Student')
             ->whereActive(true)
-            ->has('subjects')
             ->with('sections.year')
             ->get() as $student) {
             if ($student->regular) {
