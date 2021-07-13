@@ -53,10 +53,16 @@ class AnalyticsController extends Controller
             'males' => User::whereRole('student')
                 ->whereGender('Male')
                 ->whereActive(true)
+                ->whereHas('admissions.year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })
                 ->count(),
             'females' => User::whereRole('student')
                 ->whereGender('Female')
                 ->whereActive(true)
+                ->whereHas('admissions.year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })
                 ->count(),
         ];
     }
@@ -73,6 +79,9 @@ class AnalyticsController extends Controller
     {
         return [
             'pending' => User::whereRole('Student')
+                ->whereHas('admissions.year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })
                 ->whereActive(false)
                 ->count(),
         ];

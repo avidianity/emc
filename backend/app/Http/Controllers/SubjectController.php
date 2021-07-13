@@ -7,6 +7,7 @@ use App\Models\Log;
 use App\Models\Major;
 use App\Models\Subject;
 use App\Models\User;
+use App\Models\Year;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -31,6 +32,15 @@ class SubjectController extends Controller
             $builder = $builder->whereHas('schedules', function (Builder $builder) use ($user) {
                 return $builder->where('teacher_id', $user->id);
             });
+
+            /**
+             * @var \App\Models\Year|null
+             */
+            $year = Year::whereCurrent(true)->first();
+
+            if ($year) {
+                $builder = $builder->where('term', $year->semester);
+            }
         }
 
         return $builder->get();

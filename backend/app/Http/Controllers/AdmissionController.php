@@ -284,7 +284,7 @@ class AdmissionController extends Controller
                  */
                 $grade = $subject->grades()->where('student_id', $user->id)->firstOrFail();
 
-                if ($grade->status === 'Failed') {
+                if ($grade->status === 'Failed' || $grade->grade < 75) {
                     $failed->push($subject);
                 }
             }

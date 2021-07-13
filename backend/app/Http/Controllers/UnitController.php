@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Log;
 use App\Models\Major;
 use App\Models\Unit;
 use Illuminate\Http\Request;
@@ -54,6 +55,13 @@ class UnitController extends Controller
             $unit = Unit::create($data);
         }
 
+        $user = $request->user();
+
+        Log::create([
+            'payload' => $user,
+            'message' => sprintf('%s has created a unit for a course.', $user->role),
+        ]);
+
         return $unit;
     }
 
@@ -89,6 +97,13 @@ class UnitController extends Controller
 
         $unit->update($data);
 
+        $user = $request->user();
+
+        Log::create([
+            'payload' => $user,
+            'message' => sprintf('%s has updated a unit for a course.', $user->role),
+        ]);
+
         return $unit;
     }
 
@@ -98,9 +113,16 @@ class UnitController extends Controller
      * @param  \App\Models\Unit  $unit
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Unit $unit)
+    public function destroy(Request $request, Unit $unit)
     {
         $unit->delete();
+
+        $user = $request->user();
+
+        Log::create([
+            'payload' => $user,
+            'message' => sprintf('%s has deleted a unit for a course.', $user->role),
+        ]);
 
         return response('', 204);
     }

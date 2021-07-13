@@ -335,7 +335,7 @@ class UserController extends Controller
              */
             $grade = $subject->grades()->where('student_id', $user->id)->firstOrFail();
 
-            if ($grade->grade < 75) {
+            if ($grade->grade < 75 || $grade->status === 'Failed') {
                 $failed->push($subject);
             }
         }
