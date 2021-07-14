@@ -87,15 +87,6 @@ const Grades: FC<Props> = (props) => {
 						<tbody>
 							{subjects
 								?.filter((subject) => {
-									const grade = admission.student?.grades?.find(
-										(grade) => grade?.subject?.id === subject.id && grade.year_id === admission.year_id
-									);
-									if (grade) {
-										return false;
-									}
-									return true;
-								})
-								.filter((subject) => {
 									if (admission.year?.current) {
 										return admission.student?.subjects?.find((s) => s.id === subject.id) ? true : false;
 									} else {
