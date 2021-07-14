@@ -99,6 +99,14 @@ const Grades: FC<Props> = (props) => {
 									}
 									return true;
 								})
+								.filter((subject) => {
+									return (
+										subject.level === admission.level &&
+										subject.term === admission.term &&
+										subject.course_id === admission.course_id &&
+										subject.major_id === admission.major_id
+									);
+								})
 								.map((subject) => (
 									<tr key={index}>
 										<td className='text-center'>{subject?.code}</td>

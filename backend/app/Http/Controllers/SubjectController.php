@@ -181,7 +181,7 @@ class SubjectController extends Controller
             ->find($data['subjects']);
 
         $units = $subjects->reduce(function (int $previous, Subject $subject) {
-            $units = (int)$subject->units;
+            $units = $subject->units;
             return $previous + $units;
         }, 0);
 
