@@ -22,7 +22,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Message',
 			accessor: 'message',
-			minWidth: '200px',
+			minWidth: '300px',
 		},
 		{
 			title: 'IP Address',

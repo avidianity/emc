@@ -24,10 +24,13 @@ class Log extends Model
     protected static function booted()
     {
         static::creating(function (self $log) {
-            $log->ip_address = request()->ip() ?? '127.0.0.1';
-            $platform = Agent::platform();
-            $log->device = sprintf('%s - %s %s', Str::ucfirst(Agent::deviceType()), $platform, Agent::version($platform));
-            $log->browser = Agent::browser() ?? 'Generic';
+            $request = request();
+            $agent = $request->userAgent();
+            $log->ip_address = $request->ip() ?? '127.0.0.1';
+            $platform = Agent::platform($agent);
+            $log->device = sprintf('%s - %s %s', Str::ucfirst(Agent::deviceType($agent)), $platform, Agent::version($platform));
+            $browser = Agent::browser($agent);
+            $log->browser =  gettype($browser) === 'string' ? $browser : 'Generic';
         });
     }
 }
