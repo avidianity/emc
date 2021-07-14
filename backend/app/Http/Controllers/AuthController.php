@@ -76,7 +76,8 @@ class AuthController extends Controller
                 'year',
                 'student.grades.subject',
                 'student.grades.teacher',
-                'student.subjects'
+                'student.subjects',
+                'student.previousSubjects',
             ])
             ->get();
     }

@@ -1,16 +1,20 @@
 import axios from 'axios';
 import React, { FC, Fragment, useEffect } from 'react';
+import { useQuery } from 'react-query';
 import { AdmissionContract } from '../../../Contracts/admission.contract';
+import { SubjectContract } from '../../../Contracts/subject.contract';
 import { UserContract } from '../../../Contracts/user.contract';
 import { handleError } from '../../../helpers';
 import { useArray } from '../../../hooks';
 import { State } from '../../../Libraries/State';
+import { subjectService } from '../../../Services/subject.service';
 
 type Props = {};
 
 const Grades: FC<Props> = (props) => {
 	const state = State.getInstance();
 	const user = state.get<UserContract>('user');
+	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
 	const [admissions, setAdmissions] = useArray<AdmissionContract>();
 
 	const fetch = async () => {
@@ -20,6 +24,11 @@ const Grades: FC<Props> = (props) => {
 		} catch (error) {
 			handleError(error);
 		}
+	};
+
+	const findGrade = (subject: SubjectContract, admission: AdmissionContract) => {
+		const student = admission.student;
+		return student?.grades?.find((grade) => grade.year_id === admission.id && grade.subject_id === subject.id);
 	};
 
 	useEffect(() => {
@@ -76,20 +85,7 @@ const Grades: FC<Props> = (props) => {
 							</tr>
 						</thead>
 						<tbody>
-							{admission.student?.grades
-								?.filter((grade) => grade.year_id === admission.year_id)
-								.map((grade, index) => (
-									<tr key={index}>
-										<td className='text-center'>{grade.subject?.code}</td>
-										<td className='text-center' style={{ minWidth: '100px' }}>
-											{grade.subject?.description}
-										</td>
-										<td className='text-center'>{grade.subject?.units}</td>
-										<td className='text-center'>{grade.grade}%</td>
-										<td className='text-center'>{grade.status}</td>
-									</tr>
-								))}
-							{admission.student?.subjects
+							{subjects
 								?.filter((subject) => {
 									const grade = admission.student?.grades?.find(
 										(grade) => grade?.subject?.id === subject.id && grade.year_id === admission.year_id
@@ -98,6 +94,13 @@ const Grades: FC<Props> = (props) => {
 										return false;
 									}
 									return true;
+								})
+								.filter((subject) => {
+									if (admission.year?.current) {
+										return admission.student?.subjects?.find((s) => s.id === subject.id) ? true : false;
+									} else {
+										return admission.student?.previousSubjects?.find((s) => s.id === subject.id) ? true : false;
+									}
 								})
 								.filter((subject) => {
 									return (
@@ -114,8 +117,16 @@ const Grades: FC<Props> = (props) => {
 											{subject?.description}
 										</td>
 										<td className='text-center'>{subject?.units}</td>
-										<td className='text-center'>-</td>
-										<td className='text-center'>{admission.year?.current ? '-' : 'INC'}</td>
+										<td className='text-center'>
+											{findGrade(subject, admission) ? `${findGrade(subject, admission)?.grade}%` : '-'}
+										</td>
+										<td className='text-center'>
+											{admission.year?.current
+												? findGrade(subject, admission)
+													? findGrade(subject, admission)?.status
+													: '-'
+												: 'INC'}
+										</td>
 									</tr>
 								))}
 							<tr>
