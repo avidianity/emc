@@ -133,6 +133,11 @@ class User extends Authenticatable
         return $admission->status === 'Regular';
     }
 
+    public function previousSubjects()
+    {
+        return $this->hasMany(PreviousSubject::class, 'student_id');
+    }
+
     public function getEnrolledAttribute(): bool
     {
         return $this->subjects()->count() > 0;

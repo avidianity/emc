@@ -460,6 +460,10 @@ class UserController extends Controller
 
             $user->save();
 
+            $user->previousSubjects()->createMany($user->subjects->map(function (Subject $subject) {
+                return ['subject_id' => $subject->id];
+            }));
+
             $user->subjects()->detach();
         }
 

@@ -359,6 +359,10 @@ class AdmissionController extends Controller
                  */
                 $admission = $user->admissions()->create($data);
 
+                $user->previousSubjects()->createMany($user->subjects->map(function (Subject $subject) {
+                    return ['subject_id' => $subject->id];
+                }));
+
                 $user->subjects()->detach();
 
                 $admission->load('year');

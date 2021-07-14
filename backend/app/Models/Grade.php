@@ -18,6 +18,13 @@ class Grade extends Model
         'year_id',
     ];
 
+    protected static function booted()
+    {
+        static::saving(function (self $grade) {
+            $grade->status = $grade->grade >= 75 ? 'Passed' : 'Failed';
+        });
+    }
+
     public function student()
     {
         return $this->belongsTo(User::class, 'student_id');
