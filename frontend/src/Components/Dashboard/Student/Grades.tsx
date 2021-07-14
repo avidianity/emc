@@ -126,20 +126,23 @@ const Grades: FC<Props> = (props) => {
 								</td>
 								<td></td>
 								<td className='text-center'>
-									{(admission.student?.grades
-										?.filter((grade) => grade.year_id === admission.year_id)
-										.reduce((previous, next) => previous + next.subject!.units, 0) || 0) +
-										(admission.student?.subjects
-											?.filter((subject) => {
-												const grade = admission.student?.grades?.find(
-													(grade) => grade?.subject?.id === subject.id && grade.year_id === admission.year_id
-												);
-												if (grade) {
-													return false;
-												}
-												return true;
-											})
-											.reduce((previous, next) => previous + next!.units, 0) || 0)}
+									{subjects
+										?.filter((subject) => {
+											if (admission.year?.current) {
+												return admission.student?.subjects?.find((s) => s.id === subject.id) ? true : false;
+											} else {
+												return admission.student?.previousSubjects?.find((s) => s.id === subject.id) ? true : false;
+											}
+										})
+										.filter((subject) => {
+											return (
+												subject.level === admission.level &&
+												subject.term === admission.term &&
+												subject.course_id === admission.course_id &&
+												subject.major_id === admission.major_id
+											);
+										})
+										.reduce((prev, next) => prev + next.units, 0) || 0}
 								</td>
 								<td></td>
 								<td></td>
