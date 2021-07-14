@@ -15,7 +15,6 @@ use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\YearController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*

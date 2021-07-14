@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Grade;
 use App\Models\Log;
 use App\Models\Major;
+use App\Models\PreviousSubject;
 use App\Models\Subject;
 use App\Models\User;
-use App\Models\Year;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -31,16 +32,7 @@ class SubjectController extends Controller
         if ($user->role === 'Teacher' && !$request->has('all')) {
             $builder = $builder->whereHas('schedules', function (Builder $builder) use ($user) {
                 return $builder->where('teacher_id', $user->id);
-            });
-
-            /**
-             * @var \App\Models\Year|null
-             */
-            $year = Year::whereCurrent(true)->first();
-
-            if ($year) {
-                $builder = $builder->where('term', $year->semester);
-            }
+            })->latest();
         }
 
         return $builder->get();
@@ -102,6 +94,7 @@ class SubjectController extends Controller
             'course.majors',
             'students.grades.year',
             'students.admissions.year',
+            'students.previousSubjects.subject',
             'major',
             'schedules',
         ]);
@@ -172,7 +165,20 @@ class SubjectController extends Controller
 
         $data = $request->all();
 
-        $subjects = Subject::find($data['subjects']);
+        /**
+         * @var \App\Models\Admission
+         */
+        $admission = $user->admissions()->whereHas('year', function (Builder $builder) {
+            return $builder->where('current', true);
+        })->first();
+
+        if (!$admission) {
+            return response(['message' => 'Student is not admitted to current school year.'], 400);
+        }
+
+        $subjects = Subject::whereTerm($admission->term)
+            ->whereLevel($admission->level)
+            ->find($data['subjects']);
 
         $units = $subjects->reduce(function (int $previous, Subject $subject) {
             $units = (int)$subject->units;
@@ -187,5 +193,41 @@ class SubjectController extends Controller
         $user->load(['subjects']);
 
         return $user;
+    }
+
+    public function missing(Request $request)
+    {
+        /**
+         * @var \App\Models\User
+         */
+        $teacher = $request->user();
+
+        /**
+         * @var \Illuminate\Database\Eloquent\Collection<mixed, \App\Models\Subject>
+         */
+        $subjects = PreviousSubject::whereHas('subject.schedules', function (Builder $builder) use ($teacher) {
+            return $builder->where('teacher_id', $teacher->id);
+        })
+            ->with([
+                'subject.course',
+                'subject.schedule',
+                'subject.major',
+                'student.grades'
+            ])
+            ->latest()
+            ->get()
+            ->filter(function (PreviousSubject $previousSubject) {
+                $student = $previousSubject->student;
+                $subject = $previousSubject->subject;
+
+                return $student->grades->first(function (Grade $grade) use ($subject) {
+                    return $grade->subject_id === $subject->id;
+                }) ? false : true;
+            })
+            ->map(function (PreviousSubject $previousSubject) {
+                return $previousSubject->subject;
+            });
+
+        return $subjects;
     }
 }

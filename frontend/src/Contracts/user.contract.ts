@@ -1,6 +1,7 @@
 import { AdmissionContract } from './admission.contract';
 import { GradeContract } from './grade.contract';
 import { ModelContract } from './model.contract';
+import { PreviousSubjectContract } from './previous-subject.contract';
 import { SectionContract } from './section.contract';
 import { SubjectContract } from './subject.contract';
 
@@ -31,4 +32,5 @@ export interface UserContract extends ModelContract {
 	enrolled: boolean;
 	payment_status: 'Not Paid' | 'Fully Paid' | 'Partially Paid';
 	sections?: SectionContract[];
+	previousSubjects?: PreviousSubjectContract[];
 }

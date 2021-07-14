@@ -1,10 +1,11 @@
+import { AxiosError } from 'axios';
 import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useQuery } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
-import { SubjectContract } from '../../Contracts/subject.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { Asker, handleError } from '../../helpers';
 import { useCurrentYear, useNullable } from '../../hooks';
@@ -29,8 +30,7 @@ const View: FC<Props> = (props) => {
 	const id = params.id.toNumber();
 	const history = useHistory();
 	const [studentID, setStudentID] = useNullable<number>();
-	const [subject, setSubject] = useNullable<SubjectContract>();
-	const [loading, setLoading] = useState(false);
+	const { data: subject, isLoading: loading, isError, error, refetch } = useQuery(['subjects', id], () => subjectService.fetchOne(id));
 	const [setGrade, setSetGrade] = useState(false);
 	const [gradeAmount, setGradeAmount] = useState(0);
 	const { register, handleSubmit, reset, setValue } = useForm<Inputs>();
@@ -56,24 +56,16 @@ const View: FC<Props> = (props) => {
 		}
 	};
 
-	const refetch = async () => {
-		setLoading(true);
-		try {
-			const subject = await subjectService.fetchOne(id);
-			setSubject(subject);
-			setLoading(false);
-		} catch (error) {
-			if (error?.response?.status === 404) {
-				toastr.error('Subject does not exist.');
-				setTimeout(() => history.goBack(), 1000);
-			} else {
-				handleError(error);
-			}
-		}
-	};
+	if (isError && (error as AxiosError)?.response?.status === 404) {
+		toastr.error('Subject does not exist.');
+		history.goBack();
+	}
 
-	const findGrade = (student: UserContract) =>
-		student.grades?.find((grade) => grade.teacher_id === user?.id && grade.year?.current && grade.subject_id === subject?.id);
+	const findGrade = (student: UserContract, current = true) => {
+		return student.grades?.find(
+			(grade) => grade.teacher_id === user?.id && grade.year?.current === current && grade.subject_id === subject?.id
+		);
+	};
 
 	useEffect(() => {
 		refetch();
