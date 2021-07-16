@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import { AdmissionContract } from '../../../Contracts/admission.contract';
 import { SubjectContract } from '../../../Contracts/subject.contract';
 import { UserContract } from '../../../Contracts/user.contract';
-import { handleError } from '../../../helpers';
+import { handleError, toBool } from '../../../helpers';
 import { useArray } from '../../../hooks';
 import { State } from '../../../Libraries/State';
 import { subjectService } from '../../../Services/subject.service';
@@ -31,6 +31,26 @@ const Grades: FC<Props> = (props) => {
 		return student?.grades?.find((grade) => grade.year_id === admission.id && grade.subject_id === subject.id);
 	};
 
+	const filterSubjects = (admission: AdmissionContract) => {
+		return (
+			subjects
+				?.filter((subject) => {
+					return toBool(
+						admission.student?.previous_subjects?.find((s) => s.id === subject.id) ||
+							admission.student?.subjects?.find((s) => s.id === subject.id)
+					);
+				})
+				.filter((subject) => {
+					return (
+						subject.level === admission.level &&
+						subject.term === admission.term &&
+						subject.course_id === admission.course_id &&
+						subject.major_id === admission.major_id
+					);
+				}) || []
+		);
+	};
+
 	useEffect(() => {
 		fetch();
 		// eslint-disable-next-line
@@ -49,7 +69,7 @@ const Grades: FC<Props> = (props) => {
 				</div>
 			</div>
 			{admissions.map((admission, index) => (
-				<Fragment key={index}>
+				<Fragment key={`admission-${index}`}>
 					<div className='d-flex mt-5'>
 						<span className='mr-auto'>
 							<b>Name:</b> {user.last_name}, {user.first_name} {user.middle_name || ''}
@@ -85,70 +105,32 @@ const Grades: FC<Props> = (props) => {
 							</tr>
 						</thead>
 						<tbody>
-							{subjects
-								?.filter((subject) => {
-									if (admission.year?.current) {
-										return admission.student?.subjects?.find((s) => s.id === subject.id) ? true : false;
-									} else {
-										return admission.student?.previous_subjects?.find((s) => s.id === subject.id) ? true : false;
-									}
-								})
-								.filter((subject) => {
-									return (
-										subject.level === admission.level &&
-										subject.term === admission.term &&
-										subject.course_id === admission.course_id &&
-										subject.major_id === admission.major_id
-									);
-								})
-								.filter((s) => {
-									console.log(s);
-									return true;
-								})
-								.map((subject) => (
-									<tr key={index}>
-										<td className='text-center'>{subject?.code}</td>
-										<td className='text-center' style={{ minWidth: '100px' }}>
-											{subject?.description}
-										</td>
-										<td className='text-center'>{subject?.units}</td>
-										<td className='text-center'>
-											{findGrade(subject, admission) ? `${findGrade(subject, admission)?.grade}%` : '-'}
-										</td>
-										<td className='text-center'>
-											{admission.year?.current
-												? findGrade(subject, admission)
-													? findGrade(subject, admission)?.status
-													: '-'
-												: 'INC'}
-										</td>
-									</tr>
-								))}
+							{filterSubjects(admission).map((subject, index) => (
+								<tr key={`subject-${index}`}>
+									<td className='text-center'>{subject?.code}</td>
+									<td className='text-center' style={{ minWidth: '100px' }}>
+										{subject?.description}
+									</td>
+									<td className='text-center'>{subject?.units}</td>
+									<td className='text-center'>
+										{findGrade(subject, admission) ? `${findGrade(subject, admission)?.grade}%` : '-'}
+									</td>
+									<td className='text-center'>
+										{admission.year?.current
+											? findGrade(subject, admission)
+												? findGrade(subject, admission)?.status
+												: '-'
+											: 'INC'}
+									</td>
+								</tr>
+							))}
 							<tr>
 								<td className='text-center'>
 									<b>Total Units</b>
 								</td>
 								<td></td>
 								<td className='text-center'>
-									{subjects
-										?.filter((subject) => {
-											if (admission.year?.current) {
-												return admission.student?.subjects?.find((s) => s.id === subject.id) ? true : false;
-											} else {
-												return admission.student?.previous_subjects?.find((s) => s.id === subject.id)
-													? true
-													: false;
-											}
-										})
-										.filter((subject) => {
-											return (
-												subject.level === admission.level &&
-												subject.term === admission.term &&
-												subject.course_id === admission.course_id &&
-												subject.major_id === admission.major_id
-											);
-										})
-										.reduce((prev, next) => prev + next.units, 0) || 0}
+									{filterSubjects(admission).reduce((prev, next) => prev + next.units, 0) || 0}
 								</td>
 								<td></td>
 								<td></td>
