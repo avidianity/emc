@@ -88,8 +88,10 @@ const Grades: FC<Props> = (props) => {
 							{subjects
 								?.filter((subject) => {
 									if (admission.year?.current) {
+										console.log(`current:`, subject);
 										return admission.student?.subjects?.find((s) => s.id === subject.id) ? true : false;
 									} else {
+										console.log(`non-current:`, subject);
 										return admission.student?.previous_subjects?.find((s) => s.id === subject.id) ? true : false;
 									}
 								})
