@@ -112,13 +112,18 @@ const Subjects: FC<Props> = (props) => {
 						}}>
 						<div className='form-row'>
 							{subjects
-								?.filter(
-									(subject) =>
-										subject.level === admission.level &&
-										subject.term === admission.term &&
-										subject.course_id === admission.course_id &&
-										subject.major_id === admission.major_id
-								)
+								?.filter((subject) => {
+									if (user?.role === 'Admin') {
+										return subject.course_id === admission.course_id && subject.major_id === admission.major_id;
+									} else {
+										return (
+											subject.level === admission.level &&
+											subject.term === admission.term &&
+											subject.course_id === admission.course_id &&
+											subject.major_id === admission.major_id
+										);
+									}
+								})
 								.map((subject, index) => (
 									<div className='form-group col-12 col-md-4' key={index}>
 										<div className='custom-control custom-checkbox'>
