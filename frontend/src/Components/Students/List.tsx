@@ -275,7 +275,7 @@ const List: FC<Props> = (props) => {
 		},
 	];
 
-	if (['Registrar', 'Teacher'].includes(user?.role || '')) {
+	if (['Registrar', 'Teacher', 'Admin'].includes(user?.role || '')) {
 		columns.push({ title: 'Actions', accessor: 'actions', minWidth: '350px' });
 	}
 
