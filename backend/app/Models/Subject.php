@@ -35,6 +35,10 @@ class Subject extends Model
             });
 
             $subject->students()->detach();
+
+            $subject->previous->each(function (PreviousSubject $previousSubject) {
+                $previousSubject->delete();
+            });
         });
     }
 
@@ -61,5 +65,10 @@ class Subject extends Model
     public function students()
     {
         return $this->belongsToMany(User::class, 'student_subjects')->using(StudentSubject::class);
+    }
+
+    public function previous()
+    {
+        return $this->hasMany(PreviousSubject::class);
     }
 }

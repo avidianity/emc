@@ -105,6 +105,10 @@ class User extends Authenticatable
                 $schedule->delete();
             });
 
+            $user->previousSubjects->each(function (PreviousSubject $previousSubject) {
+                $previousSubject->delete();
+            });
+
             $user->subjects()->detach();
             $user->sections()->detach();
         });
