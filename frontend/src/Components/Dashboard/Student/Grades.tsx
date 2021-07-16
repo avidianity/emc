@@ -90,7 +90,7 @@ const Grades: FC<Props> = (props) => {
 									if (admission.year?.current) {
 										return admission.student?.subjects?.find((s) => s.id === subject.id) ? true : false;
 									} else {
-										return admission.student?.previousSubjects?.find((s) => s.id === subject.id) ? true : false;
+										return admission.student?.previous_subjects?.find((s) => s.id === subject.id) ? true : false;
 									}
 								})
 								.filter((subject) => {
@@ -131,7 +131,9 @@ const Grades: FC<Props> = (props) => {
 											if (admission.year?.current) {
 												return admission.student?.subjects?.find((s) => s.id === subject.id) ? true : false;
 											} else {
-												return admission.student?.previousSubjects?.find((s) => s.id === subject.id) ? true : false;
+												return admission.student?.previous_subjects?.find((s) => s.id === subject.id)
+													? true
+													: false;
 											}
 										})
 										.filter((subject) => {

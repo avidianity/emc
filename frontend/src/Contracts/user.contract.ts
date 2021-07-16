@@ -32,5 +32,5 @@ export interface UserContract extends ModelContract {
 	enrolled: boolean;
 	payment_status: 'Not Paid' | 'Fully Paid' | 'Partially Paid';
 	sections?: SectionContract[];
-	previousSubjects?: PreviousSubjectContract[];
+	previous_subjects?: PreviousSubjectContract[];
 }
