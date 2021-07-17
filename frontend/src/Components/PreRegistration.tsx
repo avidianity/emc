@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { useArray, useCurrentYear, useNullable } from '../hooks';
 import { courseService } from '../Services/course.service';
-import { yearService } from '../Services/year.service';
 import Flatpickr from 'react-flatpickr';
 import { useHistory } from 'react-router';
 import { requirementService } from '../Services/requirement.service';
@@ -63,16 +62,6 @@ const PreRegistration: FC<Props> = (props) => {
 	const [course, setCourse] = useNullable<CourseContract>();
 	const [majorID, setMajorID] = useNullable<number>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
-	const { data: years } = useQuery('years', () => yearService.fetch(), {
-		onSuccess(years) {
-			if (years.length === 0) {
-				toastr.info(
-					'Registrar has not set a school year. Pre Registration will not be available until a registrar creates one.',
-					'Notice'
-				);
-			}
-		},
-	});
 	const { data: requirements } = useQuery('requirements', () => requirementService.fetch());
 	const [selected, setSelected] = useArray<string>();
 	const [number, setNumber] = useState('');
@@ -87,7 +76,7 @@ const PreRegistration: FC<Props> = (props) => {
 		try {
 			data.status = 'Regular';
 			data.term = '1st Semester';
-			data.year_id = years?.find((year) => year.current)?.id || 0;
+			data.year_id = year?.id || 0;
 			data.pre_registration = true;
 			data.requirements = selected;
 			data.student.number = number;
@@ -127,6 +116,12 @@ const PreRegistration: FC<Props> = (props) => {
 				await Asker.okay(`Registration has already ended. Please register at the next registration phase.`, 'Notice');
 				return history.goBack();
 			}
+		} else {
+			toastr.info(
+				'Registrar has not set a school year. Pre Registration will not be available until a registrar sets one.',
+				'Notice'
+			);
+			history.goBack();
 		}
 	};
 

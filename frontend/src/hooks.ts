@@ -31,6 +31,8 @@ export function useCurrentYear(options?: { onSuccess: (year?: YearContract) => v
 			if (data) {
 				return data;
 			}
+
+			return undefined;
 		},
 		{
 			onSuccess(year) {
