@@ -309,6 +309,10 @@ class UserController extends Controller
             return response(['message' => 'Student is already currently enrolled to current school year.'], 400);
         }
 
+        if (!$user->enrolled) {
+            return response(['message' => 'Student is not enrolled to any subjects.'], 400);
+        }
+
         $subjects = $user->subjects;
 
         $missing = collect([]);
@@ -323,10 +327,6 @@ class UserController extends Controller
             return response(['message' => 'Student has missing grades.'], 400);
         }
 
-        if (!$user->enrolled) {
-            return response(['message' => 'Student is not enrolled to any subjects.'], 400);
-        }
-
         $failed = collect([]);
 
         foreach ($subjects as $subject) {
@@ -338,6 +338,10 @@ class UserController extends Controller
             if ($grade->grade < 75 || $grade->status === 'Failed') {
                 $failed->push($subject);
             }
+        }
+
+        if ($failed->count() > 0) {
+            return response(['message' => 'Student currently has failed grades.'], 400);
         }
 
         $map = [
@@ -365,14 +369,7 @@ class UserController extends Controller
             $data = $admission->toArray();
 
             $data['term'] = $term;
-
-            if ($failed->count() === 0) {
-                $data['level'] = $level;
-            } else {
-                if ($admission->term === '2nd Semester') {
-                    return response(['message' => 'Student currently has failed grades.'], 400);
-                }
-            }
+            $data['level'] = $level;
 
             $data['year_id'] = $year->id;
 
@@ -398,12 +395,6 @@ class UserController extends Controller
                     $units = (int)$subject->units;
                     return $previous + $units;
                 }, 0);
-            }
-
-            if ($failed->count() > 0) {
-                $data['status'] = 'Irregular';
-            } else {
-                $data['status'] = 'Regular';
             }
 
             $admission->update(['done' => true]);
