@@ -28,16 +28,16 @@ const Grades: FC<Props> = (props) => {
 
 	const findGrade = (subject: SubjectContract, admission: AdmissionContract) => {
 		const student = admission.student;
-		return student?.grades?.find((grade) => grade.year_id === admission.id && grade.subject_id === subject.id);
+		return student?.grades?.find((grade) => grade.year_id === admission.year_id && grade.subject_id === subject.id);
 	};
 
 	const filterSubjects = (admission: AdmissionContract) => {
 		return (
 			subjects
 				?.filter((subject) => {
-					return toBool(
-						admission.student?.previous_subjects?.find((s) => s.id === subject.id) ||
-							admission.student?.subjects?.find((s) => s.id === subject.id)
+					return (
+						toBool(admission.student?.previous_subjects?.find((s) => s.subject_id === subject.id)) ||
+						toBool(admission.student?.subjects?.find((s) => s.id === subject.id))
 					);
 				})
 				.filter((subject) => {
@@ -116,10 +116,10 @@ const Grades: FC<Props> = (props) => {
 										{findGrade(subject, admission) ? `${findGrade(subject, admission)?.grade}%` : '-'}
 									</td>
 									<td className='text-center'>
-										{admission.year?.current
-											? findGrade(subject, admission)
-												? findGrade(subject, admission)?.status
-												: '-'
+										{findGrade(subject, admission)
+											? findGrade(subject, admission)?.status
+											: admission.year?.current
+											? '-'
 											: 'INC'}
 									</td>
 								</tr>
