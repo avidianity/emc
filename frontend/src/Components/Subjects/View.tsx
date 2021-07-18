@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
 import { useHistory, useParams } from 'react-router-dom';
 import { UserContract } from '../../Contracts/user.contract';
-import { Asker, handleError } from '../../helpers';
+import { Asker, findSection, handleError, isBehind } from '../../helpers';
 import { useCurrentYear, useNullable } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { gradeService } from '../../Services/grade.service';
@@ -26,6 +26,7 @@ type Inputs = {
 };
 
 const View: FC<Props> = (props) => {
+	const [processing, setProcessing] = useState(false);
 	const params = useParams<{ id: string }>();
 	const id = params.id.toNumber();
 	const history = useHistory();
@@ -38,9 +39,10 @@ const View: FC<Props> = (props) => {
 	const user = State.getInstance().get<UserContract>('user');
 
 	const submit = async (data: Inputs) => {
+		setProcessing(true);
 		try {
 			data.student_id = studentID!;
-			data.teacher_id = user!.id!;
+			data.teacher_id = user?.id!;
 			data.subject_id = subject?.id || id;
 			data.grade = gradeAmount;
 			data.status = gradeAmount >= 75 ? 'Passed' : 'Failed';
@@ -53,6 +55,7 @@ const View: FC<Props> = (props) => {
 		} finally {
 			setStudentID(null);
 			reset();
+			setProcessing(false);
 		}
 	};
 
@@ -129,77 +132,78 @@ const View: FC<Props> = (props) => {
 						title='Student List'
 						loading={loading}
 						items={
-							subject.students
-								?.filter((student) => {
-									const admission = student.admissions?.find((admission) => admission.year?.current);
-
-									if (!admission) {
-										return false;
-									}
-
-									return true;
-								})
-								.filter((student) => student.enrolled)
-								.map((student) => ({
-									...student,
-									name: (
-										<>
-											{student.last_name}, {student.first_name} {student.middle_name || ''}
-										</>
-									),
-									year: student.admissions?.find((admission) => admission.year?.current)?.level,
-									actions: (
-										<>
-											{findGrade(student) && !setGrade ? (
-												<span
-													onClick={async () => {
-														if (year) {
-															const now = dayjs();
-															const start = dayjs(year.grade_start);
-															const end = dayjs(year.grade_end);
-															if (now.isBefore(start)) {
-																await Asker.okay(
-																	`Encoding of grades will start at ${start.format(
-																		'MMMM DD, YYYY hh:mm A'
-																	)}. Please wait until the given date.`,
-																	'Notice'
-																);
-																return history.goBack();
-															}
-															if (now.isAfter(end)) {
-																await Asker.okay(`Encoding of grades has already ended.`, 'Notice');
-																return history.goBack();
-															}
+							subject.students?.map((student) => ({
+								...student,
+								name: (
+									<>
+										{student.last_name}, {student.first_name} {student.middle_name || ''}
+									</>
+								),
+								year: !isBehind(student)
+									? student.admissions?.find((admission) => admission.year?.current)?.level
+									: student.admissions?.last()?.level,
+								semester: !isBehind(student)
+									? student.admissions?.find((admission) => admission.year?.current)?.term
+									: student.admissions?.last()?.term,
+								section: findSection(student)?.name,
+								actions: (
+									<>
+										{findGrade(student, !isBehind(student)) && !setGrade ? (
+											<span
+												onClick={async () => {
+													if (year && !isBehind(student)) {
+														const now = dayjs();
+														const start = dayjs(year.grade_start);
+														const end = dayjs(year.grade_end);
+														if (now.isBefore(start)) {
+															await Asker.okay(
+																`Encoding of grades will start at ${start.format(
+																	'MMMM DD, YYYY hh:mm A'
+																)}. Please wait until the given date.`,
+																'Notice'
+															);
+															return history.goBack();
 														}
-														const grade = findGrade(student);
-														if (grade) {
-															if (grade.grade >= 75) {
-																setValue('status', 'Passed');
-															} else {
-																setValue('status', 'Failed');
-															}
-															setGradeAmount(grade.grade);
+														if (now.isAfter(end)) {
+															await Asker.okay(`Encoding of grades has already ended.`, 'Notice');
+															return history.goBack();
 														}
-														setSetGrade(true);
-														setStudentID(student.id!);
-													}}
-													className='clickable'>
-													{findGrade(student)?.grade}%
-												</span>
-											) : (
-												<>
-													{setGrade && student.id === studentID ? (
-														<form
-															className='form-inline'
-															style={{ minWidth: '100px' }}
-															onSubmit={handleSubmit(submit)}>
-															<input type='hidden' {...register('year_id')} value={year?.id} />
+													}
+													const grade = findGrade(student, !isBehind(student));
+													if (grade) {
+														if (grade.grade >= 75) {
+															setValue('status', 'Passed');
+														} else {
+															setValue('status', 'Failed');
+														}
+														setGradeAmount(grade.grade);
+													}
+													setSetGrade(true);
+													setStudentID(student.id!);
+												}}
+												className='clickable'>
+												{findGrade(student, !isBehind(student))?.grade}%
+											</span>
+										) : (
+											<>
+												{setGrade && student.id === studentID ? (
+													<form
+														className='form-inline row'
+														style={{ minWidth: '100px' }}
+														onSubmit={handleSubmit(submit)}>
+														<input
+															type='hidden'
+															{...register('year_id')}
+															value={!isBehind(student) ? year?.id : student.admissions?.last()?.year_id}
+														/>
+														<input {...register('status')} type='hidden' />
+														<div className='col-4'>
 															<input
 																type='number'
 																id='grade'
 																min={0}
 																max={100}
-																className='form-control form-control-sm mx-1'
+																className='form-control form-control-sm'
 																onChange={(e) => {
 																	const grade = e.target.value.toNumber();
 																	if (grade >= 0 && grade <= 100) {
@@ -212,118 +216,138 @@ const View: FC<Props> = (props) => {
 																	}
 																}}
 																value={gradeAmount}
+																disabled={processing}
 															/>
-															<input {...register('status')} type='hidden' />
-															<button type='submit' className='btn btn-primary btn-sm mx-1'>
+														</div>
+														<div className='col-4'>
+															<button type='submit' className='btn btn-primary btn-sm' disabled={processing}>
 																Submit
 															</button>
+														</div>
+														<div className='col-4'>
 															<button
 																type='button'
-																className='btn btn-secondary btn-sm mx-1'
+																className='btn btn-secondary btn-sm'
 																onClick={(e) => {
 																	e.preventDefault();
 																	setSetGrade(false);
 																	setStudentID(null);
-																}}>
+																}}
+																disabled={processing}>
 																Cancel
 															</button>
-														</form>
-													) : (
-														<>
-															{findGrade(student) ? (
-																<span
-																	onClick={async () => {
-																		if (year) {
-																			const now = dayjs();
-																			const start = dayjs(year.grade_start);
-																			const end = dayjs(year.grade_end);
-																			if (now.isBefore(start)) {
-																				await Asker.okay(
-																					`Encoding of grades will start at ${start.format(
-																						'MMMM DD, YYYY hh:mm A'
-																					)}. Please wait until the given date.`,
-																					'Notice'
-																				);
-																				return history.goBack();
-																			}
-																			if (now.isAfter(end)) {
-																				await Asker.okay(
-																					`Encoding of grades has already ended.`,
-																					'Notice'
-																				);
-																				return history.goBack();
-																			}
+														</div>
+													</form>
+												) : (
+													<>
+														{findGrade(student, !isBehind(student)) ? (
+															<span
+																onClick={async () => {
+																	if (year && !isBehind(student)) {
+																		const now = dayjs();
+																		const start = dayjs(year.grade_start);
+																		const end = dayjs(year.grade_end);
+																		if (now.isBefore(start)) {
+																			await Asker.okay(
+																				`Encoding of grades will start at ${start.format(
+																					'MMMM DD, YYYY hh:mm A'
+																				)}. Please wait until the given date.`,
+																				'Notice'
+																			);
+																			return history.goBack();
 																		}
-																		const grade = findGrade(student);
-																		if (grade) {
-																			if (grade.grade >= 75) {
-																				setValue('status', 'Passed');
-																			} else {
-																				setValue('status', 'Failed');
-																			}
-																			setGradeAmount(grade.grade);
+																		if (now.isAfter(end)) {
+																			await Asker.okay(
+																				`Encoding of grades has already ended.`,
+																				'Notice'
+																			);
+																			return history.goBack();
 																		}
-																		setSetGrade(true);
-																		setStudentID(student.id!);
-																	}}
-																	className='clickable'>
-																	{findGrade(student)?.grade}%
-																</span>
-															) : (
-																<span
-																	onClick={async () => {
-																		if (year) {
-																			const now = dayjs();
-																			const start = dayjs(year.grade_start);
-																			const end = dayjs(year.grade_end);
-																			if (now.isBefore(start)) {
-																				await Asker.okay(
-																					`Encoding of grades will start at ${start.format(
-																						'MMMM DD, YYYY hh:mm A'
-																					)}. Please wait until the given date.`,
-																					'Notice'
-																				);
-																				return history.goBack();
-																			}
-																			if (now.isAfter(end)) {
-																				await Asker.okay(
-																					`Encoding of grades has already ended.`,
-																					'Notice'
-																				);
-																				return history.goBack();
-																			}
+																	}
+																	const grade = findGrade(student, !isBehind(student));
+																	if (grade) {
+																		if (grade.grade >= 75) {
+																			setValue('status', 'Passed');
+																		} else {
+																			setValue('status', 'Failed');
 																		}
-																		setSetGrade(!setGrade);
-																		setStudentID(student.id!);
-																	}}
-																	className='clickable d-block'>
-																	-
-																</span>
-															)}
-														</>
-													)}
-												</>
-											)}
-										</>
-									),
-								})) || []
+																		setGradeAmount(grade.grade);
+																	}
+																	setSetGrade(true);
+																	setStudentID(student.id!);
+																}}
+																className='clickable'>
+																{findGrade(student, !isBehind(student))?.grade}%
+															</span>
+														) : (
+															<span
+																onClick={async () => {
+																	if (year && isBehind(student)) {
+																		const now = dayjs();
+																		const start = dayjs(year.grade_start);
+																		const end = dayjs(year.grade_end);
+																		if (now.isBefore(start)) {
+																			await Asker.okay(
+																				`Encoding of grades will start at ${start.format(
+																					'MMMM DD, YYYY hh:mm A'
+																				)}. Please wait until the given date.`,
+																				'Notice'
+																			);
+																			return history.goBack();
+																		}
+																		if (now.isAfter(end)) {
+																			await Asker.okay(
+																				`Encoding of grades has already ended.`,
+																				'Notice'
+																			);
+																			return history.goBack();
+																		}
+																	}
+																	setSetGrade(!setGrade);
+																	setStudentID(student.id!);
+																}}
+																className='clickable d-block'>
+																-
+															</span>
+														)}
+													</>
+												)}
+											</>
+										)}
+									</>
+								),
+							})) || []
 						}
 						columns={[
 							{
 								title: 'ID Number',
 								accessor: 'uuid',
+								minWidth: '200px',
 							},
 							{
 								title: 'Name',
 								accessor: 'name',
+								minWidth: '150px',
 							},
 							{
 								title: 'Year',
 								accessor: 'year',
+								minWidth: '150px',
+							},
+							{
+								title: 'Semester',
+								accessor: 'semester',
+								minWidth: '150px',
+							},
+							{
+								title: 'Section',
+								accessor: 'section',
+								minWidth: '150px',
 							},
 							{
 								title: 'Actions',
 								accessor: 'actions',
+								minWidth: '300px',
 							},
 						]}
 					/>

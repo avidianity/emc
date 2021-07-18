@@ -319,6 +319,7 @@ class AdmissionController extends Controller
                 $data = $admission->toArray();
 
                 $data['term'] = $term;
+                $data['level'] = $level;
 
                 $data['year_id'] = $year->id;
 
@@ -344,12 +345,6 @@ class AdmissionController extends Controller
                         $units = $subject->units;
                         return $previous + $units;
                     }, 0);
-                }
-
-                if ($failed->count() > 0) {
-                    $data['status'] = 'Irregular';
-                } else {
-                    $data['status'] = 'Regular';
                 }
 
                 $admission->update(['done' => true]);

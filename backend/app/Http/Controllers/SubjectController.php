@@ -95,8 +95,12 @@ class SubjectController extends Controller
             'students.grades.year',
             'students.admissions.year',
             'students.previousSubjects.subject',
+            'students.sections.year',
             'major',
             'schedules',
+            'previous.student.grades.year',
+            'previous.student.admissions.year',
+            'previous.student.sections.year',
         ]);
         return $subject;
     }

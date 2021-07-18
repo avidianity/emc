@@ -3,6 +3,7 @@ import _, { isArray as _isArray, isString, trim } from 'lodash';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import swal from 'sweetalert';
+import { UserContract } from './Contracts/user.contract';
 
 dayjs.extend(relativeTime);
 
@@ -22,6 +23,18 @@ export class Asker {
 	static async okay(message: string, title?: string) {
 		return toBool(await swal({ title, text: message, icon: 'info' }));
 	}
+}
+
+export function isBehind(student: UserContract) {
+	return student.admissions?.find((admission) => admission.year?.current) === undefined;
+}
+
+export function findSection(student: UserContract) {
+	const section = student.sections?.find((section) => section.year?.current);
+	if (section) {
+		return section;
+	}
+	return student.sections?.last();
 }
 
 export function outIf<T>(condition: boolean, output: T, defaultValue: any = ''): T {

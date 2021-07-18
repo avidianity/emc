@@ -284,7 +284,7 @@ class UserController extends Controller
         return response('', 204);
     }
 
-    public function reincrement(Request $request, User $user)
+    public function reincrement(User $user)
     {
         $user->load([
             'admissions.year',

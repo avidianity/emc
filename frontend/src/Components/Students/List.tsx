@@ -12,7 +12,7 @@ import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { YearContract } from '../../Contracts/year.contract';
-import { handleError, Asker } from '../../helpers';
+import { handleError, Asker, isBehind, findSection } from '../../helpers';
 import { useCurrentYear, useNullable } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { routes } from '../../routes';
@@ -192,14 +192,6 @@ const List: FC<Props> = (props) => {
 		return student.admissions?.last();
 	};
 
-	const findSection = (student: UserContract) => {
-		const section = student.sections?.find((section) => section.year?.current);
-		if (section) {
-			return section;
-		}
-		return student.sections?.last();
-	};
-
 	const deleteItem = async (id: any) => {
 		try {
 			if (await Asker.danger('Are you sure you want to delete this Student?')) {
@@ -210,10 +202,6 @@ const List: FC<Props> = (props) => {
 		} catch (error) {
 			handleError(error);
 		}
-	};
-
-	const isBehind = (student: UserContract) => {
-		return student.admissions?.find((admission) => admission.year?.current) === undefined;
 	};
 
 	const reincrement = async (student: UserContract) => {

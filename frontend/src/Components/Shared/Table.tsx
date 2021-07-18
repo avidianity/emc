@@ -6,7 +6,7 @@ import { outIf } from '../../helpers';
 
 export type TableProps = {
 	title: string;
-	columns: { title: string; accessor: string }[];
+	columns: { title: string; accessor: string; minWidth?: string }[];
 	buttons?: any;
 	loading: boolean;
 	onRefresh: () => void;
