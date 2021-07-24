@@ -31,6 +31,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Device',
 			accessor: 'device',
+			minWidth: '300px',
 		},
 		{
 			title: 'Browser',
@@ -39,10 +40,12 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'User',
 			accessor: 'user',
+			minWidth: '300px',
 		},
 		{
 			title: 'Date',
 			accessor: 'created_at',
+			minWidth: '300px',
 		},
 	];
 
