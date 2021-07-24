@@ -12,6 +12,7 @@ import { userService } from '../Services/user.service';
 import axios from 'axios';
 import { CourseContract } from '../Contracts/course.contract';
 import InputMask from 'react-input-mask';
+import { YearContract } from '../Contracts/year.contract';
 
 type Props = {};
 
@@ -66,7 +67,7 @@ const PreRegistration: FC<Props> = (props) => {
 	const [selected, setSelected] = useArray<string>();
 	const [number, setNumber] = useState('');
 	const history = useHistory();
-	const { data: year } = useCurrentYear({ onSuccess: () => check() });
+	const { data: year } = useCurrentYear({ onSuccess: (year) => check(year) });
 
 	const submit = async (data: Inputs) => {
 		if ((course?.majors?.length || 0) > 0 && !majorID) {
@@ -100,7 +101,7 @@ const PreRegistration: FC<Props> = (props) => {
 		}
 	};
 
-	const check = async () => {
+	const check = async (year?: YearContract) => {
 		if (year) {
 			const now = dayjs();
 			const start = dayjs(year.registration_start);
