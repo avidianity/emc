@@ -75,7 +75,7 @@ const View: FC<Props> = (props) => {
 		// eslint-disable-next-line
 	}, []);
 
-	if (!subject) {
+	if (!subject || !year) {
 		return null;
 	}
 
