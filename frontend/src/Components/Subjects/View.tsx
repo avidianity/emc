@@ -151,7 +151,7 @@ const View: FC<Props> = (props) => {
 										{findGrade(student, !isBehind(student)) && !setGrade ? (
 											<span
 												onClick={async () => {
-													if (year && !isBehind(student)) {
+													if (!isBehind(student)) {
 														const now = dayjs();
 														const start = dayjs(year.grade_start);
 														const end = dayjs(year.grade_end);
@@ -243,7 +243,7 @@ const View: FC<Props> = (props) => {
 														{findGrade(student, !isBehind(student)) ? (
 															<span
 																onClick={async () => {
-																	if (year && !isBehind(student)) {
+																	if (!isBehind(student)) {
 																		const now = dayjs();
 																		const start = dayjs(year.grade_start);
 																		const end = dayjs(year.grade_end);
@@ -282,7 +282,7 @@ const View: FC<Props> = (props) => {
 														) : (
 															<span
 																onClick={async () => {
-																	if (year && isBehind(student)) {
+																	if (!isBehind(student)) {
 																		const now = dayjs();
 																		const start = dayjs(year.grade_start);
 																		const end = dayjs(year.grade_end);
@@ -303,7 +303,7 @@ const View: FC<Props> = (props) => {
 																			return history.goBack();
 																		}
 																	}
-																	setSetGrade(!setGrade);
+																	setSetGrade(true);
 																	setStudentID(student.id!);
 																}}
 																className='clickable d-block'>

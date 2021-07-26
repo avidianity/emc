@@ -340,10 +340,6 @@ class UserController extends Controller
             }
         }
 
-        if ($failed->count() > 0) {
-            return response(['message' => 'Student currently has failed grades.'], 400);
-        }
-
         $map = [
             '1st Semester' => [
                 '1st' => ['1st', '2nd Semester'],
@@ -398,6 +394,10 @@ class UserController extends Controller
             }
 
             $admission->update(['done' => true]);
+
+            if ($failed->count() > 0) {
+                $data['status'] = 'Irregular';
+            }
 
             /**
              * @var \App\Models\Admission
