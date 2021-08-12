@@ -6,7 +6,7 @@
 
 ## Pre Registration
 
-- [ ] __1500__ - After mag pre register ng students dba may submit button dun. Pagclick ng submit may modal na lalabas “Successfully Registered ! Please settle your payment to enroll the subjects. Partially paid minimum of “500 ” pesos if fully paid please pay the stated amount of “10,000” pesos”.Tapos ok button. Then kung ano yang nakalagay sa modal yan din ang dadating sa email ngstudents kasama ng reference number(auto generated)
+- [ ] __500__ - After mag pre register ng students dba may submit button dun. Pagclick ng submit may modal na lalabas “Successfully Registered ! Please settle your payment to enroll the subjects. Partially paid minimum of “500 ” pesos if fully paid please pay the stated amount of “10,000” pesos”.Tapos ok button. Then kung ano yang nakalagay sa modal yan din ang dadating sa email ngstudents kasama ng reference number(auto generated)
 - [ ] __1000__ - Pre registration – kapag same data yung ininput dapat okay button nlng hindi confirm. Example same data yung ininput sa pre-register pagkaclick ng submit eto dapat lalabas sa modal “your data is already exists” tas okay button exit. Wala ng confirm para maiwasan ang pagduplicate ng data ng student.
 - [ ] __1000__ - admissions table new columns, 'reference number', 'name', 'gender', 'course and major', 'year level', 'semester', 'payment status', 'actions'
 - [ ] __500__ - Birthday inputs maximum should be 2004 instead of 2006
