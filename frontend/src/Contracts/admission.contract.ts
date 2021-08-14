@@ -19,4 +19,5 @@ export interface AdmissionContract extends ModelContract {
 	major?: MajorContract;
 	requirements: string[];
 	done: boolean;
+	reference_number: string;
 }

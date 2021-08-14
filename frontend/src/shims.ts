@@ -23,13 +23,13 @@ String.prototype.toNumber = function () {
 	if (parts.length > 1) {
 		const whole = (parts[0].match(/\d/g) || []).join('');
 		const decimals = (parts[1].match(/\d/g) || []).join('');
-		return Number(`${whole}.${decimals}`) || 0;
+		return parseFloat(`${whole}.${decimals}` || 0);
 	}
 	const match = this.match(/\d/g);
 	if (!match) {
 		return 0;
 	}
-	return Number(match.join('')) || 0;
+	return parseFloat(match.join('') || 0);
 };
 
 String.prototype.trim = function () {

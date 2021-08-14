@@ -203,9 +203,10 @@ const View: FC<Props> = (props) => {
 																id='grade'
 																min={0}
 																max={100}
+																step='.01'
 																className='form-control form-control-sm'
 																onChange={(e) => {
-																	const grade = e.target.value.toNumber();
+																	const grade = Math.round(e.target.value.toNumber());
 																	if (grade >= 0 && grade <= 100) {
 																		if (grade >= 75) {
 																			setValue('status', 'Passed');

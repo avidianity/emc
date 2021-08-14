@@ -161,6 +161,9 @@ const Form: FC<Props> = (props) => {
 								<Flatpickr
 									value={registrationStart || undefined}
 									id='registration_start'
+									options={{
+										minDate: new Date(),
+									}}
 									onChange={(dates) => {
 										if (dates.length > 0) {
 											setRegistrationStart(dates[0]);
@@ -177,6 +180,9 @@ const Form: FC<Props> = (props) => {
 								<Flatpickr
 									value={registrationEnd || undefined}
 									id='registration_end'
+									options={{
+										minDate: registrationStart || new Date(),
+									}}
 									onChange={(dates) => {
 										if (dates.length > 0) {
 											setRegistrationEnd(dates[0]);

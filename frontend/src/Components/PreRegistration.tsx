@@ -13,6 +13,7 @@ import axios from 'axios';
 import { CourseContract } from '../Contracts/course.contract';
 import InputMask from 'react-input-mask';
 import { YearContract } from '../Contracts/year.contract';
+import swal from 'sweetalert';
 
 type Props = {};
 
@@ -79,7 +80,18 @@ const PreRegistration: FC<Props> = (props) => {
 			data.student.number = number;
 			data.student.birthday = birthday?.toJSON() || '';
 			await axios.post('/admission/pre-registration', data);
-			toastr.success('Pre Registration saved successfully.');
+
+			const p = document.createElement('p');
+
+			p.innerText =
+				'Please settle your payment to enroll the subjects. Partially paid minimum of “500 ” pesos if fully paid please pay the stated amount of “10,000” pesos';
+
+			await swal({
+				title: 'Registered Successfully!',
+				content: {
+					element: p,
+				},
+			});
 			reset();
 			history.goBack();
 		} catch (error: any) {

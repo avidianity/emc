@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Casts\JSON;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Admission extends Model
 {
@@ -21,6 +22,7 @@ class Admission extends Model
         'requirements',
         'major_id',
         'done',
+        'reference_number',
     ];
 
     protected $casts = [
@@ -31,6 +33,20 @@ class Admission extends Model
 
     protected static function booted()
     {
+        static::creating(function (self $admission) {
+            $admission->reference_number = sprintf(
+                '%s-%s-%s',
+                date('Y'),
+                Str::padLeft(static::whereCourseId($admission->course_id)
+                    ->whereLevel($admission->level)
+                    ->whereTerm($admission->term)
+                    ->whereYearId($admission->year_id)
+                    ->whereMajorId($admission->major_id)
+                    ->count() + 1, 5, '0'),
+                Str::padLeft(mt_rand(0, 9999), 0, '0'),
+            );
+        });
+
         static::deleted(function (self $admission) {
             if ($admission->student->admissions()->count() === 0) {
                 $admission->student->delete();

@@ -19,7 +19,7 @@ const Students: FC<Props> = (props) => {
 			component: List,
 		},
 		{
-			path: url('/behind'),
+			path: url('/with-deficiency'),
 			component: List,
 		},
 		{

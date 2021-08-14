@@ -6,15 +6,16 @@ import { useCurrentSection, useCurrentYear, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { routes } from '../../routes';
 import { admissionService } from '../../Services/admission.service';
+import { userService } from '../../Services/user.service';
 
 type Props = {};
 
 const Sidebar: FC<Props> = (props) => {
 	const { data: admissions } = useQuery('admissions', () => admissionService.fetch());
+	const temp = State.getInstance().get<UserContract>('user');
+	const { data: user } = useQuery(['user', temp?.id], () => userService.fetchOne(temp?.id));
 	const url = useURL();
 	const { data: year } = useCurrentYear();
-
-	const user = State.getInstance().get<UserContract>('user');
 	const section = useCurrentSection();
 
 	const roles: { [key: string]: string[] } = {
@@ -33,6 +34,9 @@ const Sidebar: FC<Props> = (props) => {
 		Teacher: [routes.SUBJECTS],
 		Student: [routes.GRADES, routes.SCHEDULES, routes.PROFILE, routes.ENROLLMENT],
 	};
+
+	const getAdmission = (student: UserContract) => student.admissions?.find((admission) => admission.year?.current);
+	const getSection = (student: UserContract) => student.sections?.find((section) => section.year?.current);
 
 	if (!user) {
 		return null;
@@ -56,6 +60,15 @@ const Sidebar: FC<Props> = (props) => {
 								S.Y {year.start} - {year.end}
 							</span>
 							<span className='mx-auto d-block'>{year.semester}</span>
+							{user?.role === 'Student' ? (
+								<>
+									<span className='mx-auto d-block'>
+										{getAdmission(user)?.course?.code}{' '}
+										{`${getAdmission(user)?.major ? `- ${getAdmission(user)?.major?.name}` : ''}`}
+									</span>
+									<span className='mx-auto d-block'>{getSection(user)?.name}</span>
+								</>
+							) : null}
 						</>
 					) : null}
 					{user.role === 'Student' ? <span className='mx-auto'>{section?.name}</span> : null}
@@ -114,9 +127,12 @@ const Sidebar: FC<Props> = (props) => {
 												</Link>
 											</li>
 											<li className='nav-item'>
-												<Link to={url(`${routes.STUDENTS}/behind`)} className='nav-link' activeClassName='active'>
+												<Link
+													to={url(`${routes.STUDENTS}/with-deficiency`)}
+													className='nav-link'
+													activeClassName='active'>
 													<i className='fe fe-user fe-16'></i>
-													<span className='ml-3 item-text'>Behind</span>
+													<span className='ml-3 item-text'>With Deficiency</span>
 												</Link>
 											</li>
 										</ul>

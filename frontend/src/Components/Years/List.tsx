@@ -132,7 +132,7 @@ const List: FC<Props> = (props) => {
 									</button>
 								) : null}
 								<button
-									className='btn btn-danger btn-sm mx-1'
+									className='btn btn-danger btn-sm mx-1 d-none'
 									onClick={(e) => {
 										e.preventDefault();
 										deleteItem(year.id);
