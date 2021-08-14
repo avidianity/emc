@@ -84,7 +84,9 @@ const Form: FC<Props> = (props) => {
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='start'>Start</label>
+								<label htmlFor='start' className='required'>
+									Start
+								</label>
 								<input
 									{...register('start')}
 									type='number'
@@ -96,7 +98,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='end'>End</label>
+								<label htmlFor='end' className='required'>
+									End
+								</label>
 								<input
 									{...register('end')}
 									type='number'
@@ -108,7 +112,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12'>
-								<label htmlFor='semester'>Semester</label>
+								<label htmlFor='semester' className='required'>
+									Semester
+								</label>
 								<select {...register('semester')} id='semester' className='form-control'>
 									<option value=''> -- Select -- </option>
 									<option value='1st Semester'>1st Semester</option>
@@ -117,7 +123,9 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='semester_start'>Semester Start</label>
+								<label htmlFor='semester_start' className='required'>
+									Semester Start
+								</label>
 								<Flatpickr
 									value={semesterStart || undefined}
 									id='semester_start'
@@ -131,7 +139,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='semester_end'>Semester End</label>
+								<label htmlFor='semester_end' className='required'>
+									Semester End
+								</label>
 								<Flatpickr
 									value={semesterEnd || undefined}
 									id='semester_end'
@@ -145,7 +155,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='registration_start'>Registration Start</label>
+								<label htmlFor='registration_start' className='required'>
+									Registration Start
+								</label>
 								<Flatpickr
 									value={registrationStart || undefined}
 									id='registration_start'
@@ -159,7 +171,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='registration_end'>Registration End</label>
+								<label htmlFor='registration_end' className='required'>
+									Registration End
+								</label>
 								<Flatpickr
 									value={registrationEnd || undefined}
 									id='registration_end'
@@ -173,7 +187,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='grade_start'>Grade Encoding Start</label>
+								<label htmlFor='grade_start' className='required'>
+									Grade Encoding Start
+								</label>
 								<Flatpickr
 									value={gradeStart || undefined}
 									id='grade_start'
@@ -193,7 +209,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='grade_end'>Grade Encoding End</label>
+								<label htmlFor='grade_end' className='required'>
+									Grade Encoding End
+								</label>
 								<Flatpickr
 									value={gradeEnd || undefined}
 									id='grade_end'

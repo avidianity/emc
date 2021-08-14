@@ -5,11 +5,13 @@
 
 <b>Here is your user account credentials</b>
 <p>Account No.: {{ $student->uuid }}</p>
-<p id="password">Password: {{ $student->password }}</p>
+@if($password)
+    <p id="password">Password: {{ $password }}</p>
+@endif
 <br />
 <p>Please use these credentials to login to the system.</p>
 <p>Thank You</p>
 
-{{ $registrar->first_name }},<br />
+{{ sprintf('%s, %s', $registrar->last_name, $registrar->first_name) }},<br />
 Registrar
 @endcomponent

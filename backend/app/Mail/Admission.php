@@ -28,6 +28,7 @@ class Admission extends Mailable
     {
         $this->student = $student;
         $this->student->password = $password;
+        $this->password = $password;
         $this->admission = $admission;
         $this->registrar = $registrar;
     }

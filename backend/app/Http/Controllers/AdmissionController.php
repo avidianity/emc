@@ -449,33 +449,30 @@ class AdmissionController extends Controller
             'student.fathers_name' => ['nullable', 'string'],
             'student.mothers_name' => ['nullable', 'string'],
             'student.fathers_occupation' => ['nullable', 'string'],
-            'student.mothers_occupation' => ['nullable', 'string'],
-            'force' => ['required', 'boolean']
+            'student.mothers_occupation' => ['nullable', 'string']
         ]);
 
         if (!isset($data['requirements'])) {
             return [];
         }
 
-        if (!$data['force']) {
-            $builder = User::whereRole('Student')
-                ->whereFirstName($data['student']['first_name'])
-                ->whereLastName($data['student']['last_name']);
-            if ($builder->count() > 0) {
-                $student = $builder->firstOrFail();
-                $admissionBuilder = Admission::whereLevel($data['level'])
-                    ->whereCourseId($data['course_id'])
-                    ->whereTerm($data['term'])
-                    ->whereStatus($data['status'])
-                    ->whereStudentId($student->id);
-                if (isset($data['major_id'])) {
-                    $admissionBuilder = $admissionBuilder->whereMajorId($data['major_id']);
-                }
-                if (
-                    $admissionBuilder->count() > 0
-                ) {
-                    return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
-                }
+        $builder = User::whereRole('Student')
+            ->whereFirstName($data['student']['first_name'])
+            ->whereLastName($data['student']['last_name']);
+        if ($builder->count() > 0) {
+            $student = $builder->firstOrFail();
+            $admissionBuilder = Admission::whereLevel($data['level'])
+                ->whereCourseId($data['course_id'])
+                ->whereTerm($data['term'])
+                ->whereStatus($data['status'])
+                ->whereStudentId($student->id);
+            if (isset($data['major_id'])) {
+                $admissionBuilder = $admissionBuilder->whereMajorId($data['major_id']);
+            }
+            if (
+                $admissionBuilder->count() > 0
+            ) {
+                return response(['message' => 'Data is already existing.'], 409);
             }
         }
 

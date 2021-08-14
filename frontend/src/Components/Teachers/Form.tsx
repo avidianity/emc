@@ -73,7 +73,7 @@ const Form: FC<Props> = (props) => {
 			toastr.success('Teacher has been saved successfully.');
 			reset();
 			setBirthday(null);
-		} catch (error) {
+		} catch (error: any) {
 			if (error.response?.status === 409) {
 				if (await Asker.save(error.response?.data?.message)) {
 					data.force = true;
@@ -167,7 +167,7 @@ const Form: FC<Props> = (props) => {
 									id='birthday'
 									options={{
 										maxDate: dayjs()
-											.year(new Date().getFullYear() - 15)
+											.year(new Date().getFullYear() - 17)
 											.toDate(),
 									}}
 									onChange={(dates) => {

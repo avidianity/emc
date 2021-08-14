@@ -54,7 +54,7 @@ const Form: FC<Props> = (props) => {
 			await (mode === 'Add' ? subjectService.create(data) : subjectService.update(id, data));
 			toastr.success('Subject has been saved successfully.');
 			reset();
-		} catch (error) {
+		} catch (error: any) {
 			if (error.response?.status === 409) {
 				if (await Asker.save(error.response?.data?.message)) {
 					data.force = true;
@@ -84,11 +84,15 @@ const Form: FC<Props> = (props) => {
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='code'>Subject Code</label>
+								<label htmlFor='code' className='required'>
+									Subject Code
+								</label>
 								<input {...register('code')} type='text' id='code' className='form-control' disabled={processing} />
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='description'>Description</label>
+								<label htmlFor='description' className='required'>
+									Description
+								</label>
 								<input
 									{...register('description')}
 									type='text'
@@ -98,7 +102,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='course_id'>Course Code</label>
+								<label htmlFor='course_id' className='required'>
+									Course Code
+								</label>
 								<select
 									{...register('course_id')}
 									id='course_id'
@@ -123,7 +129,9 @@ const Form: FC<Props> = (props) => {
 							</div>
 							{course && course.majors && course.majors.length > 0 ? (
 								<div className='form-group col-12 col-md-6'>
-									<label htmlFor='major_id'>Major</label>
+									<label htmlFor='major_id' className='required'>
+										Major
+									</label>
 									<select {...register('major_id')} id='major_id' className='form-control'>
 										<option value=''> -- Select -- </option>
 										{course.majors.map((major, index) => (
@@ -135,7 +143,9 @@ const Form: FC<Props> = (props) => {
 								</div>
 							) : null}
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='level'>Year Level</label>
+								<label htmlFor='level' className='required'>
+									Year Level
+								</label>
 								<select {...register('level')} id='level' className='form-control'>
 									<option value=''> -- Select -- </option>
 									<option value='1st'>1st</option>
@@ -146,7 +156,9 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='units'>Number of Units</label>
+								<label htmlFor='units' className='required'>
+									Number of Units
+								</label>
 								<select {...register('units')} id='units' className='form-control'>
 									<option value=''> -- Select -- </option>
 									{[1, 2, 3, 4, 5, 6].map((unit, index) => (
@@ -157,7 +169,9 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-4'>
-								<label htmlFor='term'>Term</label>
+								<label htmlFor='term' className='required'>
+									Term
+								</label>
 								<div className='custom-control custom-radio'>
 									<input
 										{...register('term')}

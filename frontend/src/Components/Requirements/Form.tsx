@@ -58,7 +58,9 @@ const Form: FC<Props> = (props) => {
 					<h5 className='card-title'>{mode} Requirement</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-group'>
-							<label htmlFor='name'>Name</label>
+							<label htmlFor='name' className='required'>
+								Name
+							</label>
 							<input {...register('name')} type='text' id='code' className='form-control' disabled={processing} />
 						</div>
 						<div className='form-group d-flex'>

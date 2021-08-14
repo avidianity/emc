@@ -31,7 +31,9 @@ const ChangePassword: FC<Props> = (props) => {
 			<div className='mx-auto'>
 				<form onSubmit={handleSubmit(submit)}>
 					<div className='form-group'>
-						<label htmlFor='old_password'>Old Password</label>
+						<label htmlFor='old_password' className='required'>
+							Old Password
+						</label>
 						<input
 							{...register('old_password')}
 							type='password'
@@ -41,7 +43,9 @@ const ChangePassword: FC<Props> = (props) => {
 						/>
 					</div>
 					<div className='form-group'>
-						<label htmlFor='new_password'>New Password</label>
+						<label htmlFor='new_password' className='required'>
+							New Password
+						</label>
 						<input
 							{...register('new_password')}
 							type='password'

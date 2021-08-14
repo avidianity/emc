@@ -1,8 +1,5 @@
 import axios from 'axios';
-
-type FreeObject = {
-	[key: string]: any;
-};
+import { FreeObject } from '../Contracts/misc';
 
 export class Service<T> {
 	protected url: string;

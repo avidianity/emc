@@ -1,0 +1,7 @@
+label.required::after {
+	content: '*';
+	color: rgb(190, 0, 0);
+	margin-left: 2px;
+	position: absolute;
+	font-size: 10px;
+}

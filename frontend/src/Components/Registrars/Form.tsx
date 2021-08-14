@@ -73,7 +73,7 @@ const Form: FC<Props> = (props) => {
 			toastr.success('Registrar has been saved successfully.');
 			reset();
 			setBirthday(null);
-		} catch (error) {
+		} catch (error: any) {
 			if (error.response?.status === 409) {
 				if (await Asker.save(error.response?.data?.message)) {
 					data.force = true;
@@ -113,7 +113,9 @@ const Form: FC<Props> = (props) => {
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='first_name'>First Name</label>
+								<label htmlFor='first_name' className='required'>
+									First Name
+								</label>
 								<input
 									{...register('first_name')}
 									type='text'
@@ -123,11 +125,15 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='uuid'>Registrar Number</label>
+								<label htmlFor='uuid' className='required'>
+									Registrar Number
+								</label>
 								<input {...register('uuid')} type='text' id='uuid' className='form-control' readOnly />
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='last_name'>Last Name</label>
+								<label htmlFor='last_name' className='required'>
+									Last Name
+								</label>
 								<input
 									{...register('last_name')}
 									type='text'
@@ -137,11 +143,15 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='email'>Email Address</label>
+								<label htmlFor='email' className='required'>
+									Email Address
+								</label>
 								<input {...register('email')} type='email' id='email' className='form-control' disabled={processing} />
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='gender'>Gender</label>
+								<label htmlFor='gender' className='required'>
+									Gender
+								</label>
 								<select {...register('gender')} id='gender' className='form-control'>
 									<option value=''> -- Select -- </option>
 									<option value='Male'>Male</option>
@@ -149,7 +159,9 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='number'>Phone Number</label>
+								<label htmlFor='number' className='required'>
+									Phone Number
+								</label>
 								<InputMask
 									mask='0\999-999-9999'
 									type='text'
@@ -161,13 +173,15 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='birthday'>Birthday</label>
+								<label htmlFor='birthday' className='required'>
+									Birthday
+								</label>
 								<Flatpickr
 									value={birthday || undefined}
 									id='birthday'
 									options={{
 										maxDate: dayjs()
-											.year(new Date().getFullYear() - 15)
+											.year(new Date().getFullYear() - 17)
 											.toDate(),
 									}}
 									onChange={(dates) => {
@@ -180,7 +194,9 @@ const Form: FC<Props> = (props) => {
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
-								<label htmlFor='address'>Address</label>
+								<label htmlFor='address' className='required'>
+									Address
+								</label>
 								<input {...register('address')} type='text' id='address' className='form-control' disabled={processing} />
 							</div>
 						</div>

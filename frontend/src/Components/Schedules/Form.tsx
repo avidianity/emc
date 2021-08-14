@@ -142,7 +142,9 @@ const Form: FC<Props> = (props) => {
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
 							<div className='form-group col-12 col-md-4'>
-								<label htmlFor='course_id'>Course</label>
+								<label htmlFor='course_id' className='required'>
+									Course
+								</label>
 								<select
 									{...register('course_id')}
 									id='course_id'
@@ -169,7 +171,9 @@ const Form: FC<Props> = (props) => {
 							</div>
 							{course && course.majors && course.majors.length > 0 ? (
 								<div className='form-group col-12 col-md-4'>
-									<label htmlFor='major_id'>Major</label>
+									<label htmlFor='major_id' className='required'>
+										Major
+									</label>
 									<select
 										{...register('major_id')}
 										id='major_id'
@@ -193,7 +197,9 @@ const Form: FC<Props> = (props) => {
 								</div>
 							) : null}
 							<div className='form-group col-12 col-md-4'>
-								<label htmlFor='section_id'>Section</label>
+								<label htmlFor='section_id' className='required'>
+									Section
+								</label>
 								<select
 									{...register('section_id')}
 									id='section_id'
@@ -230,7 +236,9 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-4'>
-								<label htmlFor='teacher_id'>Teacher</label>
+								<label htmlFor='teacher_id' className='required'>
+									Teacher
+								</label>
 								<select
 									{...register('teacher_id')}
 									id='teacher_id'
@@ -255,7 +263,9 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6 col-lg-4'>
-								<label htmlFor='semester'>Semester</label>
+								<label htmlFor='semester' className='required'>
+									Semester
+								</label>
 								<select
 									{...register('term')}
 									id='semester'
@@ -275,7 +285,9 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className='form-group col-12 col-md-6 col-lg-4'>
-								<label htmlFor='year'>Year Level</label>
+								<label htmlFor='year' className='required'>
+									Year Level
+								</label>
 								<select
 									{...register('year')}
 									id='year'
@@ -297,7 +309,9 @@ const Form: FC<Props> = (props) => {
 								</select>
 							</div>
 							<div className={`form-group col-12 col-md-4`}>
-								<label htmlFor='subject_id'>Subject</label>
+								<label htmlFor='subject_id' className='required'>
+									Subject
+								</label>
 								<select {...register('subject_id')} id='subject_id' className='form-control'>
 									<option value=''> -- Select -- </option>
 									{subjects

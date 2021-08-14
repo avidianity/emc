@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
-import { useArray, useCurrentYear, useNullable } from '../hooks';
+import { useCurrentYear, useNullable } from '../hooks';
 import { courseService } from '../Services/course.service';
 import Flatpickr from 'react-flatpickr';
 import { useHistory } from 'react-router';
@@ -47,15 +47,12 @@ type Inputs = {
 		type: string;
 		enrolled: boolean;
 	};
-	force: boolean;
 };
 
 const PreRegistration: FC<Props> = (props) => {
 	const [processing, setProcessing] = useState(false);
-	const [all, setAll] = useState(false);
 	const { register, handleSubmit, reset, setValue } = useForm<Inputs>({
 		defaultValues: {
-			force: false,
 			level: '1st',
 		},
 	});
@@ -64,7 +61,6 @@ const PreRegistration: FC<Props> = (props) => {
 	const [majorID, setMajorID] = useNullable<number>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const { data: requirements } = useQuery('requirements', () => requirementService.fetch());
-	const [selected, setSelected] = useArray<string>();
 	const [number, setNumber] = useState('');
 	const history = useHistory();
 	const { data: year } = useCurrentYear({ onSuccess: (year) => check(year) });
@@ -79,20 +75,16 @@ const PreRegistration: FC<Props> = (props) => {
 			data.term = '1st Semester';
 			data.year_id = year?.id || 0;
 			data.pre_registration = true;
-			data.requirements = selected;
+			data.requirements = requirements?.map((requirement) => requirement.name) || [];
 			data.student.number = number;
 			data.student.birthday = birthday?.toJSON() || '';
 			await axios.post('/admission/pre-registration', data);
 			toastr.success('Pre Registration saved successfully.');
 			reset();
 			history.goBack();
-		} catch (error) {
+		} catch (error: any) {
 			if (error.response?.status === 409) {
-				if (await Asker.notice(error.response?.data?.message)) {
-					data.force = true;
-					await submit(data);
-					return;
-				}
+				await Asker.okay(error.response?.data?.message);
 			} else {
 				handleError(error);
 			}
@@ -141,11 +133,15 @@ const PreRegistration: FC<Props> = (props) => {
 			<h3>Pre Registration Form</h3>
 			<form className='form-row' onSubmit={handleSubmit(submit)}>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='first_name'>First Name</label>
+					<label htmlFor='first_name' className='required'>
+						First Name
+					</label>
 					<input {...register('student.first_name')} type='text' id='first_name' className='form-control' disabled={processing} />
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='address'>Address</label>
+					<label htmlFor='address' className='required'>
+						Address
+					</label>
 					<input {...register('student.address')} type='text' id='address' className='form-control' disabled={processing} />
 				</div>
 				<div className='form-group col-12 col-md-6'>
@@ -159,7 +155,9 @@ const PreRegistration: FC<Props> = (props) => {
 					/>
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='number'>Phone Number</label>
+					<label htmlFor='number' className='required'>
+						Phone Number
+					</label>
 					<InputMask
 						mask='0\999-999-9999'
 						type='text'
@@ -171,15 +169,21 @@ const PreRegistration: FC<Props> = (props) => {
 					/>
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='last_name'>Last Name</label>
+					<label htmlFor='last_name' className='required'>
+						Last Name
+					</label>
 					<input {...register('student.last_name')} type='text' id='last_name' className='form-control' disabled={processing} />
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='email'>Email Address</label>
+					<label htmlFor='email' className='required'>
+						Email Address
+					</label>
 					<input {...register('student.email')} type='email' id='email' className='form-control' />
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='gender'>Gender</label>
+					<label htmlFor='gender' className='required'>
+						Gender
+					</label>
 					<select {...register('student.gender')} id='gender' className='form-control' disabled={processing}>
 						<option value=''> -- Select -- </option>
 						<option value='Male'>Male</option>
@@ -187,13 +191,15 @@ const PreRegistration: FC<Props> = (props) => {
 					</select>
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='birthday'>Birthday</label>
+					<label htmlFor='birthday' className='required'>
+						Birthday
+					</label>
 					<Flatpickr
 						value={birthday || undefined}
 						id='birthday'
 						options={{
 							maxDate: dayjs()
-								.year(new Date().getFullYear() - 15)
+								.year(new Date().getFullYear() - 17)
 								.toDate(),
 						}}
 						onChange={(dates) => {
@@ -206,7 +212,9 @@ const PreRegistration: FC<Props> = (props) => {
 					/>
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='course_id'>Course</label>
+					<label htmlFor='course_id' className='required'>
+						Course
+					</label>
 					<select
 						{...register('course_id')}
 						id='course_id'
@@ -235,7 +243,9 @@ const PreRegistration: FC<Props> = (props) => {
 				</div>
 				{course && course.majors && course.majors.length > 0 ? (
 					<div className='form-group col-12 col-md-6'>
-						<label htmlFor='major_id'>Major</label>
+						<label htmlFor='major_id' className='required'>
+							Major
+						</label>
 						<select
 							{...register('major_id')}
 							id='major_id'
@@ -266,69 +276,42 @@ const PreRegistration: FC<Props> = (props) => {
 						{requirements?.map((requirement, index) => (
 							<div className='col-12 col-md-6 col-lg-4 col-xl-3' key={index}>
 								<div className='form-group'>
-									<div className='custom-control custom-checkbox'>
-										<input
-											type='checkbox'
-											className='custom-control-input'
-											id={JSON.stringify(requirement)}
-											disabled={processing}
-											onChange={(e) => {
-												const name = e.target.value;
-												if (selected.includes(name)) {
-													const index = selected.findIndex((m) => m === name);
-													selected.splice(index, 1);
-												} else {
-													selected.push(name);
-												}
-												setSelected([...selected]);
-											}}
-											checked={selected.includes(requirement.name)}
-											value={requirement.name}
-										/>
-										<label className='custom-control-label' htmlFor={JSON.stringify(requirement)}>
-											{requirement.name}
-										</label>
-									</div>
+									<label className='custom-control-label' htmlFor={JSON.stringify(requirement)}>
+										{requirement.name}
+									</label>
 								</div>
 							</div>
 						))}
-						<div className='col-12 d-flex'>
-							<button
-								className={`btn btn-${!all ? 'secondary' : 'danger'} btn-sm ml-auto`}
-								onClick={(e) => {
-									e.preventDefault();
-									if (requirements) {
-										if (!all) {
-											setSelected(requirements.map((requirement) => requirement.name));
-										} else {
-											setSelected([]);
-										}
-										setAll(!all);
-									}
-								}}>
-								{!all ? 'Select All' : 'Unselect All'}
-							</button>
-						</div>
 					</div>
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='fathers_name'>Name of Father</label>
+					<label htmlFor='fathers_name' className='required'>
+						Name of Father
+					</label>
 					<input {...register('student.fathers_name')} type='text' id='fathers_name' className='form-control' />
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='mothers_name'>Name of Mother</label>
+					<label htmlFor='mothers_name' className='required'>
+						Name of Mother
+					</label>
 					<input {...register('student.mothers_name')} type='text' id='mothers_name' className='form-control' />
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='fathers_occupation'>Occupation of Father</label>
+					<label htmlFor='fathers_occupation' className='required'>
+						Occupation of Father
+					</label>
 					<input {...register('student.fathers_occupation')} type='text' id='fathers_occupation' className='form-control' />
 				</div>
 				<div className='form-group col-12 col-md-6'>
-					<label htmlFor='mothers_occupation'>Occupation of Mother</label>
+					<label htmlFor='mothers_occupation' className='required'>
+						Occupation of Mother
+					</label>
 					<input {...register('student.mothers_occupation')} type='text' id='mothers_occupation' className='form-control' />
 				</div>
 				<div className='form-group col-12 col-md-6 d-none'>
-					<label htmlFor='uuid'>Student Number</label>
+					<label htmlFor='uuid' className='required'>
+						Student Number
+					</label>
 					<input {...register('student.uuid')} type='text' id='uuid' className='form-control' readOnly />
 				</div>
 				<div className='form-group col-12 d-flex'>

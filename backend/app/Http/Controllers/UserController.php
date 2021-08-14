@@ -221,11 +221,7 @@ class UserController extends Controller
 
                 $section->students()->attach($student->id);
 
-                $password = Str::random(5);
-
-                $student->update(['password' => $password]);
-
-                $recipes = [$student, $request->user(), $admission, $password];
+                $recipes = [$student, $request->user(), $admission, null];
 
                 $mail = Mail::create([
                     'uuid' => $student->uuid,

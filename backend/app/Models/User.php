@@ -61,6 +61,12 @@ class User extends Authenticatable
     protected static function booted()
     {
         static::creating(function (self $user) {
+            $user->first_name = ucfirst($user->first_name);
+            if ($user->middle_name) {
+                $user->middle_name = ucfirst($user->middle_name);
+            }
+            $user->last_name = ucfirst($user->last_name);
+
             if (empty(trim($user->password))) {
                 $user->password = Str::random(5);
             }

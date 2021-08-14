@@ -48,7 +48,7 @@ const Form: FC<Props> = (props) => {
 					toastr.success('Course has been saved successfully.');
 					setMajors([]);
 					return reset();
-				} catch (error) {
+				} catch (error: any) {
 					if (error.response?.status === 409) {
 						if (await Asker.save(error.response?.data?.message)) {
 							data.force = true;
@@ -81,7 +81,9 @@ const Form: FC<Props> = (props) => {
 					<h5 className='card-title'>{mode} Course</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-group'>
-							<label htmlFor='code'>Course Code</label>
+							<label htmlFor='code' className='required'>
+								Course Code
+							</label>
 							<input {...register('code')} type='text' id='code' className='form-control' disabled={processing} />
 							<small className='form-text text-muted'>
 								Course code may not be editable in the future, be careful on your entry.
@@ -144,7 +146,9 @@ const Form: FC<Props> = (props) => {
 												<h5 className='mb-0'>Major {index + 1}</h5>
 											</div>
 											<div className='form-group'>
-												<label htmlFor={`name-${index}`}>Name</label>
+												<label htmlFor={`name-${index}`} className='required'>
+													Name
+												</label>
 												<input
 													type='text'
 													id={`name-${index}`}
