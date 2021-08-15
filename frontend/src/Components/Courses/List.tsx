@@ -1,12 +1,14 @@
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { CourseContract } from '../../Contracts/course.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
 import { useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { courseService } from '../../Services/course.service';
-import Table from '../Shared/Table';
+import Table, { TableColumn } from '../Shared/Table';
+import Tooltip from '../Shared/Tooltip';
 
 type Props = {};
 
@@ -33,7 +35,7 @@ const List: FC<Props> = (props) => {
 
 	const user = State.getInstance().get<UserContract>('user');
 
-	const columns = [
+	const columns: TableColumn[] = [
 		{
 			title: 'Course Code',
 			accessor: 'code',
@@ -58,58 +60,61 @@ const List: FC<Props> = (props) => {
 	if (user?.role === 'Registrar') {
 		columns.push({
 			title: 'Actions',
-			accessor: 'actions',
 			minWidth: '150px',
+			cell: (course: CourseContract) =>
+				user?.role === 'Registrar' ? (
+					<>
+						<Link to={url(`${course.id}/edit`)} className='btn btn-warning btn-sm mx-1' data-tip='Edit'>
+							<i className='fas fa-edit'></i>
+						</Link>
+						<button
+							className='btn btn-danger btn-sm mx-1'
+							onClick={(e) => {
+								e.preventDefault();
+								deleteItem(course.id);
+							}}
+							data-tip='Delete'>
+							<i className='fas fa-trash'></i>
+						</button>
+					</>
+				) : null,
 		});
 	}
 
 	return (
-		<Table
-			onRefresh={() => refetch()}
-			title='Courses'
-			loading={loading}
-			items={
-				items?.map((course) => ({
-					...course,
-					open: course.open ? (
-						<span className='badge badge-success'>Open for Enrollment</span>
-					) : (
-						<span className='badge badge-danger'>Not Open for Enrollment</span>
-					),
-					majors: course.majors?.map((major, index) => (
-						<span className='d-block' key={index}>
-							{major.name}
-						</span>
-					)),
-					actions:
-						user?.role === 'Registrar' ? (
-							<>
-								<Link to={url(`${course.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-									<i className='fas fa-edit'></i>
-								</Link>
-								<button
-									className='btn btn-danger btn-sm mx-1'
-									onClick={(e) => {
-										e.preventDefault();
-										deleteItem(course.id);
-									}}>
-									<i className='fas fa-trash'></i>
-								</button>
-							</>
-						) : null,
-				})) || []
-			}
-			columns={columns}
-			buttons={
-				<>
-					{user?.role === 'Registrar' ? (
-						<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
-							<i className='fas fa-plus'></i>
-						</Link>
-					) : null}
-				</>
-			}
-		/>
+		<>
+			<Table
+				onRefresh={() => refetch()}
+				title='Courses'
+				loading={loading}
+				items={
+					items?.map((course) => ({
+						...course,
+						open: course.open ? (
+							<span className='badge badge-success'>Open for Enrollment</span>
+						) : (
+							<span className='badge badge-danger'>Not Open for Enrollment</span>
+						),
+						majors: course.majors?.map((major, index) => (
+							<span className='d-block' key={index}>
+								{major.name}
+							</span>
+						)),
+					})) || []
+				}
+				columns={columns}
+				buttons={
+					<>
+						{user?.role === 'Registrar' ? (
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add Course'>
+								<i className='fas fa-plus'></i>
+							</Link>
+						) : null}
+					</>
+				}
+			/>
+			<Tooltip />
+		</>
 	);
 };
 

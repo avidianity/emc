@@ -23,6 +23,8 @@ const Form: FC<Props> = (props) => {
 	const [id, setID] = useState(-1);
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
+	const [startYear, setStartYear] = useState(new Date().getFullYear());
+	const [endYear, setEndYear] = useState(new Date().getFullYear() + 10);
 	const [semesterStart, setSemesterStart] = useNullable<Date>();
 	const [semesterEnd, setSemesterEnd] = useNullable<Date>();
 	const [registrationStart, setRegistrationStart] = useNullable<Date>();
@@ -51,6 +53,8 @@ const Form: FC<Props> = (props) => {
 	const submit = async (data: YearContract) => {
 		setProcessing(true);
 		try {
+			data.start = startYear;
+			data.end = endYear;
 			data.semester_start = semesterStart?.toJSON() || '';
 			data.semester_end = semesterEnd?.toJSON() || '';
 			data.registration_start = registrationStart?.toJSON() || '';
@@ -88,13 +92,14 @@ const Form: FC<Props> = (props) => {
 									Start
 								</label>
 								<input
-									{...register('start')}
 									type='number'
 									id='start'
 									min={new Date().getFullYear()}
 									max={new Date().getFullYear() + 10}
 									className='form-control'
 									disabled={processing}
+									value={startYear}
+									onChange={(e) => setStartYear(e.target.value.toNumber())}
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
@@ -102,13 +107,14 @@ const Form: FC<Props> = (props) => {
 									End
 								</label>
 								<input
-									{...register('end')}
 									type='number'
 									id='end'
 									min={new Date().getFullYear()}
 									max={new Date().getFullYear() + 10}
 									className='form-control'
 									disabled={processing}
+									value={endYear}
+									onChange={(e) => setEndYear(e.target.value.toNumber())}
 								/>
 							</div>
 							<div className='form-group col-12'>
@@ -136,6 +142,10 @@ const Form: FC<Props> = (props) => {
 									}}
 									className='form-control'
 									disabled={processing}
+									options={{
+										altInput: true,
+										minDate: dayjs().add(1, 'week').toDate(),
+									}}
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
@@ -152,6 +162,10 @@ const Form: FC<Props> = (props) => {
 									}}
 									className='form-control'
 									disabled={processing}
+									options={{
+										altInput: true,
+										minDate: dayjs().add(1, 'week').toDate(),
+									}}
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
@@ -162,7 +176,8 @@ const Form: FC<Props> = (props) => {
 									value={registrationStart || undefined}
 									id='registration_start'
 									options={{
-										minDate: new Date(),
+										minDate: dayjs(new Date()).add(1, 'week').toDate(),
+										altInput: true,
 									}}
 									onChange={(dates) => {
 										if (dates.length > 0) {
@@ -181,7 +196,10 @@ const Form: FC<Props> = (props) => {
 									value={registrationEnd || undefined}
 									id='registration_end'
 									options={{
-										minDate: registrationStart || new Date(),
+										minDate: dayjs(registrationStart || new Date())
+											.add(1, 'week')
+											.toDate(),
+										altInput: true,
 									}}
 									onChange={(dates) => {
 										if (dates.length > 0) {
@@ -211,6 +229,7 @@ const Form: FC<Props> = (props) => {
 										altFormat: 'F j, Y G:i K',
 										enableTime: true,
 										dateFormat: 'F j, Y G:i K',
+										minDate: dayjs().add(1, 'week').toDate(),
 									}}
 								/>
 							</div>
@@ -233,6 +252,7 @@ const Form: FC<Props> = (props) => {
 										altFormat: 'F j, Y G:i K',
 										enableTime: true,
 										dateFormat: 'F j, Y G:i K',
+										minDate: dayjs().add(1, 'week').toDate(),
 									}}
 								/>
 							</div>

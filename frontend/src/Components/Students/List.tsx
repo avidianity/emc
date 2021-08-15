@@ -1,12 +1,10 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
 import React, { createRef, FC } from 'react';
-import { useEffect } from 'react';
-import { useCallback } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, RouteComponentProps } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { CourseContract } from '../../Contracts/course.contract';
 import { MajorContract } from '../../Contracts/major.contract';
@@ -23,7 +21,9 @@ import { userService } from '../../Services/user.service';
 import { yearService } from '../../Services/year.service';
 import Flatpickr from 'react-flatpickr';
 
-import Table from '../Shared/Table';
+import Table, { TableColumn } from '../Shared/Table';
+import { statuses } from '../../constants';
+import Tooltip from '../Shared/Tooltip';
 
 type GradeContract = {
 	student_id: number;
@@ -38,12 +38,14 @@ type UserInput = {
 	payment_status: 'Not Paid' | 'Partially Paid' | 'Fully Paid';
 };
 
-type Props = {};
+interface Props extends RouteComponentProps {
+	type: 'Old' | 'New' | 'Behind';
+}
 
 const incrementModalRef = v4();
 const updatePaymentModalRef = v4();
 
-const List: FC<Props> = (props) => {
+const List: FC<Props> = ({ type }) => {
 	const [processing, setProcessing] = useState(false);
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('users', () => userService.fetch());
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
@@ -63,7 +65,6 @@ const List: FC<Props> = (props) => {
 	const [student, setStudent] = useNullable<number>();
 	const addGradeModalRef = createRef<HTMLDivElement>();
 	const { data: year } = useCurrentYear();
-	const history = useHistory();
 	const [semesterStart, setSemesterStart] = useNullable<Date>();
 	const [semesterEnd, setSemesterEnd] = useNullable<Date>();
 	const [registrationStart, setRegistrationStart] = useNullable<Date>();
@@ -72,7 +73,7 @@ const List: FC<Props> = (props) => {
 	const [gradeEnd, setGradeEnd] = useNullable<Date>();
 	const {
 		register,
-		handleSubmit: yearHandleSubmit,
+		handleSubmit: handleSubmitYear,
 		reset: yearReset,
 	} = useForm<YearContract>({
 		defaultValues: {
@@ -82,24 +83,7 @@ const List: FC<Props> = (props) => {
 		},
 	});
 
-	const determine = useCallback(() => {
-		if (history.location.pathname.includes('old')) {
-			return 'Old';
-		} else if (history.location.pathname.includes('new')) {
-			return 'New';
-		} else if (history.location.pathname.includes('behind')) {
-			return 'Behind';
-		}
-		throw new Error();
-	}, [history.location.pathname]);
-
-	const [type, setType] = useState(determine());
 	const user = State.getInstance().get<UserContract>('user');
-	const statuses = {
-		'Not Paid': 'danger',
-		'Fully Paid': 'success',
-		'Partially Paid': 'warning',
-	};
 
 	if (isError) {
 		handleError(error);
@@ -214,11 +198,7 @@ const List: FC<Props> = (props) => {
 		}
 	};
 
-	useEffect(() => {
-		setType(determine());
-	}, [determine]);
-
-	const columns = [
+	const columns: TableColumn[] = [
 		{
 			title: 'ID Number',
 			accessor: 'uuid',
@@ -264,7 +244,84 @@ const List: FC<Props> = (props) => {
 	];
 
 	if (['Registrar', 'Teacher', 'Admin'].includes(user?.role || '')) {
-		columns.push({ title: 'Actions', accessor: 'actions', minWidth: '350px' });
+		columns.push({
+			title: 'Actions',
+			minWidth: '180px',
+			cell: (student: UserContract) => (
+				<>
+					{user?.role === 'Registrar' ? (
+						<>
+							<Link
+								to={`/dashboard/admissions/${student.admissions?.find((admission) => admission?.year?.current)?.id}/edit`}
+								className='btn btn-warning btn-sm mx-1'
+								data-tip='Edit'>
+								<i className='fas fa-edit'></i>
+							</Link>
+							<button
+								className='btn btn-info btn-sm mx-1'
+								data-tip='Update Payment'
+								onClick={(e) => {
+									e.preventDefault();
+									const modal = $(`#${updatePaymentModalRef}`);
+									if (modal.length > 0) {
+										setStudent(student.id!);
+										setValueUser('payment_status', student.payment_status);
+										modal.modal('toggle');
+									}
+								}}>
+								<i className='fas fa-money-bill'></i>
+							</button>
+							{isBehind(student) ? (
+								<button
+									className='btn btn-primary btn-sm'
+									data-tip='Re-Increment Student'
+									onClick={async (e) => {
+										e.preventDefault();
+										if (await Asker.notice('Are you sure to reincrement this student?')) {
+											await reincrement(student);
+										}
+									}}>
+									<i className='fas fa-university'></i>
+								</button>
+							) : null}
+						</>
+					) : null}
+					{['Registrar', 'Admin'].includes(user?.role || '') && !isBehind(student) ? (
+						<Link
+							to={`${routes.DASHBOARD}${routes.STUDENTS}/${student.id}/subjects`}
+							className='btn btn-primary btn-sm mx-1'
+							data-tip='Add Subjects'>
+							<i className='fas fa-book'></i>
+						</Link>
+					) : null}
+					{user?.role === 'Teacher' ? (
+						<>
+							<button
+								className='btn btn-primary btn-sm mx-1'
+								data-tip='Add Grade'
+								onClick={(e) => {
+									e.preventDefault();
+									if (addGradeModalRef.current) {
+										setStudent(student.id!);
+										$(addGradeModalRef.current).modal('toggle');
+									}
+								}}>
+								<i className='fas fa-chart-bar'></i>
+							</button>
+						</>
+					) : null}
+					<button
+						className='btn btn-danger btn-sm mx-1 d-none'
+						onClick={(e) => {
+							e.preventDefault();
+							deleteItem(student.id);
+						}}
+						data-tip='Delete'>
+						<i className='fas fa-trash'></i>
+					</button>
+				</>
+			),
+		});
 	}
 
 	return (
@@ -321,81 +378,6 @@ const List: FC<Props> = (props) => {
 							),
 							section: <>{findSection(student)?.name}</>,
 							semester: findAdmission(student)?.year?.semester,
-							actions: (
-								<>
-									{user?.role === 'Registrar' ? (
-										<>
-											<Link
-												to={`/dashboard/admissions/${
-													student.admissions?.find((admission) => admission?.year?.current)?.id
-												}/edit`}
-												className='btn btn-warning btn-sm mx-1'
-												title='Edit'>
-												<i className='fas fa-edit'></i>
-											</Link>
-											<button
-												className='btn btn-info btn-sm mx-1'
-												title='Update Payment'
-												onClick={(e) => {
-													e.preventDefault();
-													const modal = $(`#${updatePaymentModalRef}`);
-													if (modal.length > 0) {
-														setStudent(student.id!);
-														setValueUser('payment_status', student.payment_status);
-														modal.modal('toggle');
-													}
-												}}>
-												<i className='fas fa-money-bill'></i>
-											</button>
-											{isBehind(student) ? (
-												<button
-													className='btn btn-primary btn-sm'
-													title='Re-Increment Student'
-													onClick={async (e) => {
-														e.preventDefault();
-														if (await Asker.notice('Are you sure to reincrement this student?')) {
-															await reincrement(student);
-														}
-													}}>
-													<i className='fas fa-university'></i>
-												</button>
-											) : null}
-										</>
-									) : null}
-									{['Registrar', 'Admin'].includes(user?.role || '') && !isBehind(student) ? (
-										<Link
-											to={`${routes.DASHBOARD}${routes.STUDENTS}/${student.id}/subjects`}
-											className='btn btn-primary btn-sm mx-1'
-											title='Add Subjects'>
-											<i className='fas fa-book'></i>
-										</Link>
-									) : null}
-									{user?.role === 'Teacher' ? (
-										<>
-											<button
-												className='btn btn-primary btn-sm mx-1'
-												title='Add Grade'
-												onClick={(e) => {
-													e.preventDefault();
-													if (addGradeModalRef.current) {
-														setStudent(student.id!);
-														$(addGradeModalRef.current).modal('toggle');
-													}
-												}}>
-												<i className='fas fa-chart-bar'></i>
-											</button>
-										</>
-									) : null}
-									<button
-										className='btn btn-danger btn-sm mx-1 d-none'
-										onClick={(e) => {
-											e.preventDefault();
-											deleteItem(student.id);
-										}}>
-										<i className='fas fa-trash'></i>
-									</button>
-								</>
-							),
 						})) || []
 				}
 				columns={columns}
@@ -459,7 +441,7 @@ const List: FC<Props> = (props) => {
 								{type !== 'Behind' ? (
 									<button
 										className='btn btn-secondary btn-sm mx-1'
-										title='Evaluate Students'
+										data-tip='Evaluate Students'
 										onClick={(e) => {
 											e.preventDefault();
 											$(`#${incrementModalRef}`).modal('show');
@@ -471,21 +453,21 @@ const List: FC<Props> = (props) => {
 									href={`${axios.defaults.baseURL}/exports/registrar/classlist/regular-and-irregular`}
 									download
 									className='btn btn-warning btn-sm mx-1'
-									title='Download Classlist per Regular and Irregular Student'>
+									data-tip='Download Classlist per Regular and Irregular Student'>
 									<i className='fas fa-file-excel'></i>
 								</a>
 								<a
 									href={`${axios.defaults.baseURL}/exports/registrar/classlist/course-and-major`}
 									download
 									className='btn btn-primary btn-sm mx-1'
-									title='Download Classlist per Course and Major'>
+									data-tip='Download Classlist per Course and Major'>
 									<i className='fas fa-file-excel'></i>
 								</a>
 								<a
 									href={`${axios.defaults.baseURL}/exports/registrar/classlist/subject`}
 									download
 									className='btn btn-success btn-sm mx-1'
-									title='Download Classlist per Subject'>
+									data-tip='Download Classlist per Subject'>
 									<i className='fas fa-file-excel'></i>
 								</a>
 							</>
@@ -579,7 +561,7 @@ const List: FC<Props> = (props) => {
 			<div id={incrementModalRef} className='modal fade' tabIndex={-1}>
 				<div className='modal-dialog modal-dialog-centered modal-lg'>
 					<div className='modal-content'>
-						<form onSubmit={yearHandleSubmit(submitYear)}>
+						<form onSubmit={handleSubmitYear(submitYear)}>
 							<div className='modal-header'>
 								<h5 className='modal-title'>Increment to new School Year</h5>
 								<button
@@ -752,6 +734,7 @@ const List: FC<Props> = (props) => {
 					</div>
 				</div>
 			</div>
+			<Tooltip />
 		</>
 	);
 };

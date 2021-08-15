@@ -12,15 +12,15 @@ const Students: FC<Props> = (props) => {
 	const routes: RouteProps[] = [
 		{
 			path: url('/new'),
-			component: List,
+			render: (props) => <List {...props} type='New' />,
 		},
 		{
 			path: url('/old'),
-			component: List,
+			render: (props) => <List {...props} type='Old' />,
 		},
 		{
 			path: url('/with-deficiency'),
-			component: List,
+			render: (props) => <List {...props} type='Behind' />,
 		},
 		{
 			path: url('/:id/subjects'),

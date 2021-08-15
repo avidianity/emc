@@ -2,12 +2,14 @@ import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { RequirementContract } from '../../Contracts/requirement.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
 import { useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { requirementService } from '../../Services/requirement.service';
-import Table from '../Shared/Table';
+import Table, { TableColumn } from '../Shared/Table';
+import Tooltip from '../Shared/Tooltip';
 
 type Props = {};
 
@@ -34,7 +36,7 @@ const List: FC<Props> = (props) => {
 
 	const user = State.getInstance().get<UserContract>('user');
 
-	const columns = [
+	const columns: TableColumn[] = [
 		{
 			title: 'ID',
 			accessor: 'id',
@@ -52,48 +54,51 @@ const List: FC<Props> = (props) => {
 	if (user?.role === 'Registrar') {
 		columns.push({
 			title: 'Actions',
-			accessor: 'actions',
+			cell: (requirement: RequirementContract) =>
+				user?.role === 'Registrar' ? (
+					<>
+						<Link to={url(`${requirement.id}/edit`)} className='btn btn-warning btn-sm mx-1' data-tip='Edit'>
+							<i className='fas fa-edit'></i>
+						</Link>
+						<button
+							className='btn btn-danger btn-sm mx-1'
+							onClick={(e) => {
+								e.preventDefault();
+								deleteItem(requirement.id);
+							}}
+							data-tip='Delete'>
+							<i className='fas fa-trash'></i>
+						</button>
+					</>
+				) : null,
 		});
 	}
 
 	return (
-		<Table
-			onRefresh={() => refetch()}
-			title='Requirements'
-			loading={loading}
-			items={
-				items?.map((requirement) => ({
-					...requirement,
-					created_at: dayjs(requirement.created_at).format('MMMM DD, YYYY hh:mm A'),
-					actions:
-						user?.role === 'Registrar' ? (
-							<>
-								<Link to={url(`${requirement.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-									<i className='fas fa-edit'></i>
-								</Link>
-								<button
-									className='btn btn-danger btn-sm mx-1'
-									onClick={(e) => {
-										e.preventDefault();
-										deleteItem(requirement.id);
-									}}>
-									<i className='fas fa-trash'></i>
-								</button>
-							</>
-						) : null,
-				})) || []
-			}
-			columns={columns}
-			buttons={
-				<>
-					{user?.role === 'Registrar' ? (
-						<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
-							<i className='fas fa-plus'></i>
-						</Link>
-					) : null}
-				</>
-			}
-		/>
+		<>
+			<Table
+				onRefresh={() => refetch()}
+				title='Requirements'
+				loading={loading}
+				items={
+					items?.map((requirement) => ({
+						...requirement,
+						created_at: dayjs(requirement.created_at).format('MMMM DD, YYYY hh:mm A'),
+					})) || []
+				}
+				columns={columns}
+				buttons={
+					<>
+						{user?.role === 'Registrar' ? (
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add Requirement'>
+								<i className='fas fa-plus'></i>
+							</Link>
+						) : null}
+					</>
+				}
+			/>
+			<Tooltip />
+		</>
 	);
 };
 

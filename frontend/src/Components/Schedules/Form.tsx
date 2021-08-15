@@ -112,7 +112,7 @@ const Form: FC<Props> = (props) => {
 			setCourse(null);
 			setMajor(null);
 			setTerm(null);
-		} catch (error) {
+		} catch (error: any) {
 			if (error.response?.status === 409) {
 				if (await Asker.save(error.response?.data?.message)) {
 					data.force = true;

@@ -12,7 +12,8 @@ import { useNullable, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { courseService } from '../../Services/course.service';
 import { subjectService } from '../../Services/subject.service';
-import Table from '../Shared/Table';
+import Table, { TableColumn } from '../Shared/Table';
+import Tooltip from '../Shared/Tooltip';
 
 type Props = {};
 
@@ -42,7 +43,7 @@ const List: FC<Props> = (props) => {
 
 	const user = State.getInstance().get<UserContract>('user');
 
-	const columns = [
+	const columns: TableColumn[] = [
 		{
 			title: 'Subject Code',
 			accessor: 'code',
@@ -74,7 +75,43 @@ const List: FC<Props> = (props) => {
 	if (['Registrar', 'Teacher'].includes(user?.role || '')) {
 		columns.push({
 			title: 'Actions',
-			accessor: 'actions',
+			minWidth: '100px',
+			cell: (subject: SubjectContract) => (
+				<>
+					{user?.role === 'Teacher' ? (
+						<>
+							<Link to={url(`${subject.id}/view`)} className='btn btn-info btn-sm mx-1' data-tip='View'>
+								<i className='fas fa-eye'></i>
+							</Link>
+							<a
+								href={`${axios.defaults.baseURL}/exports/teacher/classlist/${subject.id}`}
+								download
+								className={`btn btn-warning btn-sm mx-1 ${
+									subject.students_count && subject.students_count > 0 ? '' : 'disabled'
+								}`}
+								data-tip='Download Classlist'>
+								<i className='fas fa-file-excel'></i>
+							</a>
+						</>
+					) : null}
+					{user?.role === 'Registrar' ? (
+						<>
+							<Link to={url(`${subject.id}/edit`)} className='btn btn-warning btn-sm mx-1' data-tip='Edit'>
+								<i className='fas fa-edit'></i>
+							</Link>
+							<button
+								className='btn btn-danger btn-sm mx-1'
+								onClick={(e) => {
+									e.preventDefault();
+									deleteItem(subject.id);
+								}}
+								data-tip='Delete'>
+								<i className='fas fa-trash'></i>
+							</button>
+						</>
+					) : null}
+				</>
+			),
 		});
 	}
 
@@ -94,41 +131,6 @@ const List: FC<Props> = (props) => {
 			.map((subject) => ({
 				...subject,
 				course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
-				actions: (
-					<div style={{ minWidth: '350px' }}>
-						{user?.role === 'Teacher' ? (
-							<>
-								<Link to={url(`${subject.id}/view`)} className='btn btn-info btn-sm mx-1' title='View'>
-									<i className='fas fa-eye'></i>
-								</Link>
-								<a
-									href={`${axios.defaults.baseURL}/exports/teacher/classlist/${subject.id}`}
-									download
-									className={`btn btn-warning btn-sm mx-1 ${
-										subject.students_count && subject.students_count > 0 ? '' : 'disabled'
-									}`}
-									title='Download Classlist'>
-									<i className='fas fa-file-excel'></i>
-								</a>
-							</>
-						) : null}
-						{user?.role === 'Registrar' ? (
-							<>
-								<Link to={url(`${subject.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-									<i className='fas fa-edit'></i>
-								</Link>
-								<button
-									className='btn btn-danger btn-sm mx-1'
-									onClick={(e) => {
-										e.preventDefault();
-										deleteItem(subject.id);
-									}}>
-									<i className='fas fa-trash'></i>
-								</button>
-							</>
-						) : null}
-					</div>
-				),
 			}));
 
 	const memoizedRefine = useCallback(refine, [refine]);
@@ -137,75 +139,78 @@ const List: FC<Props> = (props) => {
 	const raw = refine(items || []);
 
 	return (
-		<Table
-			onRefresh={() => refetch()}
-			title='Subjects'
-			loading={loading}
-			items={items && items.length >= 250 ? memoized : raw}
-			columns={columns}
-			buttons={
-				<>
-					{user?.role === 'Registrar' ? (
-						<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
-							<i className='fas fa-plus'></i>
-						</Link>
-					) : null}
-				</>
-			}
-			misc={
-				<>
-					<label className='mb-0 mt-2 mx-1'>
-						Course:
-						<select
-							className='custom-select custom-select-sm form-control form-control-sm'
-							onChange={(e) => {
-								const id = e.target.value.toNumber();
-								if (id === 0) {
-									setCourse(null);
-									setMajor(null);
-								} else {
-									const course = courses?.find((course) => course.id === id);
-									if (course) {
-										setCourse(course);
-									}
-								}
-							}}>
-							<option value='0'>All</option>
-							{courses?.map((course, index) => (
-								<option value={course.id} key={index}>
-									{course.code}
-								</option>
-							))}
-						</select>
-					</label>
-					{course ? (
+		<>
+			<Table
+				onRefresh={() => refetch()}
+				title='Subjects'
+				loading={loading}
+				items={items && items.length >= 250 ? memoized : raw}
+				columns={columns}
+				buttons={
+					<>
+						{user?.role === 'Registrar' ? (
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add Subject'>
+								<i className='fas fa-plus'></i>
+							</Link>
+						) : null}
+					</>
+				}
+				misc={
+					<>
 						<label className='mb-0 mt-2 mx-1'>
-							Major:
+							Course:
 							<select
 								className='custom-select custom-select-sm form-control form-control-sm'
 								onChange={(e) => {
 									const id = e.target.value.toNumber();
 									if (id === 0) {
+										setCourse(null);
 										setMajor(null);
 									} else {
-										const major = course?.majors?.find((major) => major.id === id);
-										if (major) {
-											setMajor(major);
+										const course = courses?.find((course) => course.id === id);
+										if (course) {
+											setCourse(course);
 										}
 									}
 								}}>
 								<option value='0'>All</option>
-								{course.majors?.map((major, index) => (
-									<option value={major.id} key={index}>
-										{major.name}
+								{courses?.map((course, index) => (
+									<option value={course.id} key={index}>
+										{course.code}
 									</option>
 								))}
 							</select>
 						</label>
-					) : null}
-				</>
-			}
-		/>
+						{course ? (
+							<label className='mb-0 mt-2 mx-1'>
+								Major:
+								<select
+									className='custom-select custom-select-sm form-control form-control-sm'
+									onChange={(e) => {
+										const id = e.target.value.toNumber();
+										if (id === 0) {
+											setMajor(null);
+										} else {
+											const major = course?.majors?.find((major) => major.id === id);
+											if (major) {
+												setMajor(major);
+											}
+										}
+									}}>
+									<option value='0'>All</option>
+									{course.majors?.map((major, index) => (
+										<option value={major.id} key={index}>
+											{major.name}
+										</option>
+									))}
+								</select>
+							</label>
+						) : null}
+					</>
+				}
+			/>
+			<Tooltip />
+		</>
 	);
 };
 

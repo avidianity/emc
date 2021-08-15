@@ -140,6 +140,14 @@ const Enrollment: FC<Props> = (props) => {
 		<div ref={ref} className='container'>
 			<div className='row'>
 				<div className='col-12 col-md-8 offset-md-2 text-center'>
+					<img
+						src='/logo.png'
+						alt='EMC Registration System'
+						className='rounded-circle shadow-sm border'
+						style={{ height: '100px', width: '100px' }}
+					/>
+				</div>
+				<div className='col-12 col-md-8 offset-md-2 text-center'>
 					<h4>EASTERN MINDORO COLLEGE</h4>
 					<p>Bongabong, Oriental Mindoro</p>
 					<h6>College Enrollment Slip</h6>

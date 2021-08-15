@@ -23,6 +23,7 @@ type Inputs = {
 	year_id: number;
 	major_id?: number;
 	requirements: string[];
+	reference_number: string;
 	student: {
 		uuid: string;
 		first_name: string;

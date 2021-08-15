@@ -8,7 +8,8 @@ import { useArray, useNullable, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { userService } from '../../Services/user.service';
 
-import Table from '../Shared/Table';
+import Table, { TableColumn } from '../Shared/Table';
+import Tooltip from '../Shared/Tooltip';
 
 type Props = {};
 
@@ -49,7 +50,7 @@ const List: FC<Props> = (props) => {
 
 	const user = State.getInstance().get<UserContract>('user');
 
-	const columns = [
+	const columns: TableColumn[] = [
 		{
 			title: 'Teacher #',
 			accessor: 'uuid',
@@ -74,7 +75,58 @@ const List: FC<Props> = (props) => {
 			title: '#',
 			accessor: 'toggle',
 		});
-		columns.push({ title: 'Actions', accessor: 'actions' });
+		columns.push({
+			title: 'Actions',
+			cell: (teacher: UserContract) => (
+				<>
+					<Link to={url(`${teacher.id}/edit`)} className='btn btn-warning btn-sm mx-1' data-tip='Edit'>
+						<i className='fas fa-edit'></i>
+					</Link>
+					<button
+						className='btn btn-primary btn-sm mx-1'
+						data-tip='View'
+						onClick={(e) => {
+							e.preventDefault();
+							setTeacher(teacher);
+							if (modalRef.current) {
+								$(modalRef.current).modal('show');
+							}
+						}}>
+						<i className='fas fa-eye'></i>
+					</button>
+					{user?.role === 'Registrar' ? (
+						<button
+							className={`btn btn-${teacher.active ? 'danger' : 'info'} btn-sm mx-1`}
+							onClick={async (e) => {
+								e.preventDefault();
+								if (
+									await Asker.notice(
+										`Are you sure you want to ${teacher.active ? 'disable' : 'enable'} this teacher? ${
+											teacher.active
+												? 'If you disable this teacher, this teacher can’t access the system. And you can’t distribute subjects to this teacher.'
+												: 'If you enable this teacher, this teacher can access the system. And you can distribute subject to this teacher.'
+										}`
+									)
+								) {
+									update(teacher);
+								}
+							}}
+							data-tip={teacher.active ? 'Disable' : 'Enable'}>
+							<i className={`fas fa-user-${teacher.active ? 'times' : 'check'}`}></i>
+						</button>
+					) : null}
+					<button
+						className='btn btn-danger btn-sm mx-1 d-none'
+						onClick={(e) => {
+							e.preventDefault();
+							deleteItem(teacher.id);
+						}}
+						data-tip='Delete'>
+						<i className='fas fa-trash'></i>
+					</button>
+				</>
+			),
+		});
 	}
 
 	useEffect(() => {
@@ -130,61 +182,13 @@ const List: FC<Props> = (props) => {
 							) : (
 								<span className='badge badge-danger'>Inactive</span>
 							),
-							actions: (
-								<div style={{ minWidth: '350px' }}>
-									<Link to={url(`${teacher.id}/edit`)} className='btn btn-warning btn-sm mx-1' title='Edit'>
-										<i className='fas fa-edit'></i>
-									</Link>
-									<button
-										className='btn btn-primary btn-sm mx-1'
-										title='View'
-										onClick={(e) => {
-											e.preventDefault();
-											setTeacher(teacher);
-											if (modalRef.current) {
-												$(modalRef.current).modal('show');
-											}
-										}}>
-										<i className='fas fa-eye'></i>
-									</button>
-									{user?.role === 'Registrar' ? (
-										<button
-											className={`btn btn-${teacher.active ? 'danger' : 'info'} btn-sm mx-1`}
-											onClick={async (e) => {
-												e.preventDefault();
-												if (
-													await Asker.notice(
-														`Are you sure you want to ${teacher.active ? 'disable' : 'enable'} this teacher? ${
-															teacher.active
-																? 'If you disable this teacher, this teacher can’t access the system. And you can’t distribute subjects to this teacher.'
-																: 'If you enable this teacher, this teacher can access the system. And you can distribute subject to this teacher.'
-														}`
-													)
-												) {
-													update(teacher);
-												}
-											}}
-											title={teacher.active ? 'Disable' : 'Enable'}>
-											<i className={`fas fa-user-${teacher.active ? 'times' : 'check'}`}></i>
-										</button>
-									) : null}
-									<button
-										className='btn btn-danger btn-sm mx-1 d-none'
-										onClick={(e) => {
-											e.preventDefault();
-											deleteItem(teacher.id);
-										}}>
-										<i className='fas fa-trash'></i>
-									</button>
-								</div>
-							),
 						})) || []
 				}
 				columns={columns}
 				buttons={
 					<>
 						{user?.role === 'Registrar' ? (
-							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add Teacher'>
 								<i className='fas fa-plus'></i>
 							</Link>
 						) : null}
@@ -192,7 +196,7 @@ const List: FC<Props> = (props) => {
 							<>
 								<button
 									className='btn btn-primary btn-sm ml-2'
-									title='Enable Selected'
+									data-tip='Enable Selected'
 									onClick={async (e) => {
 										e.preventDefault();
 										if (selected.length > 0) {
@@ -227,7 +231,7 @@ const List: FC<Props> = (props) => {
 								</button>
 								<button
 									className='btn btn-danger btn-sm ml-2'
-									title='Disable Selected'
+									data-tip='Disable Selected'
 									onClick={async (e) => {
 										e.preventDefault();
 										if (selected.length > 0) {
@@ -334,7 +338,6 @@ const List: FC<Props> = (props) => {
 							{teacher && (
 								<button
 									className='btn btn-warning btn-sm mx-1'
-									title='Edit'
 									onClick={(e) => {
 										e.preventDefault();
 										if (modalRef.current) {
@@ -360,6 +363,7 @@ const List: FC<Props> = (props) => {
 					</div>
 				</div>
 			</div>
+			<Tooltip />
 		</>
 	);
 };

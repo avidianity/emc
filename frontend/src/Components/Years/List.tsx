@@ -8,7 +8,8 @@ import { handleError, Asker } from '../../helpers';
 import { useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { yearService } from '../../Services/year.service';
-import Table from '../Shared/Table';
+import Table, { TableColumn } from '../Shared/Table';
+import Tooltip from '../Shared/Tooltip';
 
 type Props = {};
 
@@ -47,7 +48,7 @@ const List: FC<Props> = (props) => {
 
 	const user = State.getInstance().get<UserContract>('user');
 
-	const columns = [
+	const columns: TableColumn[] = [
 		{
 			title: 'ID',
 			accessor: 'id',
@@ -87,74 +88,76 @@ const List: FC<Props> = (props) => {
 	if (user?.role === 'Registrar') {
 		columns.push({
 			title: 'Actions',
-			accessor: 'actions',
 			minWidth: '200px',
+			cell: (year: YearContract) =>
+				user?.role === 'Registrar' ? (
+					<>
+						<Link to={url(`${year.id}/edit`)} className='btn btn-warning btn-sm mx-1' data-tip='Edit'>
+							<i className='fas fa-edit'></i>
+						</Link>
+						{!year.current ? (
+							<button
+								className='btn btn-success btn-sm mx-1'
+								onClick={(e) => {
+									e.preventDefault();
+									setAsCurrent(year);
+								}}
+								data-tip='Set as Current'>
+								<i className='fas fa-check'></i>
+							</button>
+						) : null}
+						<button
+							className='btn btn-danger btn-sm mx-1 d-none'
+							onClick={(e) => {
+								e.preventDefault();
+								deleteItem(year.id);
+							}}
+							data-tip='Delete'>
+							<i className='fas fa-trash'></i>
+						</button>
+					</>
+				) : null,
 		});
 	}
 
 	return (
-		<Table
-			onRefresh={() => refetch()}
-			title='School Years'
-			loading={loading}
-			items={
-				items?.map((year) => ({
-					...year,
-					year: (
-						<>
-							{`${year.start} - ${year.end}`}{' '}
-							{year.current ? <span className='badge badge-success mb-1 ml-1'>Current</span> : ''}
-						</>
-					),
-					semester_start: dayjs(year.semester_start).format('MMMM DD, YYYY'),
-					semester_end: dayjs(year.semester_end).format('MMMM DD, YYYY'),
-					registration: `${dayjs(year.registration_start).format('MMMM DD, YYYY')} to ${dayjs(year.registration_end).format(
-						'MMMM DD, YYYY'
-					)}`,
-					grade: `${dayjs(year.grade_start).format('MMMM DD, YYYY hh:mm A')} to ${dayjs(year.grade_end).format(
-						'MMMM DD, YYYY hh:mm A'
-					)}`,
-					actions:
-						user?.role === 'Registrar' ? (
+		<>
+			<Table
+				onRefresh={() => refetch()}
+				title='School Years'
+				loading={loading}
+				items={
+					items?.map((year) => ({
+						...year,
+						year: (
 							<>
-								<Link to={url(`${year.id}/edit`)} className='btn btn-warning btn-sm mx-1' title='Edit'>
-									<i className='fas fa-edit'></i>
-								</Link>
-								{!year.current ? (
-									<button
-										className='btn btn-success btn-sm mx-1'
-										onClick={(e) => {
-											e.preventDefault();
-											setAsCurrent(year);
-										}}
-										title='Set as Current'>
-										<i className='fas fa-check'></i>
-									</button>
-								) : null}
-								<button
-									className='btn btn-danger btn-sm mx-1 d-none'
-									onClick={(e) => {
-										e.preventDefault();
-										deleteItem(year.id);
-									}}
-									title='Delete'>
-									<i className='fas fa-trash'></i>
-								</button>
+								{`${year.start} - ${year.end}`}{' '}
+								{year.current ? <span className='badge badge-success mb-1 ml-1'>Current</span> : ''}
 							</>
-						) : null,
-				})) || []
-			}
-			columns={columns}
-			buttons={
-				<>
-					{user?.role === 'Registrar' && items && items.length === 0 ? (
-						<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
-							<i className='fas fa-plus'></i>
-						</Link>
-					) : null}
-				</>
-			}
-		/>
+						),
+						semester_start: dayjs(year.semester_start).format('MMMM DD, YYYY'),
+						semester_end: dayjs(year.semester_end).format('MMMM DD, YYYY'),
+						registration: `${dayjs(year.registration_start).format('MMMM DD, YYYY')} to ${dayjs(year.registration_end).format(
+							'MMMM DD, YYYY'
+						)}`,
+						grade: `${dayjs(year.grade_start).format('MMMM DD, YYYY hh:mm A')} to ${dayjs(year.grade_end).format(
+							'MMMM DD, YYYY hh:mm A'
+						)}`,
+					})) || []
+				}
+				columns={columns}
+				buttons={
+					<>
+						{user?.role === 'Registrar' && items && items.length === 0 ? (
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
+								<i className='fas fa-plus'></i>
+							</Link>
+						) : null}
+					</>
+				}
+			/>
+			<Tooltip />
+		</>
 	);
 };
 

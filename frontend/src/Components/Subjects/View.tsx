@@ -98,6 +98,9 @@ const View: FC<Props> = (props) => {
 					<p className='card-text mb-0'>Code: {subject.code}</p>
 					<p className='card-text mb-0'>Description: {subject.description}</p>
 					<p className='card-text mb-0'>
+						Teacher: {user?.last_name}, {user?.first_name}
+					</p>
+					<p className='card-text mb-0'>
 						Course: {`${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`}
 					</p>
 					<p className='card-text'>
@@ -146,7 +149,38 @@ const View: FC<Props> = (props) => {
 									? student.admissions?.find((admission) => admission.year?.current)?.term
 									: student.admissions?.last()?.term,
 								section: findSection(student)?.name,
-								actions: (
+							})) || []
+						}
+						columns={[
+							{
+								title: 'ID Number',
+								accessor: 'uuid',
+								minWidth: '200px',
+							},
+							{
+								title: 'Name',
+								accessor: 'name',
+								minWidth: '150px',
+							},
+							{
+								title: 'Year',
+								accessor: 'year',
+								minWidth: '150px',
+							},
+							{
+								title: 'Semester',
+								accessor: 'semester',
+								minWidth: '150px',
+							},
+							{
+								title: 'Section',
+								accessor: 'section',
+								minWidth: '150px',
+							},
+							{
+								title: 'Grades',
+								minWidth: '300px',
+								cell: (student: UserContract) => (
 									<>
 										{findGrade(student, !isBehind(student)) && !setGrade ? (
 											<span
@@ -181,7 +215,7 @@ const View: FC<Props> = (props) => {
 													setSetGrade(true);
 													setStudentID(student.id!);
 												}}
-												className='clickable'>
+												className='clickable d-block'>
 												{findGrade(student, !isBehind(student))?.grade}%
 											</span>
 										) : (
@@ -277,7 +311,7 @@ const View: FC<Props> = (props) => {
 																	setSetGrade(true);
 																	setStudentID(student.id!);
 																}}
-																className='clickable'>
+																className='clickable d-block'>
 																{findGrade(student, !isBehind(student))?.grade}%
 															</span>
 														) : (
@@ -317,38 +351,18 @@ const View: FC<Props> = (props) => {
 										)}
 									</>
 								),
-							})) || []
-						}
-						columns={[
-							{
-								title: 'ID Number',
-								accessor: 'uuid',
-								minWidth: '200px',
 							},
 							{
-								title: 'Name',
-								accessor: 'name',
-								minWidth: '150px',
-							},
-							{
-								title: 'Year',
-								accessor: 'year',
-								minWidth: '150px',
-							},
-							{
-								title: 'Semester',
-								accessor: 'semester',
-								minWidth: '150px',
-							},
-							{
-								title: 'Section',
-								accessor: 'section',
-								minWidth: '150px',
-							},
-							{
-								title: 'Actions',
-								accessor: 'actions',
-								minWidth: '300px',
+								title: 'Status',
+								cell: (student: UserContract) => (
+									<>
+										{findGrade(student, !isBehind(student)) ? (
+											<span className='d-block'>{findGrade(student, !isBehind(student))?.status}</span>
+										) : (
+											<span className='d-block'>N/A</span>
+										)}
+									</>
+								),
 							},
 						]}
 					/>

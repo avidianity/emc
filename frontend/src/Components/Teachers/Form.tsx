@@ -169,6 +169,7 @@ const Form: FC<Props> = (props) => {
 										maxDate: dayjs()
 											.year(new Date().getFullYear() - 17)
 											.toDate(),
+										altInput: true,
 									}}
 									onChange={(dates) => {
 										if (dates.length > 0) {

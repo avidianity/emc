@@ -7,7 +7,8 @@ import { handleError } from '../../helpers';
 import { useNullable } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { userService } from '../../Services/user.service';
-import Table from '../Shared/Table';
+import Table, { TableColumn } from '../Shared/Table';
+import Tooltip from '../Shared/Tooltip';
 
 type Props = {};
 
@@ -51,7 +52,7 @@ const List: FC<Props> = (props) => {
 		handleError(error);
 	}
 
-	const columns = [
+	const columns: TableColumn[] = [
 		{
 			title: '#',
 			accessor: 'id',
@@ -81,7 +82,34 @@ const List: FC<Props> = (props) => {
 	if (user?.role === 'Admin') {
 		columns.push({
 			title: 'Actions',
-			accessor: 'actions',
+			cell: (user: UserContract) => (
+				<>
+					<button
+						className='btn btn-warning btn-sm mx-1'
+						onClick={(e) => {
+							e.preventDefault();
+							setSelected(user.id!);
+							if (modalRef.current) {
+								$(modalRef.current).modal('toggle');
+							}
+						}}
+						data-tip='Change Password'>
+						<i className='fas fa-key'></i>
+					</button>
+					{/* <Link to={url(`${user.id}/edit`)} className='btn btn-warning btn-sm mx-1' data-tip='Edit'>
+								<i className='fas fa-edit'></i>
+							</Link>
+							<button
+								className='btn btn-danger btn-sm mx-1 d-none'
+								onClick={(e) => {
+									e.preventDefault();
+									deleteItem(user.id);
+								}}
+                                data-tip='Delete'>
+								<i className='fas fa-trash'></i>
+							</button> */}
+				</>
+			),
 		});
 	}
 
@@ -106,39 +134,12 @@ const List: FC<Props> = (props) => {
 								{user.last_name}, {user.first_name} {user.middle_name || ''}
 							</>
 						),
-						actions: (
-							<>
-								<button
-									className='btn btn-warning btn-sm mx-1'
-									onClick={(e) => {
-										e.preventDefault();
-										setSelected(user.id!);
-										if (modalRef.current) {
-											$(modalRef.current).modal('toggle');
-										}
-									}}
-									title='Change Password'>
-									<i className='fas fa-key'></i>
-								</button>
-								{/* <Link to={url(`${user.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-								<i className='fas fa-edit'></i>
-							</Link>
-							<button
-								className='btn btn-danger btn-sm mx-1 d-none'
-								onClick={(e) => {
-									e.preventDefault();
-									deleteItem(user.id);
-								}}>
-								<i className='fas fa-trash'></i>
-							</button> */}
-							</>
-						),
 					})) || []
 				}
 				columns={columns}
 				buttons={
 					<>
-						{/* <Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
+						{/* <Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add User'>
 						<i className='fas fa-plus'></i>
 					</Link> */}
 					</>
@@ -187,6 +188,7 @@ const List: FC<Props> = (props) => {
 					</div>
 				</div>
 			</div>
+			<Tooltip />
 		</>
 	);
 };

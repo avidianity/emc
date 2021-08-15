@@ -1,5 +1,9 @@
 <?php
 
+use App\Mail\Admission;
+use App\Models\Admission as ModelsAdmission;
+use App\Models\Course;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*

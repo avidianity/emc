@@ -21,10 +21,10 @@ class Admission extends Mailable
      * @param \App\Models\User $student
      * @param \App\Models\User $registrar
      * @param \App\Models\Admission $admission
-     * @param string $password
+     * @param string|null $password
      * @return void
      */
-    public function __construct($student, $registrar, $admission, $password)
+    public function __construct($student, $registrar, $admission, $password = null)
     {
         $this->student = $student;
         $this->student->password = $password;

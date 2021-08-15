@@ -2,12 +2,14 @@ import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
+import { ScheduleContract } from '../../Contracts/schedule.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
 import { useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { scheduleService } from '../../Services/schedule.service';
-import Table from '../Shared/Table';
+import Table, { TableColumn } from '../Shared/Table';
+import Tooltip from '../Shared/Tooltip';
 
 type Props = {};
 
@@ -34,7 +36,7 @@ const List: FC<Props> = (props) => {
 
 	const user = State.getInstance().get<UserContract>('user');
 
-	const columns = [
+	const columns: TableColumn[] = [
 		{
 			title: 'Course',
 			accessor: 'course',
@@ -68,65 +70,66 @@ const List: FC<Props> = (props) => {
 	if (user?.role === 'Registrar') {
 		columns.push({
 			title: 'Actions',
-			accessor: 'actions',
+			minWidth: '60px',
+			cell: (schedule: ScheduleContract) =>
+				user?.role === 'Registrar' ? (
+					<>
+						<Link to={url(`${schedule.id}/edit`)} className='btn btn-warning btn-sm mx-1' data-tip='Edit'>
+							<i className='fas fa-edit'></i>
+						</Link>
+						<button
+							className='btn btn-danger btn-sm mx-1'
+							onClick={(e) => {
+								e.preventDefault();
+								deleteItem(schedule.id);
+							}}
+							data-tip='Delete'>
+							<i className='fas fa-trash'></i>
+						</button>
+					</>
+				) : null,
 		});
 	}
 
 	return (
-		<Table
-			onRefresh={() => refetch()}
-			title='Schedules'
-			loading={loading}
-			items={
-				items?.map((schedule) => ({
-					...schedule,
-					section: schedule.section?.name,
-					subject: schedule?.subject?.description,
-					course: `${schedule.course?.code}${schedule.major ? ` - Major in ${schedule.major.name}` : ''}`,
-					teacher: `${schedule.teacher?.last_name}, ${schedule.teacher?.first_name} ${schedule.teacher?.middle_name || ''}`,
-					times: (
-						<>
-							{schedule.payload.map((row, index) =>
-								row.start_time && row.end_time ? (
-									<span className='d-block' key={index}>
-										{row.day} {dayjs(row.start_time).format('hh:mm A')} - {dayjs(row.end_time).format('hh:mm A')}
-									</span>
-								) : null
-							)}
-						</>
-					),
-					actions: (
-						<div style={{ minWidth: '250px' }}>
-							{user?.role === 'Registrar' ? (
-								<>
-									<Link to={url(`${schedule.id}/edit`)} className='btn btn-warning btn-sm mx-1'>
-										<i className='fas fa-edit'></i>
-									</Link>
-									<button
-										className='btn btn-danger btn-sm mx-1'
-										onClick={(e) => {
-											e.preventDefault();
-											deleteItem(schedule.id);
-										}}>
-										<i className='fas fa-trash'></i>
-									</button>
-								</>
-							) : null}
-						</div>
-					),
-				})) || []
-			}
-			columns={columns}
-			buttons={
-				<>
-					{user?.role === 'Registrar' ? (
-						<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
-							<i className='fas fa-plus'></i>
-						</Link>
-					) : null}
-				</>
-			}
-		/>
+		<>
+			<Table
+				onRefresh={() => refetch()}
+				title='Schedules'
+				loading={loading}
+				items={
+					items?.map((schedule) => ({
+						...schedule,
+						section: schedule.section?.name,
+						subject: schedule?.subject?.description,
+						course: `${schedule.course?.code}${schedule.major ? ` - Major in ${schedule.major.name}` : ''}`,
+						teacher: `${schedule.teacher?.last_name}, ${schedule.teacher?.first_name} ${schedule.teacher?.middle_name || ''}`,
+						times: (
+							<>
+								{schedule.payload.map((row, index) =>
+									row.start_time && row.end_time ? (
+										<span className='d-block' key={index}>
+											{row.day} {dayjs(row.start_time).format('hh:mm A')} - {dayjs(row.end_time).format('hh:mm A')}
+										</span>
+									) : null
+								)}
+							</>
+						),
+					})) || []
+				}
+				columns={columns}
+				buttons={
+					<>
+						{user?.role === 'Registrar' ? (
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add Schedule'>
+								<i className='fas fa-plus'></i>
+							</Link>
+						) : null}
+					</>
+				}
+			/>
+			<Tooltip />
+		</>
 	);
 };
 

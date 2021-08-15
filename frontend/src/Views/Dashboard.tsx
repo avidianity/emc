@@ -113,7 +113,7 @@ const Dashboard: FC<Props> = (props) => {
 	}
 
 	return (
-		<div className='vertical dark'>
+		<div className='vertical'>
 			<div className='wrapper'>
 				<Navbar />
 				<Sidebar />

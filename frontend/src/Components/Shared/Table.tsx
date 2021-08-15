@@ -1,12 +1,22 @@
 import React, { FC, useEffect } from 'react';
-import Datatable from 'react-data-table-component';
+import Datatable, { ColumnSortFunction, ConditionalStyles, Format, Selector, TableColumnBase } from 'react-data-table-component';
 import { useState } from 'react';
 import { State } from '../../Libraries/State';
 import { outIf } from '../../helpers';
 
+export interface TableColumn extends TableColumnBase {
+	title?: string | number | React.ReactNode;
+	cell?: (row: any, rowIndex: number, column: TableColumn, id: string | number) => React.ReactNode;
+	conditionalCellStyles?: ConditionalStyles<any>[];
+	format?: Format<any> | undefined;
+	selector?: Selector<any>;
+	sortFunction?: ColumnSortFunction<any>;
+	accessor?: string;
+}
+
 export type TableProps = {
 	title: string;
-	columns: { title: string; accessor: string; minWidth?: string }[];
+	columns: TableColumn[];
 	buttons?: any;
 	loading: boolean;
 	onRefresh: () => void;
@@ -47,7 +57,7 @@ const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, it
 										e.preventDefault();
 										onRefresh();
 									}}
-									title='Refresh'>
+									data-tip='Refresh'>
 									<i className={`fas fa-sync-alt ${outIf(loading, 'fa-spin')}`}></i>
 								</button>
 								{buttons}
@@ -58,12 +68,22 @@ const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, it
 				</div>
 				<div className={`card-body table-responsive`}>
 					<Datatable
-						columns={columns.map((column) => ({
-							name: column.title,
-							selector: ((row: any) => row[column.accessor]) as any,
-							sortable: true,
-							...column,
-						}))}
+						columns={columns
+							.map((column) => ({
+								name: column.title,
+								sortable: true,
+								...column,
+							}))
+							.map((column) => {
+								if (column.accessor) {
+									return {
+										...column,
+										selector: ((row: any) => row[column.accessor!]) as any,
+									};
+								}
+
+								return column;
+							})}
 						data={data}
 						pagination
 						fixedHeader
