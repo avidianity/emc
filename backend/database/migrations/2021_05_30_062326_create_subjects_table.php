@@ -17,14 +17,14 @@ class CreateSubjectsTable extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
-            $table->string('code');
-            $table->string('description');
+            $table->string('code')->index();
+            $table->string('description')->index();
             $table->foreignIdFor(new Course())->constrained();
             $table->foreignIdFor(new Major())
                 ->nullable()
                 ->constrained();
-            $table->string('level');
-            $table->string('term');
+            $table->string('level')->index();
+            $table->string('term')->index();
             $table->string('units');
             $table->timestamps();
         });

@@ -18,6 +18,7 @@ class Section extends Model
         'course_id',
         'year_id',
         'major_id',
+        'limit',
     ];
 
     protected static function booted()

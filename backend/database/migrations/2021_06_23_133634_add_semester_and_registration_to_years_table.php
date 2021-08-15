@@ -14,7 +14,7 @@ class AddSemesterAndRegistrationToYearsTable extends Migration
     public function up()
     {
         Schema::table('years', function (Blueprint $table) {
-            $table->string('semester');
+            $table->string('semester')->index();
             $table->timestamp('registration_start')->nullable();
             $table->timestamp('registration_end')->nullable();
         });

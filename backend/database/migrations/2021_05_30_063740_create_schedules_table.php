@@ -26,7 +26,7 @@ class CreateSchedulesTable extends Migration
                 ->constrained();
             $table->foreignIdFor(new Subject())->constrained();
             $table->foreignIdFor(new User(), 'teacher_id')->constrained((new User())->getTable());
-            $table->string('year');
+            $table->string('year')->index();
             $table->text('payload');
             $table->foreignIdFor(new Year())->constrained();
             $table->timestamps();

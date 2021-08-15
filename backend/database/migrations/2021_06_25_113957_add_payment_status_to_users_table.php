@@ -16,6 +16,7 @@ class AddPaymentStatusToUsersTable extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->enum('payment_status', User::PAYMENT_STATUSES)
+                ->index()
                 ->default('Not Paid');
         });
     }

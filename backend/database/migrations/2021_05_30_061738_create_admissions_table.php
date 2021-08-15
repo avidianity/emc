@@ -20,9 +20,9 @@ class CreateAdmissionsTable extends Migration
         Schema::create('admissions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(new Course())->constrained();
-            $table->string('level');
-            $table->string('status');
-            $table->string('term');
+            $table->string('level')->index();
+            $table->string('status')->index();
+            $table->string('term')->index();
             $table->boolean('pre_registration')->default(false);
             $table->foreignIdFor(new User(), 'student_id')->constrained((new User())->getTable());
             $table->foreignIdFor(new Year())->constrained();

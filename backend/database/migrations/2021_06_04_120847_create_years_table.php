@@ -15,11 +15,11 @@ class CreateYearsTable extends Migration
     {
         Schema::create('years', function (Blueprint $table) {
             $table->id();
-            $table->year('start');
-            $table->year('end');
-            $table->timestamp('semester_start')->nullable();
-            $table->timestamp('semester_end')->nullable();
-            $table->boolean('current');
+            $table->year('start')->index();
+            $table->year('end')->index();
+            $table->timestamp('semester_start')->index()->nullable();
+            $table->timestamp('semester_end')->index()->nullable();
+            $table->boolean('current')->index();
             $table->timestamps();
         });
     }

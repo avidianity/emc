@@ -16,8 +16,8 @@ class CreateCoursesTable extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('code')->index();
-            $table->string('description');
-            $table->boolean('open');
+            $table->string('description')->index();
+            $table->boolean('open')->index();
             $table->timestamps();
         });
     }

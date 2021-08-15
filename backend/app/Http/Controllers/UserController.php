@@ -199,7 +199,7 @@ class UserController extends Controller
                  */
                 $section = $builder->first();
 
-                if (!$section || $section->students_count >= 35) {
+                if (!$section || $section->students_count >= $section->limit) {
                     /**
                      * @var \App\Models\Section
                      */
@@ -414,7 +414,7 @@ class UserController extends Controller
              */
             $section = $builder->first();
 
-            if (!$section || $section->students_count >= 35) {
+            if (!$section || $section->students_count >= $section->limit) {
                 /**
                  * @var \App\Models\Section
                  */

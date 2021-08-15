@@ -14,7 +14,7 @@ class AddTermToSchedulesTable extends Migration
     public function up()
     {
         Schema::table('schedules', function (Blueprint $table) {
-            $table->string('term');
+            $table->string('term')->index();
         });
     }
 

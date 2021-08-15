@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddShortNameToMajorsTable extends Migration
+class AddLimitToSectionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddShortNameToMajorsTable extends Migration
      */
     public function up()
     {
-        Schema::table('majors', function (Blueprint $table) {
-            $table->string('short_name')->index();
+        Schema::table('sections', function (Blueprint $table) {
+            $table->unsignedInteger('limit');
         });
     }
 
@@ -25,8 +25,8 @@ class AddShortNameToMajorsTable extends Migration
      */
     public function down()
     {
-        Schema::table('majors', function (Blueprint $table) {
-            $table->dropColumn('short_name');
+        Schema::table('sections', function (Blueprint $table) {
+            $table->dropColumn('limit');
         });
     }
 }
