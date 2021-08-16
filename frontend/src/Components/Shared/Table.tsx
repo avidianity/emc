@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { State } from '../../Libraries/State';
 import { outIf } from '../../helpers';
 
-export interface TableColumn extends TableColumnBase {
+export interface TableColumn<T = any> extends TableColumnBase {
 	title?: string | number | React.ReactNode;
-	cell?: (row: any, rowIndex: number, column: TableColumn, id: string | number) => React.ReactNode;
-	conditionalCellStyles?: ConditionalStyles<any>[];
-	format?: Format<any> | undefined;
-	selector?: Selector<any>;
-	sortFunction?: ColumnSortFunction<any>;
+	cell?: (row: T, rowIndex: number, column: TableColumn<T>, id: string | number) => React.ReactNode;
+	conditionalCellStyles?: ConditionalStyles<T>[];
+	format?: Format<T> | undefined;
+	selector?: Selector<T>;
+	sortFunction?: ColumnSortFunction<T>;
 	accessor?: string;
 }
 

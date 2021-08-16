@@ -149,7 +149,7 @@ const List: FC<Props> = (props) => {
 				buttons={
 					<>
 						{user?.role === 'Registrar' && items && items.length === 0 ? (
-							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2'>
+							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add School Year'>
 								<i className='fas fa-plus'></i>
 							</Link>
 						) : null}

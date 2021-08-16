@@ -21,4 +21,5 @@ export const routes = {
 	ADMISSION_REQUIREMENTS: '/admission-requirements',
 	LOGS: '/logs',
 	UNITS: '/units',
+	SECTIONS: '/sections',
 };

@@ -23,6 +23,17 @@ class Section extends Model
 
     protected static function booted()
     {
+        static::updated(function (self $section) {
+            if ($section->students_count > $section->limit) {
+                $overhead = $section->students_count - $section->limit;
+                $students = $section->students;
+                while ($overhead !== 0) {
+                    $students->last()->delete();
+                    $overhead--;
+                }
+            }
+        });
+
         static::deleting(function (self $section) {
             $section->students()->detach();
             $section->schedules->each(function (Schedule $schedule) {

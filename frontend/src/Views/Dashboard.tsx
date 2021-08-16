@@ -14,6 +14,7 @@ import Mails from '../Components/Mails';
 import Registrars from '../Components/Registrars';
 import Requirements from '../Components/Requirements';
 import Schedules from '../Components/Schedules';
+import Sections from '../Components/Sections';
 import Students from '../Components/Students';
 import Subjects from '../Components/Subjects';
 import Teachers from '../Components/Teachers';
@@ -104,6 +105,10 @@ const Dashboard: FC<Props> = (props) => {
 		{
 			path: url(routes.UNITS),
 			component: Units,
+		},
+		{
+			path: url(routes.SECTIONS),
+			component: Sections,
 		},
 	];
 

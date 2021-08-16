@@ -30,6 +30,7 @@ const Sidebar: FC<Props> = (props) => {
 			routes.YEARS,
 			routes.ADMISSION_REQUIREMENTS,
 			routes.UNITS,
+			routes.SECTIONS,
 		],
 		Teacher: [routes.SUBJECTS],
 		Student: [routes.GRADES, routes.SCHEDULES, routes.PROFILE, routes.ENROLLMENT],
@@ -77,7 +78,7 @@ const Sidebar: FC<Props> = (props) => {
 					<li className='nav-item'>
 						<Link to={url('')} className='nav-link' activeClassName='active' exact>
 							<i className='fe fe-home fe-16'></i>
-							<span className='ml-3 item-text'>Dashboard</span>
+							<span className='ml-3 item-text'>{user.role === 'Student' ? 'Reminders' : 'Dashboard'}</span>
 						</Link>
 					</li>
 					{roles[user.role].includes(routes.COURSES) ? (
@@ -234,6 +235,14 @@ const Sidebar: FC<Props> = (props) => {
 							<Link to={url(routes.PROFILE)} className='nav-link' activeClassName='active'>
 								<i className='fe fe-user fe-16'></i>
 								<span className='ml-3 item-text'>Profile</span>
+							</Link>
+						</li>
+					) : null}
+					{roles[user.role].includes(routes.SECTIONS) ? (
+						<li className='nav-item'>
+							<Link to={url(routes.SECTIONS)} className='nav-link' activeClassName='active'>
+								<i className='fe fe-book fe-16'></i>
+								<span className='ml-3 item-text'>Sections</span>
 							</Link>
 						</li>
 					) : null}

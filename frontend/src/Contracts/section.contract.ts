@@ -10,11 +10,13 @@ export interface SectionContract extends ModelContract {
 	level: string;
 	term: string;
 	course_id: number;
-	major_id: number;
-	year_id: number;
+	major_id?: number;
+	year_id?: number;
+	limit: number;
 	course?: CourseContract;
 	major?: MajorContract;
 	year?: YearContract;
 	students?: UserContract[];
 	schedules?: ScheduleContract[];
+	students_count?: number;
 }

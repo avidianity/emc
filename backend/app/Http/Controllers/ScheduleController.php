@@ -63,6 +63,46 @@ class ScheduleController extends Controller
         return $builder->get();
     }
 
+    public function advance(Request $request)
+    {
+        $builder = Schedule::with('course', 'teacher', 'subject', 'major', 'section')
+            ->whereNull('year_id');
+
+        /**
+         * @var \App\Models\User
+         */
+        $user = $request->user();
+
+        if ($user->role === 'Student') {
+            $sections = $user->sections->map(function (Section $section) {
+                return $section->id;
+            });
+
+            $subjects = $user->subjects->map(function (Subject $subject) {
+                return $subject->id;
+            });
+
+            /**
+             * @var \App\Models\Admission|null
+             */
+            $admission = $user->admissions()->whereHas('year', function (Builder $builder) {
+                return $builder->where('current', true);
+            })->first() ?: $user->admissions()->latest()->first();
+
+            if ($admission) {
+                $builder = $builder->where('year', $admission->level)
+                    ->where('term', $admission->term);
+            }
+
+            $builder = $builder->whereIn('section_id', $sections->toArray())
+                ->whereIn('subject_id', $subjects->toArray());
+        } else if ($user->role === 'Teacher') {
+            $builder = $builder->where('teacher_id', $user->id);
+        }
+
+        return $builder->get();
+    }
+
     /**
      * Store a newly created resource in storage.
      *
@@ -80,7 +120,7 @@ class ScheduleController extends Controller
             'payload.*.day' => ['required', 'string'],
             'payload.*.start_time' => ['required', 'string'],
             'payload.*.end_time' => ['required', 'string'],
-            'year_id' => ['required', 'numeric', Rule::exists(Year::class, 'id')],
+            'year_id' => ['nullable', 'numeric', Rule::exists(Year::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'section_id' => ['required', 'numeric', Rule::exists(Section::class, 'id')],
             'term' => ['required', 'string'],
@@ -90,10 +130,11 @@ class ScheduleController extends Controller
         if (!$data['force']) {
             if (
                 Schedule::whereCourseId($data['course_id'])
+                ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
                 ->whereTeacherId($data['teacher_id'])
                 ->whereSubjectId($data['subject_id'])
                 ->whereYear('year', $data['year'])
-                ->whereYearId($data['year_id'])
+                ->whereYearId(isset($data['year_id']) ? $data['year_id'] : null)
                 ->whereSectionId($data['section_id'])
                 ->count() > 0
             ) {

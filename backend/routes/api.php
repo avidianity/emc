@@ -61,6 +61,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/admissions/increment', [AdmissionController::class, 'increment']);
     Route::post('/users/{user}/reincrement', [UserController::class, 'reincrement']);
 
+    Route::get('/schedules/advance', [ScheduleController::class, 'advance']);
+    Route::get('/sections/advance', [SectionController::class, 'advance']);
+
     Route::apiResources([
         'admissions' => AdmissionController::class,
         'grades' => GradeController::class,

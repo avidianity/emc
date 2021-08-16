@@ -34,6 +34,16 @@ class Year extends Model
 
     protected static function booted()
     {
+        static::creating(function (self $year) {
+            $schedules = Schedule::whereNull('year_id')
+                ->get();
+
+            $schedules->each(function (Schedule $schedule) use ($year) {
+                $schedule->year_id = $year->id;
+                $schedule->save();
+            });
+        });
+
         static::deleting(function (self $year) {
             $year->admissions->each(function (Admission $admission) {
                 $admission->delete();

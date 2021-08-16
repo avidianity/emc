@@ -25,7 +25,7 @@ type Inputs = {
 	subject_id: number;
 	teacher_id: number;
 	year: string;
-	year_id: number;
+	year_id?: number;
 	major_id?: number;
 	payload: ScheduleRow[];
 	term: string;
