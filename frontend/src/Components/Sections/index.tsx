@@ -13,15 +13,28 @@ const Sections: FC<Props> = (props) => {
 		{
 			path: url('/'),
 			exact: true,
-			component: List,
+			render: (props) => <List {...props} type='Normal' />,
 		},
 		{
 			path: url('/add'),
-			component: Form,
+			render: (props) => <Form {...props} type='Normal' />,
 		},
 		{
 			path: url('/:id/edit'),
-			component: Form,
+			render: (props) => <Form {...props} type='Normal' />,
+		},
+		{
+			path: url('/advance'),
+			exact: true,
+			render: (props) => <List {...props} type='Advance' />,
+		},
+		{
+			path: url('/advance/add'),
+			render: (props) => <Form {...props} type='Advance' />,
+		},
+		{
+			path: url('/advance/:id/edit'),
+			render: (props) => <Form {...props} type='Advance' />,
 		},
 	];
 

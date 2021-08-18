@@ -47,6 +47,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Subject Code',
 			accessor: 'code',
+			minWidth: '150px',
 		},
 		{
 			title: 'Subject Description',
@@ -55,16 +56,18 @@ const List: FC<Props> = (props) => {
 		},
 		{
 			title: 'Course',
-			accessor: 'course',
+			accessor: 'course_name',
 			minWidth: '350px',
 		},
 		{
 			title: 'Year Level',
 			accessor: 'level',
+			minWidth: '150px',
 		},
 		{
 			title: 'Semester',
 			accessor: 'term',
+			minWidth: '150px',
 		},
 		{
 			title: 'Units',
@@ -130,7 +133,7 @@ const List: FC<Props> = (props) => {
 			})
 			.map((subject) => ({
 				...subject,
-				course: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
+				course_name: `${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`,
 			}));
 
 	const memoizedRefine = useCallback(refine, [refine]);

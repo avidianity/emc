@@ -14,7 +14,7 @@ class AddLimitToSectionsTable extends Migration
     public function up()
     {
         Schema::table('sections', function (Blueprint $table) {
-            $table->unsignedInteger('limit');
+            $table->unsignedInteger('limit')->default(25);
         });
     }
 

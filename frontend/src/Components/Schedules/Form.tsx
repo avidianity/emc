@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
-import { useHistory, useRouteMatch } from 'react-router';
+import { RouteComponentProps, useHistory, useRouteMatch } from 'react-router';
 import { ScheduleRow } from '../../Contracts/schedule.contract';
 import { Asker, handleError, setValues } from '../../helpers';
 import { useArray, useMode, useNullable } from '../../hooks';
@@ -17,8 +17,11 @@ import { MajorContract } from '../../Contracts/major.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { sectionService } from '../../Services/section.service';
 import { SectionContract } from '../../Contracts/section.contract';
+import axios from 'axios';
 
-type Props = {};
+interface Props extends RouteComponentProps {
+	type: 'Normal' | 'Advance';
+}
 
 type Inputs = {
 	course_id: number;
@@ -33,7 +36,7 @@ type Inputs = {
 	section_id: number;
 };
 
-const Form: FC<Props> = (props) => {
+const Form: FC<Props> = ({ type }) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
 	const { register, setValue, handleSubmit, reset } = useForm<Inputs>({
@@ -61,7 +64,9 @@ const Form: FC<Props> = (props) => {
 	const { data: users, refetch: refetchUsers } = useQuery('users', () => userService.fetch());
 	const { data: subjects, refetch: refetchSubjects } = useQuery('subjects', () => subjectService.fetch());
 	const { data: years, refetch: refetchYears } = useQuery('years', () => yearService.fetch());
-	const { data: sections, refetch: refetchSections } = useQuery('sections', () => sectionService.fetch());
+	const { data: sections, refetch: refetchSections } = useQuery(type === 'Normal' ? 'sections' : 'advance-sections', () =>
+		type === 'Normal' ? sectionService.fetch() : sectionService.advance()
+	);
 
 	const refetchAll = async () => {
 		try {
@@ -97,14 +102,18 @@ const Form: FC<Props> = (props) => {
 	const submit = async (data: Inputs) => {
 		setProcessing(true);
 		try {
-			const year = years?.find((year) => year.current);
-			if (year) {
-				data.year_id = year.id!;
-			} else {
-				return toastr.error('A School Year is not set, please create/make one as current.');
-			}
 			data.payload = rows;
-			await (mode === 'Add' ? scheduleService.create(data) : scheduleService.update(id, data));
+			if (type === 'Normal') {
+				const year = years?.find((year) => year.current);
+				if (year) {
+					data.year_id = year.id!;
+				} else {
+					return toastr.error('A School Year is not set, please create/make one as current.');
+				}
+				await (mode === 'Add' ? scheduleService.create(data) : scheduleService.update(id, data));
+			} else {
+				await axios.post('/schedules/advance', data);
+			}
 			toastr.success('Schedule has been saved successfully.');
 			await refetchAll();
 			reset();
@@ -138,7 +147,10 @@ const Form: FC<Props> = (props) => {
 		<div className='container-fluid'>
 			<div className='card'>
 				<div className='card-body'>
-					<h5 className='card-title'>{mode} Schedule</h5>
+					<h5 className='card-title'>
+						{mode}
+						{type === 'Advance' ? ' Advance' : ''} Schedule
+					</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
 							<div className='form-group col-12 col-md-4'>
@@ -196,45 +208,6 @@ const Form: FC<Props> = (props) => {
 									</select>
 								</div>
 							) : null}
-							<div className='form-group col-12 col-md-4'>
-								<label htmlFor='section_id' className='required'>
-									Section
-								</label>
-								<select
-									{...register('section_id')}
-									id='section_id'
-									className='form-control'
-									onChange={(e) => {
-										const id = e.target.value.toNumber();
-										const section = sections?.find((section) => section.id === id);
-										if (section) {
-											setSection(section);
-										} else {
-											setSection(null);
-										}
-									}}>
-									<option value=''> -- Select -- </option>
-									{sections
-										?.filter((section) => {
-											if (course) {
-												return section.course_id === course.id;
-											}
-											return true;
-										})
-										.filter((section) => {
-											if (major) {
-												return section.major_id === major.id;
-											}
-											return true;
-										})
-										.filter((section) => section.year?.current)
-										.map((section, index) => (
-											<option value={section.id} key={index}>
-												{section.name}
-											</option>
-										))}
-								</select>
-							</div>
 							<div className='form-group col-12 col-md-4'>
 								<label htmlFor='teacher_id' className='required'>
 									Teacher
@@ -308,6 +281,63 @@ const Form: FC<Props> = (props) => {
 									<option value='5th'>5th</option>
 								</select>
 							</div>
+							<div className='form-group col-12 col-md-4'>
+								<label htmlFor='section_id' className='required'>
+									Section
+								</label>
+								<select
+									{...register('section_id')}
+									id='section_id'
+									className='form-control'
+									onChange={(e) => {
+										const id = e.target.value.toNumber();
+										const section = sections?.find((section) => section.id === id);
+										if (section) {
+											setSection(section);
+										} else {
+											setSection(null);
+										}
+									}}>
+									<option value=''> -- Select -- </option>
+									{sections
+										?.filter((section) => {
+											if (course) {
+												return section.course_id === course.id;
+											}
+											return true;
+										})
+										.filter((section) => {
+											if (major) {
+												return section.major_id === major.id;
+											}
+											return true;
+										})
+										.filter((section) => {
+											if (term) {
+												return section.term === term;
+											}
+											return true;
+										})
+										.filter((section) => {
+											if (year) {
+												return section.level === year;
+											}
+											return true;
+										})
+										.filter((section) => {
+											if (type === 'Advance') {
+												return true;
+											} else {
+												return section.year?.current;
+											}
+										})
+										.map((section, index) => (
+											<option value={section.id} key={index}>
+												{section.name}
+											</option>
+										))}
+								</select>
+							</div>
 							<div className={`form-group col-12 col-md-4`}>
 								<label htmlFor='subject_id' className='required'>
 									Subject
@@ -316,7 +346,7 @@ const Form: FC<Props> = (props) => {
 									<option value=''> -- Select -- </option>
 									{subjects
 										?.filter((subject) => {
-											const valid =
+											return (
 												subject.schedules?.find((schedule) => {
 													if (course && major && teacher && section) {
 														return (
@@ -333,12 +363,8 @@ const Form: FC<Props> = (props) => {
 														);
 													}
 													return true;
-												}) === undefined;
-
-											if (mode === 'Add') {
-												return valid;
-											}
-											return valid || subject.id === id;
+												}) === undefined
+											);
 										})
 										.filter((subject) => {
 											if (course && major) {

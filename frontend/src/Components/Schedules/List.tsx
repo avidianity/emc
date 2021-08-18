@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps, useHistory } from 'react-router-dom';
 import { ScheduleContract } from '../../Contracts/schedule.contract';
 import { UserContract } from '../../Contracts/user.contract';
 import { handleError, Asker } from '../../helpers';
@@ -11,10 +11,21 @@ import { scheduleService } from '../../Services/schedule.service';
 import Table, { TableColumn } from '../Shared/Table';
 import Tooltip from '../Shared/Tooltip';
 
-type Props = {};
+interface Props extends RouteComponentProps {
+	type: 'Normal' | 'Advance';
+}
 
-const List: FC<Props> = (props) => {
-	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('schedules', () => scheduleService.fetch());
+const List: FC<Props> = ({ type }) => {
+	const {
+		data: items,
+		isFetching: loading,
+		isError,
+		error,
+		refetch,
+	} = useQuery(`${type === 'Advance' ? 'advance-' : ''}schedules`, () =>
+		type === 'Normal' ? scheduleService.fetch() : scheduleService.advance()
+	);
+	const history = useHistory();
 
 	const url = useURL();
 
@@ -39,21 +50,21 @@ const List: FC<Props> = (props) => {
 	const columns: TableColumn[] = [
 		{
 			title: 'Course',
-			accessor: 'course',
+			accessor: 'course_name',
 			minWidth: '375px',
 		},
 		{
 			title: 'Subject',
-			accessor: 'subject',
+			accessor: 'subject_name',
 			minWidth: '350px',
 		},
 		{
 			title: 'Section',
-			accessor: 'section',
+			accessor: 'section_name',
 		},
 		{
 			title: 'Teacher',
-			accessor: 'teacher',
+			accessor: 'teacher_name',
 			minWidth: '250px',
 		},
 		{
@@ -95,15 +106,17 @@ const List: FC<Props> = (props) => {
 		<>
 			<Table
 				onRefresh={() => refetch()}
-				title='Schedules'
+				title={`${type === 'Advance' ? 'Advance ' : ''}Schedules`}
 				loading={loading}
 				items={
 					items?.map((schedule) => ({
 						...schedule,
-						section: schedule.section?.name,
-						subject: schedule?.subject?.description,
-						course: `${schedule.course?.code}${schedule.major ? ` - Major in ${schedule.major.name}` : ''}`,
-						teacher: `${schedule.teacher?.last_name}, ${schedule.teacher?.first_name} ${schedule.teacher?.middle_name || ''}`,
+						section_name: schedule.section?.name,
+						subject_name: schedule?.subject?.description,
+						course_name: `${schedule.course?.code}${schedule.major ? ` - Major in ${schedule.major.name}` : ''}`,
+						teacher_name: `${schedule.teacher?.last_name}, ${schedule.teacher?.first_name} ${
+							schedule.teacher?.middle_name || ''
+						}`,
 						times: (
 							<>
 								{schedule.payload.map((row, index) =>
@@ -121,9 +134,29 @@ const List: FC<Props> = (props) => {
 				buttons={
 					<>
 						{user?.role === 'Registrar' ? (
-							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add Schedule'>
-								<i className='fas fa-plus'></i>
-							</Link>
+							<>
+								{type === 'Normal' ? (
+									<Link to={url(`advance`)} className='btn btn-secondary btn-sm ml-2' data-tip='View Advance Schedules'>
+										<i className='fas fa-calendar-week'></i>
+									</Link>
+								) : (
+									<button
+										className='btn btn-secondary btn-sm ml-2'
+										data-tip='Go Back'
+										onClick={(e) => {
+											e.preventDefault();
+											history.goBack();
+										}}>
+										<i className='fas fa-arrow-left'></i>
+									</button>
+								)}
+								<Link
+									to={url(`add`)}
+									className='btn btn-primary btn-sm ml-2'
+									data-tip={type === 'Normal' ? 'Add Schedule' : 'Add Advance Schedule'}>
+									<i className='fas fa-plus'></i>
+								</Link>
+							</>
 						) : null}
 					</>
 				}

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import React, { FC, useState } from 'react';
 import { useHistory } from 'react-router';
 import { Asker, outIf } from '../../helpers';
@@ -52,6 +53,7 @@ const Navbar: FC<Props> = (props) => {
 								e.preventDefault();
 								if (await Asker.notice('Are you sure you want to logout?')) {
 									state.remove('user').remove('token');
+									axios.get('/auth/logout').catch(() => {});
 									history.push(routes.HOME);
 								}
 							}}>

@@ -367,18 +367,22 @@ class AdmissionController extends Controller
                 $incremented += 1;
 
                 $year = $admission->year;
-                $builder = Section::whereCourseId($admission->course_id)
+
+                $sections = Section::whereCourseId($admission->course_id)
                     ->whereMajorId($admission->major_id)
                     ->whereTerm($year->semester)
                     ->whereLevel($admission->level)
                     ->whereYearId($year->id)
                     ->withCount('students')
-                    ->latest();
+                    ->latest()
+                    ->get();
 
                 /**
                  * @var \App\Models\Section|null
                  */
-                $section = $builder->first();
+                $section = $sections->first(function (Section $section) {
+                    return $section->students_count < $section->limit;
+                });
 
                 if (!$section || $section->students_count >= $section->limit) {
                     /**
@@ -393,7 +397,7 @@ class AdmissionController extends Controller
                                 $admission->course->code,
                                 $admission->major ? ' - ' . $admission->major->short_name : '',
                                 $admission->level[0],
-                                Section::NAMES[$builder->count()]
+                                Section::NAMES[$sections->count()]
                             ),
                             'course_id' => $admission->course_id,
                             'major_id' => $admission->major_id,
@@ -453,7 +457,7 @@ class AdmissionController extends Controller
         ]);
 
         if (!isset($data['requirements'])) {
-            return [];
+            $data['requirements'] = [];
         }
 
         $builder = User::whereRole('Student')
@@ -498,7 +502,7 @@ class AdmissionController extends Controller
             $student->allowed_units = $unit->units;
         } else {
             $subjects = Subject::whereCourseId($data['course_id'])
-                ->whereMajorId($data['major_id'])
+                ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
                 ->whereTerm($data['term'])
                 ->whereLevel($data['level'])
                 ->get();

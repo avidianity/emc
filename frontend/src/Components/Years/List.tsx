@@ -76,7 +76,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Registration Date',
 			accessor: 'registration',
-			minWidth: '250px',
+			minWidth: '300px',
 		},
 		{
 			title: 'Grade Encoding Date',

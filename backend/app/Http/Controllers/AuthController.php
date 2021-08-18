@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Log;
+use App\Models\PreviousSubject;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -48,6 +49,13 @@ class AuthController extends Controller
             'user' => $user,
             'token' => $token->plainTextToken,
         ];
+    }
+
+    public function logout()
+    {
+        $this->user()->currentAccessToken()->delete();
+
+        return response('', 204);
     }
 
     public function changePassword(Request $request)
@@ -102,5 +110,31 @@ class AuthController extends Controller
         ]);
 
         return $user;
+    }
+
+    public function subjects(Request $request)
+    {
+        /**
+         * @var \App\Models\User
+         */
+        $user = $request->user();
+
+        return [
+            'failed' => array_merge(
+                $user->subjects()->whereHas('grades', function ($builder) {
+                    return $builder->where('grade', '<', 75);
+                })->get()->toArray(),
+                $user->previousSubjects()
+                    ->with('subject')
+                    ->whereHas('subject.grades', function ($builder) {
+                        return $builder->where('grade', '<', 75);
+                    })
+                    ->get()
+                    ->map(function (PreviousSubject $previousSubject) {
+                        return $previousSubject->subject;
+                    })
+                    ->toArray(),
+            ),
+        ];
     }
 }

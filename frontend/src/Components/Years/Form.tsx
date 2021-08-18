@@ -144,7 +144,7 @@ const Form: FC<Props> = (props) => {
 									disabled={processing}
 									options={{
 										altInput: true,
-										minDate: dayjs().add(1, 'week').toDate(),
+										minDate: mode === 'Add' ? dayjs().add(1, 'week').toDate() : undefined,
 									}}
 								/>
 							</div>
@@ -164,7 +164,7 @@ const Form: FC<Props> = (props) => {
 									disabled={processing}
 									options={{
 										altInput: true,
-										minDate: dayjs().add(1, 'week').toDate(),
+										minDate: mode === 'Add' ? dayjs().add(1, 'week').toDate() : undefined,
 									}}
 								/>
 							</div>
@@ -176,7 +176,7 @@ const Form: FC<Props> = (props) => {
 									value={registrationStart || undefined}
 									id='registration_start'
 									options={{
-										minDate: dayjs(new Date()).add(1, 'week').toDate(),
+										minDate: mode === 'Add' ? dayjs(new Date()).add(1, 'week').toDate() : undefined,
 										altInput: true,
 									}}
 									onChange={(dates) => {
@@ -229,7 +229,7 @@ const Form: FC<Props> = (props) => {
 										altFormat: 'F j, Y G:i K',
 										enableTime: true,
 										dateFormat: 'F j, Y G:i K',
-										minDate: dayjs().add(1, 'week').toDate(),
+										minDate: mode === 'Add' ? dayjs().add(1, 'week').toDate() : undefined,
 									}}
 								/>
 							</div>
@@ -252,7 +252,7 @@ const Form: FC<Props> = (props) => {
 										altFormat: 'F j, Y G:i K',
 										enableTime: true,
 										dateFormat: 'F j, Y G:i K',
-										minDate: dayjs().add(1, 'week').toDate(),
+										minDate: mode === 'Add' ? dayjs().add(1, 'week').toDate() : undefined,
 									}}
 								/>
 							</div>

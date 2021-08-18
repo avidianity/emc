@@ -1,6 +1,6 @@
 import React, { FC } from 'react';
 import { useQuery } from 'react-query';
-import { Link } from 'react-router-dom';
+import { Link, RouteComponentProps, useHistory } from 'react-router-dom';
 import { UserContract } from '../../Contracts/user.contract';
 import { SectionContract } from '../../Contracts/section.contract';
 import { handleError, Asker } from '../../helpers';
@@ -10,10 +10,21 @@ import { sectionService } from '../../Services/section.service';
 import Table, { TableColumn } from '../Shared/Table';
 import Tooltip from '../Shared/Tooltip';
 
-type Props = {};
+interface Props extends RouteComponentProps {
+	type: 'Normal' | 'Advance';
+}
 
-const List: FC<Props> = (props) => {
-	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('sections', () => sectionService.fetch());
+const List: FC<Props> = ({ type }) => {
+	const {
+		data: items,
+		isFetching: loading,
+		isError,
+		error,
+		refetch,
+	} = useQuery(type === 'Normal' ? 'sections' : 'advance-sections', () =>
+		type === 'Normal' ? sectionService.fetch() : sectionService.advance()
+	);
+	const history = useHistory();
 
 	const url = useURL();
 
@@ -57,7 +68,7 @@ const List: FC<Props> = (props) => {
 		},
 		{
 			title: 'Course',
-			accessor: 'course',
+			accessor: 'course_name',
 			minWidth: '250px',
 		},
 		{
@@ -95,24 +106,44 @@ const List: FC<Props> = (props) => {
 		<>
 			<Table
 				onRefresh={() => refetch()}
-				title='Sections'
+				title={type === 'Normal' ? 'Sections' : 'Advance Sections'}
 				loading={loading}
 				items={
 					items
-						?.filter((section) => section.year?.current)
+						?.filter((section) => (type === 'Normal' ? section.year?.current : true))
 						.map((section) => ({
 							...section,
-							course: `${section.course?.code}${section.major ? ` - Major in ${section.major.name}` : ''}`,
-							limit: `${section.students_count}/${section.limit}`,
+							course_name: `${section.course?.code}${section.major ? ` - Major in ${section.major.name}` : ''}`,
+							limit: type === 'Normal' ? `${section.students_count}/${section.limit}` : section.limit,
 						})) || []
 				}
 				columns={columns}
 				buttons={
 					<>
-						{user?.role === 'Registrar' && items && items.length === 0 ? (
-							<Link to={url(`add`)} className='btn btn-primary btn-sm ml-2' data-tip='Add Section'>
-								<i className='fas fa-plus'></i>
-							</Link>
+						{user?.role === 'Registrar' ? (
+							<>
+								{type === 'Normal' ? (
+									<Link to={url(`advance`)} className='btn btn-secondary btn-sm ml-2' data-tip='View Advance Sections'>
+										<i className='fas fa-calendar-week'></i>
+									</Link>
+								) : (
+									<button
+										className='btn btn-secondary btn-sm ml-2'
+										data-tip='Go Back'
+										onClick={(e) => {
+											e.preventDefault();
+											history.goBack();
+										}}>
+										<i className='fas fa-arrow-left'></i>
+									</button>
+								)}
+								<Link
+									to={url(`/add`)}
+									className='btn btn-primary btn-sm ml-2'
+									data-tip={type === 'Normal' ? 'Add Section' : 'Add Advance Section'}>
+									<i className='fas fa-plus'></i>
+								</Link>
+							</>
 						) : null}
 					</>
 				}

@@ -213,6 +213,7 @@ const PreRegistration: FC<Props> = (props) => {
 							maxDate: dayjs()
 								.year(new Date().getFullYear() - 17)
 								.toDate(),
+							altInput: true,
 						}}
 						onChange={(dates) => {
 							if (dates.length > 0) {
@@ -288,9 +289,7 @@ const PreRegistration: FC<Props> = (props) => {
 						{requirements?.map((requirement, index) => (
 							<div className='col-12 col-md-6 col-lg-4 col-xl-3' key={index}>
 								<div className='form-group'>
-									<label className='custom-control-label' htmlFor={JSON.stringify(requirement)}>
-										{requirement.name}
-									</label>
+									<label htmlFor={`${index}`}>{requirement.name}</label>
 								</div>
 							</div>
 						))}

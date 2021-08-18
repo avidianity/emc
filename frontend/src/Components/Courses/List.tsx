@@ -47,7 +47,7 @@ const List: FC<Props> = (props) => {
 		},
 		{
 			title: 'Majors',
-			accessor: 'majors',
+			accessor: 'majors_name',
 			minWidth: '250px',
 		},
 		{
@@ -95,7 +95,7 @@ const List: FC<Props> = (props) => {
 						) : (
 							<span className='badge badge-danger'>Not Open for Enrollment</span>
 						),
-						majors: course.majors?.map((major, index) => (
+						majors_name: course.majors?.map((major, index) => (
 							<span className='d-block' key={index}>
 								{major.name}
 							</span>

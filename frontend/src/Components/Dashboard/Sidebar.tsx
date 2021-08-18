@@ -13,7 +13,7 @@ type Props = {};
 const Sidebar: FC<Props> = (props) => {
 	const { data: admissions } = useQuery('admissions', () => admissionService.fetch());
 	const temp = State.getInstance().get<UserContract>('user');
-	const { data: user } = useQuery(['user', temp?.id], () => userService.fetchOne(temp?.id));
+	const { data: fetchedUser } = useQuery(['user', temp?.id], () => userService.fetchOne(temp?.id));
 	const url = useURL();
 	const { data: year } = useCurrentYear();
 	const section = useCurrentSection();
@@ -38,6 +38,8 @@ const Sidebar: FC<Props> = (props) => {
 
 	const getAdmission = (student: UserContract) => student.admissions?.find((admission) => admission.year?.current);
 	const getSection = (student: UserContract) => student.sections?.find((section) => section.year?.current);
+
+	const user = temp || fetchedUser;
 
 	if (!user) {
 		return null;

@@ -170,6 +170,13 @@ class UserController extends Controller
             unset($data['payment_status']);
         }
 
+        $password = null;
+
+        if ($user->admissions_count <= 1) {
+            $password = Str::random(5);
+            $data['password'] = $password;
+        }
+
         $user->update($data);
 
         if ($user->role === 'Student' && $user->active && $isPreviouslyInactive && !$user->enrolled) {
@@ -186,18 +193,22 @@ class UserController extends Controller
 
             if ($admission) {
                 $year = $admission->year;
-                $builder = Section::whereCourseId($admission->course_id)
+
+                $sections = Section::whereCourseId($admission->course_id)
                     ->whereMajorId($admission->major_id)
                     ->whereTerm($year->semester)
                     ->whereLevel($admission->level)
                     ->whereYearId($year->id)
                     ->withCount('students')
-                    ->latest();
+                    ->latest()
+                    ->get();
 
                 /**
                  * @var \App\Models\Section|null
                  */
-                $section = $builder->first();
+                $section = $sections->first(function (Section $section) {
+                    return $section->students_count < $section->limit;
+                });
 
                 if (!$section || $section->students_count >= $section->limit) {
                     /**
@@ -212,7 +223,7 @@ class UserController extends Controller
                                 $admission->course->code,
                                 $admission->major ? ' - ' . $admission->major->short_name : '',
                                 $admission->level[0],
-                                Section::NAMES[$builder->count()]
+                                Section::NAMES[$sections->count()]
                             ),
                             'course_id' => $admission->course_id,
                             'major_id' => $admission->major_id,
@@ -221,7 +232,7 @@ class UserController extends Controller
 
                 $section->students()->attach($student->id);
 
-                $recipes = [$student, $request->user(), $admission, null];
+                $recipes = [$student, $request->user(), $admission, $password];
 
                 $mail = Mail::create([
                     'uuid' => $student->uuid,

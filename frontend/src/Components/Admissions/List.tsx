@@ -50,12 +50,12 @@ const List: FC<Props> = (props) => {
 	const columns: TableColumn[] = [
 		{
 			title: 'Reference Number',
-			accessor: 'id_number',
+			accessor: 'reference_number',
 			minWidth: '160px',
 		},
 		{
 			title: 'Name',
-			accessor: 'student',
+			accessor: 'student_name',
 			minWidth: '250px',
 		},
 		{
@@ -70,10 +70,12 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Year Level',
 			accessor: 'level',
+			minWidth: '150px',
 		},
 		{
 			title: 'Semester',
 			accessor: 'term',
+			minWidth: '150px',
 		},
 		{
 			title: 'Payment Status',
@@ -96,6 +98,7 @@ const List: FC<Props> = (props) => {
 							className={`btn btn-${admission.student?.active ? 'danger' : 'info'} btn-sm mx-1`}
 							onClick={async (e) => {
 								e.preventDefault();
+								console.log(admission.student);
 								if (
 									await Asker.notice(
 										`Are you sure you want to ${admission.student?.active ? 'unconfirm' : 'confirm'} this student?`
@@ -133,7 +136,7 @@ const List: FC<Props> = (props) => {
 						.map((admission) => ({
 							...admission,
 							id_number: admission.student?.uuid,
-							student: `${admission.student?.last_name}, ${admission.student?.first_name} ${
+							student_name: `${admission.student?.last_name}, ${admission.student?.first_name} ${
 								admission.student?.middle_name || ''
 							}`,
 							gender: admission.student?.gender,

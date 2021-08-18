@@ -19,12 +19,13 @@ class SectionController extends Controller
      */
     public function index()
     {
-        return Section::with([
-            'schedules',
-            'course',
-            'year',
-            'major',
-        ])
+        return Section::whereNotNull('year_id')
+            ->with([
+                'schedules',
+                'course',
+                'year',
+                'major',
+            ])
             ->withCount('students')
             ->get();
     }
@@ -53,19 +54,23 @@ class SectionController extends Controller
             'level' => ['required', 'string'],
             'term' => ['required', 'string'],
             'course_id' => ['required', 'numeric', Rule::exists(Course::class, 'id')],
-            'year_id' => ['nullable', 'numeric', Rule::exists(Year::class, 'id')],
+            'year_id' => ['required', 'numeric', Rule::exists(Year::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'limit' => ['required', 'numeric'],
+            'force' => ['required', 'boolean'],
         ]);
 
-        $builder = Section::whereLevel($data['level'])
-            ->whereTerm($data['term'])
-            ->whereCourseId($data['course_id'])
-            ->whereYearId(isset($data['year_id']) ? $data['year_id'] : null)
-            ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null);
+        if (!$data['force']) {
+            $builder = Section::whereLevel($data['level'])
+                ->whereTerm($data['term'])
+                ->whereCourseId($data['course_id'])
+                ->whereYearId($data['year_id'])
+                ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
+                ->whereName($data['name']);
 
-        if ($builder->count() > 0) {
-            return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+            if ($builder->count() > 0) {
+                return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
+            }
         }
 
         return Section::create($data);

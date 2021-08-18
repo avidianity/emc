@@ -1,14 +1,17 @@
+import axios from 'axios';
 import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
-import { useHistory, useRouteMatch } from 'react-router';
+import { RouteComponentProps, useHistory, useRouteMatch } from 'react-router';
 import { CourseContract } from '../../Contracts/course.contract';
-import { handleError, outIf, setValues, toBool } from '../../helpers';
+import { Asker, handleError, outIf, setValues, toBool } from '../../helpers';
 import { useCurrentYear, useMode, useNullable } from '../../hooks';
 import { courseService } from '../../Services/course.service';
 import { sectionService } from '../../Services/section.service';
 
-type Props = {};
+interface Props extends RouteComponentProps {
+	type: 'Normal' | 'Advance';
+}
 
 type SectionContract = {
 	name: string;
@@ -18,14 +21,16 @@ type SectionContract = {
 	major_id?: number;
 	year_id?: number;
 	limit: number;
+	force: boolean;
 };
 
-const Form: FC<Props> = (props) => {
+const Form: FC<Props> = ({ type }) => {
 	const [processing, setProcessing] = useState(false);
 	const [mode, setMode] = useMode();
 	const { register, setValue, handleSubmit, reset } = useForm<SectionContract>({
 		defaultValues: {
 			limit: 25,
+			force: false,
 		},
 	});
 	const [id, setID] = useState(-1);
@@ -58,12 +63,25 @@ const Form: FC<Props> = (props) => {
 		}
 		setProcessing(true);
 		try {
-			data.year_id = year?.id;
-			await (mode === 'Add' ? sectionService.create(data) : sectionService.update(id, data));
+			if (type === 'Normal') {
+				data.year_id = year?.id;
+				await (mode === 'Add' ? sectionService.create(data) : sectionService.update(id, data));
+			} else {
+				await axios.post('/sections/advance', data);
+			}
+
 			toastr.success('Section has been saved successfully.');
 			reset();
-		} catch (error) {
-			handleError(error);
+		} catch (error: any) {
+			if (error.response?.status === 409) {
+				if (await Asker.save(error.response?.data?.message)) {
+					data.force = true;
+					await submit(data);
+					return;
+				}
+			} else {
+				handleError(error);
+			}
 		} finally {
 			setProcessing(false);
 		}
@@ -80,7 +98,10 @@ const Form: FC<Props> = (props) => {
 		<div className='container-fluid'>
 			<div className='card'>
 				<div className='card-body'>
-					<h5 className='card-title'>{mode} School Section</h5>
+					<h5 className='card-title'>
+						{mode}
+						{type === 'Advance' ? ' Advance' : ''} School Section
+					</h5>
 					<form onSubmit={handleSubmit(submit)}>
 						<div className='form-row'>
 							<div className='form-group col-12 col-md-6 col-lg-4'>

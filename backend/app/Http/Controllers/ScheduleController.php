@@ -120,7 +120,7 @@ class ScheduleController extends Controller
             'payload.*.day' => ['required', 'string'],
             'payload.*.start_time' => ['required', 'string'],
             'payload.*.end_time' => ['required', 'string'],
-            'year_id' => ['nullable', 'numeric', Rule::exists(Year::class, 'id')],
+            'year_id' => ['required', 'numeric', Rule::exists(Year::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'section_id' => ['required', 'numeric', Rule::exists(Section::class, 'id')],
             'term' => ['required', 'string'],
@@ -134,7 +134,7 @@ class ScheduleController extends Controller
                 ->whereTeacherId($data['teacher_id'])
                 ->whereSubjectId($data['subject_id'])
                 ->whereYear('year', $data['year'])
-                ->whereYearId(isset($data['year_id']) ? $data['year_id'] : null)
+                ->whereYearId($data['year_id'])
                 ->whereSectionId($data['section_id'])
                 ->count() > 0
             ) {

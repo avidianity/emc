@@ -220,7 +220,7 @@ const List: FC<Props> = ({ type }) => {
 		},
 		{
 			title: 'Course',
-			accessor: 'course',
+			accessor: 'course_name',
 			minWidth: '375px',
 		},
 		{
@@ -236,6 +236,7 @@ const List: FC<Props> = ({ type }) => {
 		{
 			title: 'Payment Status',
 			accessor: 'payment_status',
+			minWidth: '150px',
 		},
 		{
 			title: 'Status',
@@ -363,7 +364,7 @@ const List: FC<Props> = ({ type }) => {
 								</>
 							),
 							year: findAdmission(student)?.level,
-							course: `${findAdmission(student)?.course?.code || ''}${
+							course_name: `${findAdmission(student)?.course?.code || ''}${
 								findAdmission(student)?.major ? ` - Major in ${findAdmission(student)?.major?.name || 'N/A'}` : ''
 							}`,
 							birthday: dayjs(student.birthday).format('MMMM DD, YYYY'),

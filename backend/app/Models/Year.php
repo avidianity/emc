@@ -40,7 +40,9 @@ class Year extends Model
 
             $schedules->each(function (Schedule $schedule) use ($year) {
                 $schedule->year_id = $year->id;
+                $schedule->section->year_id = $year->id;
                 $schedule->save();
+                $schedule->section->save();
             });
         });
 

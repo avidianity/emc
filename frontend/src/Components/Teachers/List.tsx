@@ -3,7 +3,7 @@ import React, { createRef, FC, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { Link, useHistory } from 'react-router-dom';
 import { UserContract } from '../../Contracts/user.contract';
-import { handleError, Asker, toJSON } from '../../helpers';
+import { handleError, Asker } from '../../helpers';
 import { useArray, useNullable, useURL } from '../../hooks';
 import { State } from '../../Libraries/State';
 import { userService } from '../../Services/user.service';
@@ -50,7 +50,7 @@ const List: FC<Props> = (props) => {
 
 	const user = State.getInstance().get<UserContract>('user');
 
-	const columns: TableColumn[] = [
+	const columns: TableColumn<UserContract>[] = [
 		{
 			title: 'Teacher #',
 			accessor: 'uuid',
@@ -58,6 +58,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'Name',
 			accessor: 'name',
+			minWidth: '200px',
 		},
 		{
 			title: 'Email',
@@ -73,7 +74,30 @@ const List: FC<Props> = (props) => {
 	if (['Registrar'].includes(user?.role || '')) {
 		columns.unshift({
 			title: '#',
-			accessor: 'toggle',
+			cell: (teacher) => (
+				<>
+					<div className='custom-control custom-checkbox'>
+						<input
+							type='checkbox'
+							className='custom-control-input'
+							id={`toggle-${teacher.id}`}
+							onChange={(e) => {
+								const id = e.target.value.toNumber();
+								if (selected.includes(id)) {
+									const index = selected.findIndex((number) => number === id);
+									selected.splice(index, 1);
+								} else {
+									selected.push(id);
+								}
+								setSelected([...selected]);
+							}}
+							value={teacher.id}
+							checked={selected.includes(teacher.id!)}
+						/>
+						<label className='custom-control-label' htmlFor={`toggle-${teacher.id}`}></label>
+					</div>
+				</>
+			),
 		});
 		columns.push({
 			title: 'Actions',
@@ -146,30 +170,6 @@ const List: FC<Props> = (props) => {
 						?.filter((user) => user.role === 'Teacher')
 						.map((teacher) => ({
 							...teacher,
-							toggle: (
-								<>
-									<div className='custom-control custom-checkbox'>
-										<input
-											type='checkbox'
-											className='custom-control-input'
-											id={toJSON(teacher)}
-											onChange={(e) => {
-												const id = e.target.value.toNumber();
-												if (selected.includes(id)) {
-													const index = selected.findIndex((number) => number === id);
-													selected.splice(index, 1);
-												} else {
-													selected.push(id);
-												}
-												setSelected([...selected]);
-											}}
-											value={teacher.id}
-											checked={selected.includes(teacher.id!)}
-										/>
-										<label className='custom-control-label' htmlFor={toJSON(teacher)}></label>
-									</div>
-								</>
-							),
 							name: (
 								<>
 									{teacher.last_name}, {teacher.first_name} {teacher.middle_name || ''}

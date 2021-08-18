@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdmissionController;
+use App\Http\Controllers\AdvanceController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CourseController;
@@ -31,9 +32,12 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::middleware('auth:sanctum')->group(function () {
-        Route::post('/change-password', [AuthController::class, 'changePassword']);
+        Route::get('/logout', [AuthController::class, 'logout']);
         Route::get('/admissions', [AuthController::class, 'admissions']);
         Route::get('/check', [AuthController::class, 'check']);
+        Route::get('/subjects', [AuthController::class, 'subjects']);
+
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
         Route::post('/profile', [AuthController::class, 'profile']);
     });
 });
@@ -62,7 +66,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/users/{user}/reincrement', [UserController::class, 'reincrement']);
 
     Route::get('/schedules/advance', [ScheduleController::class, 'advance']);
+    Route::post('/schedules/advance', [AdvanceController::class, 'schedule']);
+
     Route::get('/sections/advance', [SectionController::class, 'advance']);
+    Route::post('/sections/advance', [AdvanceController::class, 'section']);
 
     Route::apiResources([
         'admissions' => AdmissionController::class,

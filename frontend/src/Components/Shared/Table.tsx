@@ -3,6 +3,8 @@ import Datatable, { ColumnSortFunction, ConditionalStyles, Format, Selector, Tab
 import { useState } from 'react';
 import { State } from '../../Libraries/State';
 import { outIf } from '../../helpers';
+import Tooltip from './Tooltip';
+import ReactTooltip from 'react-tooltip';
 
 export interface TableColumn<T = any> extends TableColumnBase {
 	title?: string | number | React.ReactNode;
@@ -34,6 +36,11 @@ const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, it
 	}, [items]);
 
 	useEffect(() => {
+		ReactTooltip.rebuild();
+		setTimeout(() => ReactTooltip.rebuild(), 1000);
+	});
+
+	useEffect(() => {
 		const key = state.listen<string>('mode', (mode) => setMode(mode));
 
 		return () => {
@@ -43,85 +50,88 @@ const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, it
 	}, []);
 
 	return (
-		<div className='container-fluid'>
-			<div className='card shadow'>
-				<div className='card-header'>
-					<div className='container-fluid'>
-						<div className='row'>
-							<div className='col-12 d-flex align-items-center'>
-								<h4 className='card-title mb-0'>{title}</h4>
-								<button
-									className='btn btn-info btn-sm ml-auto'
-									disabled={loading}
-									onClick={(e) => {
-										e.preventDefault();
-										onRefresh();
-									}}
-									data-tip='Refresh'>
-									<i className={`fas fa-sync-alt ${outIf(loading, 'fa-spin')}`}></i>
-								</button>
-								{buttons}
+		<>
+			<div className='container-fluid'>
+				<div className='card shadow'>
+					<div className='card-header'>
+						<div className='container-fluid'>
+							<div className='row'>
+								<div className='col-12 d-flex align-items-center'>
+									<h4 className='card-title mb-0'>{title}</h4>
+									<button
+										className='btn btn-info btn-sm ml-auto'
+										disabled={loading}
+										onClick={(e) => {
+											e.preventDefault();
+											onRefresh();
+										}}
+										data-tip='Refresh'>
+										<i className={`fas fa-sync-alt ${outIf(loading, 'fa-spin')}`}></i>
+									</button>
+									{buttons}
+								</div>
+								{misc ? <div className='col-12'>{misc}</div> : null}
 							</div>
-							{misc ? <div className='col-12'>{misc}</div> : null}
 						</div>
 					</div>
-				</div>
-				<div className={`card-body table-responsive`}>
-					<Datatable
-						columns={columns
-							.map((column) => ({
-								name: column.title,
-								sortable: true,
-								...column,
-							}))
-							.map((column) => {
-								if (column.accessor) {
-									return {
-										...column,
-										selector: ((row: any) => row[column.accessor!]) as any,
-									};
-								}
+					<div className={`card-body table-responsive`}>
+						<Datatable
+							columns={columns
+								.map((column) => ({
+									name: column.title,
+									sortable: true,
+									...column,
+								}))
+								.map((column) => {
+									if (column.accessor) {
+										return {
+											...column,
+											selector: ((row: any) => row[column.accessor!]) as any,
+										};
+									}
 
-								return column;
-							})}
-						data={data}
-						pagination
-						fixedHeader
-						subHeader
-						subHeaderComponent={
-							<div className='d-flex align-items-center'>
-								<input
-									type='text'
-									placeholder='Search'
-									className='form-control'
-									onChange={(e) => {
-										const text = e.target.value;
+									return column;
+								})}
+							data={data}
+							pagination
+							fixedHeader
+							subHeader
+							subHeaderComponent={
+								<div className='d-flex align-items-center'>
+									<input
+										type='text'
+										placeholder='Search'
+										className='form-control'
+										onChange={(e) => {
+											const text = e.target.value;
 
-										if (text.length > 0) {
-											setData(
-												items.filter((item) => {
-													for (const key of Object.keys(item)) {
-														const value = item[key];
-														if (value && value.toString().includes(text)) {
-															return true;
+											if (text.length > 0) {
+												setData(
+													items.filter((item) => {
+														for (const key of Object.keys(item)) {
+															const value = item[key];
+															if (value && value.toString().includes(text)) {
+																return true;
+															}
 														}
-													}
 
-													return false;
-												})
-											);
-										} else {
-											setData(items);
-										}
-									}}
-								/>
-							</div>
-						}
-						theme={mode === 'dark' ? 'dark' : 'default'}
-					/>
+														return false;
+													})
+												);
+											} else {
+												setData(items);
+											}
+										}}
+									/>
+								</div>
+							}
+							theme={mode === 'dark' ? 'dark' : 'default'}
+						/>
+					</div>
 				</div>
 			</div>
-		</div>
+			<Tooltip />
+		</>
 	);
 };
 
