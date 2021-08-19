@@ -19,13 +19,13 @@ const Home: FC<Props> = (props) => {
 				<div className='row'>
 					<div className='col-md-12 col-sm-12'>
 						<h3
-							className='wow bounceIn animated text-shadow-dark'
+							className='wow bounceIn animated text-shadow-dark text-white'
 							data-wow-delay='0.9s'
 							style={{ visibility: 'visible', animationDelay: '0.9s', animationName: 'bounceIn' }}>
 							Welcome to
 						</h3>
 						<h1
-							className='wow fadeInUp animated text-shadow-dark'
+							className='wow fadeInUp animated text-shadow-dark text-white'
 							data-wow-delay='1.6s'
 							style={{ visibility: 'visible', animationDelay: '1.6s', animationName: 'fadeInUp' }}>
 							EMC Registration System

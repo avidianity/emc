@@ -6,6 +6,7 @@ import App from './Views/App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import './Styles/global.css';
+import { DEVELOPMENT, PRODUCTION } from './constants';
 
 ReactDOM.render(
 	<React.StrictMode>
@@ -14,6 +15,10 @@ ReactDOM.render(
 	document.getElementById('root')
 );
 
-serviceWorkerRegistration.unregister();
+if (DEVELOPMENT) {
+	serviceWorkerRegistration.unregister();
+} else if (PRODUCTION) {
+	serviceWorkerRegistration.register();
+}
 
 reportWebVitals();
