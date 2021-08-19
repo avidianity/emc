@@ -18,25 +18,15 @@ class Major extends Model
     protected static function booted()
     {
         static::deleting(function (self $major) {
-            $major->admissions->each(function (Admission $admission) {
-                $admission->delete();
-            });
+            $major->admissions->delete();
 
-            $major->schedules->each(function (Schedule $schedule) {
-                $schedule->delete();
-            });
+            $major->schedules->delete();
 
-            $major->subjects->each(function (Subject $subject) {
-                $subject->delete();
-            });
+            $major->subjects->delete();
 
-            $major->sections->each(function (Section $section) {
-                $section->delete();
-            });
+            $major->sections->delete();
 
-            $major->units->each(function (Unit $unit) {
-                $unit->delete();
-            });
+            $major->units->delete();
         });
 
         static::created(function () {

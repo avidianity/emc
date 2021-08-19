@@ -22,29 +22,17 @@ class Course extends Model
     protected static function booted()
     {
         static::deleting(function (self $course) {
-            $course->admissions->each(function (Admission $admission) {
-                $admission->delete();
-            });
+            $course->admissions->delete();
 
-            $course->schedules->each(function (Schedule $schedule) {
-                $schedule->delete();
-            });
+            $course->schedules->delete();
 
-            $course->majors->each(function (Major $major) {
-                $major->delete();
-            });
+            $course->majors->delete();
 
-            $course->subjects->each(function (Subject $subject) {
-                $subject->delete();
-            });
+            $course->subjects->delete();
 
-            $course->sections->each(function (Section $section) {
-                $section->delete();
-            });
+            $course->sections->delete();
 
-            $course->units->each(function (Unit $unit) {
-                $unit->delete();
-            });
+            $course->units->delete();
         });
     }
 

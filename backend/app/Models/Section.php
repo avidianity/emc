@@ -36,9 +36,7 @@ class Section extends Model
 
         static::deleting(function (self $section) {
             $section->students()->detach();
-            $section->schedules->each(function (Schedule $schedule) {
-                $schedule->delete();
-            });
+            $section->schedules->delete();
         });
     }
 

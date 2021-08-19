@@ -47,21 +47,13 @@ class Year extends Model
         });
 
         static::deleting(function (self $year) {
-            $year->admissions->each(function (Admission $admission) {
-                $admission->delete();
-            });
+            $year->admissions->delete();
 
-            $year->grades->each(function (Grade $grade) {
-                $grade->delete();
-            });
+            $year->grades->delete();
 
-            $year->schedules->each(function (Schedule $schedule) {
-                $schedule->delete();
-            });
+            $year->schedules->delete();
 
-            $year->sections->each(function (Section $section) {
-                return $section->delete();
-            });
+            $year->sections->delete();
         });
     }
 

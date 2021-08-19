@@ -98,7 +98,6 @@ const List: FC<Props> = (props) => {
 							className={`btn btn-${admission.student?.active ? 'danger' : 'info'} btn-sm mx-1`}
 							onClick={async (e) => {
 								e.preventDefault();
-								console.log(admission.student);
 								if (
 									await Asker.notice(
 										`Are you sure you want to ${admission.student?.active ? 'unconfirm' : 'confirm'} this student?`

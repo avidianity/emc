@@ -32,7 +32,6 @@ class AdmissionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -119,7 +118,8 @@ class AdmissionController extends Controller
                 ->get();
 
             $student->allowed_units = $subjects->reduce(function ($previous, Subject $subject) {
-                $units = (int)$subject->units;
+                $units = (int) $subject->units;
+
                 return $previous + $units;
             }, 0);
         }
@@ -139,20 +139,18 @@ class AdmissionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Admission  $admission
      * @return \Illuminate\Http\Response
      */
     public function show(Admission $admission)
     {
         $admission->load('student', 'course.majors', 'major');
+
         return $admission;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Admission  $admission
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Admission $admission)
@@ -205,7 +203,6 @@ class AdmissionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Admission  $admission
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, Admission $admission)
@@ -244,7 +241,7 @@ class AdmissionController extends Controller
                 return $user->enrolled;
             });
 
-        /**
+        /*
          * @var \App\Models\User
          */
         foreach ($users as $user) {
@@ -272,7 +269,7 @@ class AdmissionController extends Controller
             }
 
             if ($missing->count() > 0) {
-                $missingGrades += 1;
+                ++$missingGrades;
                 continue;
             }
 
@@ -290,7 +287,7 @@ class AdmissionController extends Controller
             }
 
             if ($failed->count() > 0) {
-                $failedStudents += 1;
+                ++$failedStudents;
                 continue;
             }
 
@@ -310,7 +307,7 @@ class AdmissionController extends Controller
                 ],
                 'Summer' => [
                     '3rd' => ['4th', '1st Semester'],
-                ]
+                ],
             ];
 
             if (isset($map[$admission->term]) && isset($map[$admission->term][$admission->level])) {
@@ -343,6 +340,7 @@ class AdmissionController extends Controller
 
                     $user->allowed_units = $subjects->reduce(function ($previous, Subject $subject) {
                         $units = $subject->units;
+
                         return $previous + $units;
                     }, 0);
                 }
@@ -364,7 +362,7 @@ class AdmissionController extends Controller
 
                 $user->type = 'Old';
 
-                $incremented += 1;
+                ++$incremented;
 
                 $year = $admission->year;
 
@@ -395,7 +393,7 @@ class AdmissionController extends Controller
                             'name' => sprintf(
                                 '%s%s %s%s',
                                 $admission->course->code,
-                                $admission->major ? ' - ' . $admission->major->short_name : '',
+                                $admission->major ? ' - '.$admission->major->short_name : '',
                                 $admission->level[0],
                                 Section::NAMES[$sections->count()]
                             ),
@@ -453,7 +451,7 @@ class AdmissionController extends Controller
             'student.fathers_name' => ['nullable', 'string'],
             'student.mothers_name' => ['nullable', 'string'],
             'student.fathers_occupation' => ['nullable', 'string'],
-            'student.mothers_occupation' => ['nullable', 'string']
+            'student.mothers_occupation' => ['nullable', 'string'],
         ]);
 
         if (!isset($data['requirements'])) {
@@ -508,7 +506,8 @@ class AdmissionController extends Controller
                 ->get();
 
             $student->allowed_units = $subjects->reduce(function ($previous, Subject $subject) {
-                $units = (int)$subject->units;
+                $units = (int) $subject->units;
+
                 return $previous + $units;
             }, 0);
         }

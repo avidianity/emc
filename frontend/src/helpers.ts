@@ -23,6 +23,10 @@ export class Asker {
 	static async okay(message: string, title?: string) {
 		return toBool(await swal({ title, text: message, icon: 'info' }));
 	}
+
+	static async error(message: string, title?: string) {
+		return toBool(await swal({ title, text: message, icon: 'error' }));
+	}
 }
 
 export function isBehind(student: UserContract) {

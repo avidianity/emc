@@ -1,6 +1,6 @@
 import axios from 'axios';
 import dayjs from 'dayjs';
-import React, { createRef, FC } from 'react';
+import React, { createRef, FC, useEffect } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useQuery } from 'react-query';
@@ -20,10 +20,11 @@ import { subjectService } from '../../Services/subject.service';
 import { userService } from '../../Services/user.service';
 import { yearService } from '../../Services/year.service';
 import Flatpickr from 'react-flatpickr';
-
 import Table, { TableColumn } from '../Shared/Table';
 import { statuses } from '../../constants';
 import Tooltip from '../Shared/Tooltip';
+import Loader from '../Shared/Loader';
+import swal from 'sweetalert';
 
 type GradeContract = {
 	student_id: number;
@@ -46,6 +47,7 @@ const incrementModalRef = v4();
 const updatePaymentModalRef = v4();
 
 const List: FC<Props> = ({ type }) => {
+	const [loader, setLoader] = useNullable<JQuery<HTMLDivElement>>();
 	const [processing, setProcessing] = useState(false);
 	const { data: items, isFetching: loading, isError, error, refetch } = useQuery('users', () => userService.fetch());
 	const { data: subjects } = useQuery('subjects', () => subjectService.fetch());
@@ -82,6 +84,7 @@ const List: FC<Props> = ({ type }) => {
 			current: true,
 		},
 	});
+	const loaderRef = createRef<HTMLDivElement>();
 
 	const user = State.getInstance().get<UserContract>('user');
 
@@ -114,24 +117,43 @@ const List: FC<Props> = ({ type }) => {
 
 	const evaluate = async () => {
 		try {
-			toastr.info('Processing students. Please wait.', 'Notice');
+			loader?.modal('show');
 			const {
 				data: { missing, failed, passed },
 			} = await axios.post<{ missing: number; failed: number; passed: number }>('/admissions/increment');
-			toastr.success(
-				`Processing done. 
-                    <br />Passed Students: ${passed}
-                    <br />Failed Students: ${failed} 
-                    <br />Subjects with missing grades: ${missing}`,
-				'Success',
-				{
-					escapeHtml: false,
-				}
-			);
+
+			loader?.modal('hide');
+			await swal({
+				icon: 'success',
+				title: 'Success!',
+				content: {
+					element: ((passedCount, failedCount, missingCount) => {
+						const div = document.createElement('div');
+
+						const passed = document.createElement('p');
+
+						passed.innerText = `Passed Students: ${passedCount}`;
+
+						const failed = document.createElement('p');
+
+						failed.innerText = `Failed Students: ${failedCount}`;
+
+						const missing = document.createElement('p');
+
+						missing.innerText = `Subjects with missing grades: ${missingCount}`;
+
+						div.append(passed, failed, missing);
+
+						return div;
+					})(passed, failed, missing),
+				},
+			});
 			refetch();
 		} catch (error) {
-			toastr.error('Unable to process students.');
+			Asker.error('Unable to process students.', 'Oops!');
 			console.log(error);
+		} finally {
+			loader?.modal('hide');
 		}
 	};
 
@@ -324,6 +346,12 @@ const List: FC<Props> = ({ type }) => {
 			),
 		});
 	}
+
+	useEffect(() => {
+		if (loaderRef.current && !loader) {
+			setLoader($(loaderRef.current));
+		}
+	}, [loaderRef, loader, setLoader]);
 
 	return (
 		<>
@@ -629,6 +657,10 @@ const List: FC<Props> = ({ type }) => {
 											}}
 											className='form-control'
 											disabled={processing}
+											options={{
+												altInput: true,
+												minDate: dayjs().add(1, 'week').toDate(),
+											}}
 										/>
 									</div>
 									<div className='form-group col-12 col-md-6'>
@@ -643,6 +675,10 @@ const List: FC<Props> = ({ type }) => {
 											}}
 											className='form-control'
 											disabled={processing}
+											options={{
+												altInput: true,
+												minDate: dayjs().add(1, 'week').toDate(),
+											}}
 										/>
 									</div>
 									<div className='form-group col-12 col-md-6'>
@@ -657,6 +693,10 @@ const List: FC<Props> = ({ type }) => {
 											}}
 											className='form-control'
 											disabled={processing}
+											options={{
+												minDate: dayjs(new Date()).add(1, 'week').toDate(),
+												altInput: true,
+											}}
 										/>
 									</div>
 									<div className='form-group col-12 col-md-6'>
@@ -671,6 +711,12 @@ const List: FC<Props> = ({ type }) => {
 											}}
 											className='form-control'
 											disabled={processing}
+											options={{
+												minDate: dayjs(registrationStart || new Date())
+													.add(1, 'week')
+													.toDate(),
+												altInput: true,
+											}}
 										/>
 									</div>
 									<div className='form-group col-12 col-md-6'>
@@ -690,6 +736,7 @@ const List: FC<Props> = ({ type }) => {
 												altFormat: 'F j, Y G:i K',
 												enableTime: true,
 												dateFormat: 'F j, Y G:i K',
+												minDate: dayjs().add(1, 'week').toDate(),
 											}}
 										/>
 									</div>
@@ -710,6 +757,7 @@ const List: FC<Props> = ({ type }) => {
 												altFormat: 'F j, Y G:i K',
 												enableTime: true,
 												dateFormat: 'F j, Y G:i K',
+												minDate: dayjs().add(1, 'week').toDate(),
 											}}
 										/>
 									</div>
@@ -735,6 +783,7 @@ const List: FC<Props> = ({ type }) => {
 					</div>
 				</div>
 			</div>
+			<Loader ref={loaderRef} />
 			<Tooltip />
 		</>
 	);

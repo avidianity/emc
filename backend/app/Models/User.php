@@ -4,8 +4,6 @@ namespace App\Models;
 
 use App\Jobs\SendMail;
 use App\Mail\AccountCreated;
-use App\Mail\Admission;
-use App\Models\Admission as ModelsAdmission;
 use App\Notifications\PasswordChanged;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -99,21 +97,13 @@ class User extends Authenticatable
         });
 
         static::deleting(function (self $user) {
-            $user->admissions->each(function (ModelsAdmission $admission) {
-                $admission->delete();
-            });
+            $user->admissions->delete();
 
-            $user->grades->each(function (Grade $grade) {
-                $grade->delete();
-            });
+            $user->grades->delete();
 
-            $user->schedules->each(function (Schedule $schedule) {
-                $schedule->delete();
-            });
+            $user->schedules->delete();
 
-            $user->previousSubjects->each(function (PreviousSubject $previousSubject) {
-                $previousSubject->delete();
-            });
+            $user->previousSubjects->delete();
 
             $user->subjects()->detach();
             $user->sections()->detach();
@@ -170,7 +160,7 @@ class User extends Authenticatable
 
     public function admissions()
     {
-        return $this->hasMany(ModelsAdmission::class, 'student_id');
+        return $this->hasMany(Admission::class, 'student_id');
     }
 
     public function grades()

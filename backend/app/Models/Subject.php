@@ -26,19 +26,13 @@ class Subject extends Model
     protected static function booted()
     {
         static::deleting(function (self $subject) {
-            $subject->grades->each(function (Grade $grade) {
-                $grade->delete();
-            });
+            $subject->grades->delete();
 
-            $subject->schedules->each(function (Schedule $schedule) {
-                $schedule->delete();
-            });
+            $subject->schedules->delete();
 
             $subject->students()->detach();
 
-            $subject->previous->each(function (PreviousSubject $previousSubject) {
-                $previousSubject->delete();
-            });
+            $subject->previous->delete();
         });
     }
 

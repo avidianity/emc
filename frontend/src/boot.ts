@@ -1,5 +1,4 @@
 import toastr from 'toastr';
-import 'toastr/build/toastr.css';
 import axios from 'axios';
 import './shims';
 import $ from 'jquery';
