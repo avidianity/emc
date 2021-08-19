@@ -7,7 +7,6 @@ use App\Models\Course;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\Request;
 
 class AnalyticsController extends Controller
 {

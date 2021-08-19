@@ -84,7 +84,7 @@ const PreRegistration: FC<Props> = (props) => {
 			const p = document.createElement('p');
 
 			p.innerText =
-				'Please settle your payment to enroll the subjects. Partially paid minimum of “500 ” pesos if fully paid please pay the stated amount of “10,000” pesos';
+				'Please settle your payment to enroll the subjects. Partially paid minimum of “500” pesos if fully paid please pay the stated amount of “10,000” pesos';
 
 			await swal({
 				title: 'Registered Successfully!',
