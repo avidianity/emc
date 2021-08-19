@@ -27,9 +27,13 @@ const Form: FC<Props> = (props) => {
 	const submit = async (payload: Inputs) => {
 		if (state.has('block')) {
 			const block = dayjs(state.get<string>('block') || undefined);
-			if (block.isValid() && dayjs().isAfter(block)) {
-				state.remove('block');
-				setTries(0);
+			if (block.isValid()) {
+				if (dayjs(new Date()).isAfter(block)) {
+					state.remove('block');
+					setTries(0);
+				} else {
+					setTries(3);
+				}
 			}
 		}
 		if (tries >= 3) {
