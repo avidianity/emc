@@ -10,39 +10,7 @@ import axios from 'axios';
 import { State } from '../Libraries/State';
 import PreRegistration from '../Components/PreRegistration';
 
-const urls = [
-	// '/js/jquery.min.js',
-	'/js/popper.min.js',
-	'/js/moment.min.js',
-	'/js/bootstrap.min.js',
-	'/js/simplebar.min.js',
-	'/js/daterangepicker.js',
-	'/js/jquery.stickOnScroll.js',
-	'/js/tinycolor-min.js',
-	'/js/config.js',
-	'/js/d3.min.js',
-	'/js/topojson.min.js',
-	'/js/datamaps.all.min.js',
-	'/js/datamaps-zoomto.js',
-	'/js/datamaps.custom.js',
-	'/js/Chart.min.js',
-	'/js/chart-setup.js',
-	'/js/gauge.min.js',
-	'/js/jquery.sparkline.min.js',
-	'/js/apexcharts.min.js',
-	'/js/apexcharts.custom.js',
-	'/js/jquery.mask.min.js',
-	'/js/select2.min.js',
-	'/js/jquery.steps.min.js',
-	'/js/jquery.validate.min.js',
-	'/js/jquery.timepicker.js',
-	'/js/dropzone.min.js',
-	'/js/uppy.min.js',
-	'/js/quill.min.js',
-	'/js/setup-1.js',
-	'/js/uppy.js',
-	'/js/apps.js',
-];
+const urls = ['/js/simplebar.min.js'];
 
 export default function App() {
 	const state = State.getInstance();

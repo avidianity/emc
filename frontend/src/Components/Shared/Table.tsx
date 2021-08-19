@@ -1,7 +1,6 @@
 import React, { FC, useEffect } from 'react';
 import Datatable, { ColumnSortFunction, ConditionalStyles, Format, Selector, TableColumnBase } from 'react-data-table-component';
 import { useState } from 'react';
-import { State } from '../../Libraries/State';
 import { outIf } from '../../helpers';
 import Tooltip from './Tooltip';
 import ReactTooltip from 'react-tooltip';
@@ -27,8 +26,6 @@ export type TableProps = {
 };
 
 const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, items, misc }) => {
-	const state = State.getInstance();
-	const [mode, setMode] = useState(state.get<string>('mode') || 'dark');
 	const [data, setData] = useState(items);
 
 	useEffect(() => {
@@ -39,15 +36,6 @@ const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, it
 		ReactTooltip.rebuild();
 		setTimeout(() => ReactTooltip.rebuild(), 1000);
 	});
-
-	useEffect(() => {
-		const key = state.listen<string>('mode', (mode) => setMode(mode));
-
-		return () => {
-			state.unlisten(key);
-		};
-		// eslint-disable-next-line
-	}, []);
 
 	return (
 		<>
@@ -125,7 +113,7 @@ const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, it
 									/>
 								</div>
 							}
-							theme={mode === 'dark' ? 'dark' : 'default'}
+							theme={'default'}
 						/>
 					</div>
 				</div>
