@@ -27,6 +27,7 @@ const List: FC<Props> = (props) => {
 		{
 			title: 'IP Address',
 			accessor: 'ip_address',
+			minWidth: '250px',
 		},
 		{
 			title: 'Device',
