@@ -21,4 +21,4 @@ if (DEVELOPMENT) {
 	serviceWorkerRegistration.register();
 }
 
-reportWebVitals();
+reportWebVitals(console.log);
