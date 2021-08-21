@@ -200,14 +200,16 @@ const Form: FC<Props> = (props) => {
 									value={registrationEnd || undefined}
 									id='registration_end'
 									options={{
-										minDate: dayjs(registrationStart || new Date())
-											.add(1, 'week')
-											.toDate(),
 										altInput: true,
 									}}
 									onChange={(dates) => {
 										if (dates.length > 0) {
-											setRegistrationEnd(dates[0]);
+											const date = dates[0];
+											if (dayjs(date).isAfter(new Date(), 'days') || dayjs(date).isSame(new Date(), 'day')) {
+												setRegistrationEnd(date);
+											} else {
+												setRegistrationEnd(null);
+											}
 										}
 									}}
 									className='form-control'
