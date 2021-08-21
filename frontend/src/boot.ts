@@ -14,11 +14,6 @@ import customParseFormat from 'dayjs/plugin/customParseFormat';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-dayjs.tz.setDefault('Asia/Manila');
-
 dayjs.extend(relativeTime);
 dayjs.extend(customParseFormat);
 
