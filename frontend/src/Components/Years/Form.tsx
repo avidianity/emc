@@ -43,7 +43,6 @@ const Form: FC<Props> = (props) => {
 			setRegistrationEnd(dayjs(data.registration_end).toDate());
 			setGradeStart(dayjs(data.grade_start).toDate());
 			setGradeEnd(dayjs(data.grade_end).toDate());
-			setMode('Edit');
 		} catch (error) {
 			handleError(error);
 			history.goBack();
@@ -75,6 +74,7 @@ const Form: FC<Props> = (props) => {
 
 	useEffect(() => {
 		if (match.path.includes('edit')) {
+			setMode('Edit');
 			fetch(match.params.id);
 		}
 		// eslint-disable-next-line
