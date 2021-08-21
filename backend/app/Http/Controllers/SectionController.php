@@ -44,7 +44,6 @@ class SectionController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -58,6 +57,7 @@ class SectionController extends Controller
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'limit' => ['required', 'numeric'],
             'force' => ['required', 'boolean'],
+            'room_name' => ['required', 'string'],
         ]);
 
         if (!$data['force']) {
@@ -66,7 +66,8 @@ class SectionController extends Controller
                 ->whereCourseId($data['course_id'])
                 ->whereYearId($data['year_id'])
                 ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
-                ->whereName($data['name']);
+                ->whereName($data['name'])
+                ->whereRoomName($data['room_name']);
 
             if ($builder->count() > 0) {
                 return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);
@@ -79,7 +80,6 @@ class SectionController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Section  $section
      * @return \Illuminate\Http\Response
      */
     public function show(Section $section)
@@ -97,8 +97,6 @@ class SectionController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Section  $section
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Section $section)
@@ -111,6 +109,7 @@ class SectionController extends Controller
             'year_id' => ['nullable', 'numeric', Rule::exists(Year::class, 'id')],
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'limit' => ['nullable', 'numeric'],
+            'room_name' => ['nullable', 'string'],
         ]);
 
         $section->update($data);
@@ -121,7 +120,6 @@ class SectionController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Section  $section
      * @return \Illuminate\Http\Response
      */
     public function destroy(Section $section)

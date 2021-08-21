@@ -57,6 +57,11 @@ const List: FC<Props> = ({ type }) => {
 			minWidth: '150px',
 		},
 		{
+			title: 'Room Name',
+			accessor: 'room_name',
+			minWidth: '150px',
+		},
+		{
 			title: 'Year Level',
 			accessor: 'level',
 			minWidth: '150px',

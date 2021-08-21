@@ -22,6 +22,7 @@ type SectionContract = {
 	year_id?: number;
 	limit: number;
 	force: boolean;
+	room_name: string;
 };
 
 const Form: FC<Props> = ({ type }) => {
@@ -186,6 +187,18 @@ const Form: FC<Props> = ({ type }) => {
 									Limit
 								</label>
 								<input {...register('limit')} type='text' id='limit' className='form-control' disabled={processing} />
+							</div>
+							<div className={`form-group col-12`}>
+								<label htmlFor='room_name' className='required'>
+									Room Name
+								</label>
+								<input
+									{...register('room_name')}
+									type='text'
+									id='room_name'
+									className='form-control'
+									disabled={processing}
+								/>
 							</div>
 						</div>
 						<div className='form-group d-flex'>

@@ -357,7 +357,7 @@ const List: FC<Props> = ({ type }) => {
 		<>
 			<Table
 				onRefresh={() => refetch()}
-				title={`${type} Students`}
+				title={type === 'Behind' ? 'With Deficiency' : `${type} Students`}
 				loading={loading}
 				items={
 					items

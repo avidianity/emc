@@ -66,6 +66,7 @@ class AdvanceController extends Controller
             'major_id' => ['nullable', 'numeric', Rule::exists(Major::class, 'id')],
             'limit' => ['required', 'numeric'],
             'force' => ['required', 'boolean'],
+            'room_name' => ['required', 'string'],
         ]);
 
         if (!$data['force']) {
@@ -76,6 +77,7 @@ class AdvanceController extends Controller
                 ->whereMajorId(isset($data['major_id']) ? $data['major_id'] : null)
                 ->whereYearId(null)
                 ->whereName($data['name'])
+                ->whereRoomName($data['room_name'])
                 ->count() > 0
             ) {
                 return response(['message' => 'Data is already existing. Please save again to confirm.'], 409);

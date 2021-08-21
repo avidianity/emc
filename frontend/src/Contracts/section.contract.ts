@@ -19,4 +19,5 @@ export interface SectionContract extends ModelContract {
 	students?: UserContract[];
 	schedules?: ScheduleContract[];
 	students_count?: number;
+	room_name: string;
 }

@@ -244,7 +244,7 @@ const Sidebar: FC<Props> = (props) => {
 						<li className='nav-item'>
 							<Link to={url(routes.SECTIONS)} className='nav-link' activeClassName='active'>
 								<i className='fe fe-book fe-16'></i>
-								<span className='ml-3 item-text'>Sections</span>
+								<span className='ml-3 item-text'>Rooms & Sections</span>
 							</Link>
 						</li>
 					) : null}
