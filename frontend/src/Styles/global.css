@@ -6,7 +6,7 @@
 @import '@fontsource/lato';
 @import '@fontsource/roboto';
 
-@media only screen and (max-device-width: 768px) {
+@media (min-width: 576px) {
 	*::-webkit-scrollbar {
 		width: 6px;
 		height: 6px;
