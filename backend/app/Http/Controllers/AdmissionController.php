@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendMail;
+use App\Mail\PreRegistration;
 use App\Models\Admission;
 use App\Models\Course;
 use App\Models\Log;
+use App\Models\Mail;
 use App\Models\Major;
 use App\Models\Section;
 use App\Models\Subject;
@@ -522,6 +525,16 @@ class AdmissionController extends Controller
             'payload' => $student,
             'message' => 'Student submitted a pre-registration.',
         ]);
+
+        $mail = Mail::create([
+            'uuid' => $student->uuid,
+            'to' => $student->email,
+            'subject' => 'Pre Registration',
+            'status' => 'Pending',
+            'body' => (new PreRegistration($student, $admission, $password))->render(),
+        ]);
+
+        SendMail::dispatch($mail, [$student, $admission, $password], PreRegistration::class);
 
         return $admission;
     }

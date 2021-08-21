@@ -3,13 +3,13 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 
 class PreRegistration extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
     public $student;
     public $admission;
@@ -18,9 +18,10 @@ class PreRegistration extends Mailable
     /**
      * Create a new message instance.
      *
-     * @param \App\Models\User $student
+     * @param \App\Models\User      $student
      * @param \App\Models\Admission $admission
-     * @param string $password
+     * @param string                $password
+     *
      * @return void
      */
     public function __construct($student, $admission, $password)

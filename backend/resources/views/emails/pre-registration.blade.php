@@ -1,7 +1,9 @@
 @component('mail::message')
 # Hi {{ $student->first_name }}.
 
-<p>You have pre-registered for Course: {{ $admission->course->code }} - {{ $admission->level }} Year of {{ $admission->term }}.</p>
+<p>Successfully Registered! Please settle your payment to enroll the subjects. Partially paid minimum of “500” pesos if fully paid please pay the stated amount of “10,000” pesos</p>
+
+<p>Course: {{ $admission->course->code }} - {{ $admission->level }} Year of {{ $admission->term }}.</p>
 
 <b>Here is your user account credentials</b>
 <p>Account No.: {{ $student->uuid }}
