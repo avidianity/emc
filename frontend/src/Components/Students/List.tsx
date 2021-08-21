@@ -686,17 +686,21 @@ const List: FC<Props> = ({ type }) => {
 										<Flatpickr
 											value={registrationStart || undefined}
 											id='registration_start'
+											options={{
+												altInput: true,
+											}}
 											onChange={(dates) => {
 												if (dates.length > 0) {
-													setRegistrationStart(dates[0]);
+													const date = dates[0];
+													if (dayjs(date).isAfter(new Date(), 'days') || dayjs(date).isSame(new Date(), 'day')) {
+														setRegistrationStart(date);
+													} else {
+														setRegistrationStart(null);
+													}
 												}
 											}}
 											className='form-control'
 											disabled={processing}
-											options={{
-												minDate: dayjs(new Date()).toDate(),
-												altInput: true,
-											}}
 										/>
 									</div>
 									<div className='form-group col-12 col-md-6'>
