@@ -694,7 +694,7 @@ const List: FC<Props> = ({ type }) => {
 											className='form-control'
 											disabled={processing}
 											options={{
-												minDate: dayjs(new Date()).add(1, 'week').toDate(),
+												minDate: dayjs(new Date()).toDate(),
 												altInput: true,
 											}}
 										/>
@@ -712,9 +712,7 @@ const List: FC<Props> = ({ type }) => {
 											className='form-control'
 											disabled={processing}
 											options={{
-												minDate: dayjs(registrationStart || new Date())
-													.add(1, 'week')
-													.toDate(),
+												minDate: dayjs(registrationStart || new Date()).toDate(),
 												altInput: true,
 											}}
 										/>
