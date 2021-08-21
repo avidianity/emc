@@ -176,7 +176,7 @@ const Form: FC<Props> = (props) => {
 									value={registrationStart || undefined}
 									id='registration_start'
 									options={{
-										minDate: mode === 'Add' ? dayjs(new Date()).add(1, 'week').toDate() : undefined,
+										minDate: mode === 'Add' ? dayjs(new Date()).toDate() : undefined,
 										altInput: true,
 									}}
 									onChange={(dates) => {
