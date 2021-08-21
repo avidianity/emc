@@ -117,6 +117,11 @@ const Form: FC<Props> = (props) => {
 			toastr.success('Admission has been saved successfully.');
 			setBirthday(null);
 			reset();
+			setName({
+				first_name: '',
+				middle_name: '',
+				last_name: '',
+			});
 		} catch (error: any) {
 			if (error.response?.status === 409) {
 				if (await Asker.save(error.response?.data?.message)) {

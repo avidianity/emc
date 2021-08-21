@@ -87,6 +87,11 @@ const Form: FC<Props> = (props) => {
 			toastr.success('Teacher has been saved successfully.');
 			reset();
 			setBirthday(null);
+			setName({
+				first_name: '',
+				middle_name: '',
+				last_name: '',
+			});
 		} catch (error: any) {
 			if (error.response?.status === 409) {
 				if (await Asker.save(error.response?.data?.message)) {

@@ -99,6 +99,11 @@ const PreRegistration: FC<Props> = (props) => {
 				},
 			});
 			reset();
+			setName({
+				first_name: '',
+				middle_name: '',
+				last_name: '',
+			});
 			history.goBack();
 		} catch (error: any) {
 			if (error.response?.status === 409) {

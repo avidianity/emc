@@ -63,6 +63,10 @@ const Form: FC<Props> = (props) => {
 			await (mode === 'Add' ? yearService.create(data) : yearService.update(id, data));
 			toastr.success('School Year has been saved successfully.');
 			reset();
+			setSemesterStart(null);
+			setSemesterEnd(null);
+			setRegistrationStart(null);
+			setRegistrationEnd(null);
 			setGradeStart(null);
 			setGradeEnd(null);
 		} catch (error) {
