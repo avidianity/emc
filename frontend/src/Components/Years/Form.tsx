@@ -176,12 +176,16 @@ const Form: FC<Props> = (props) => {
 									value={registrationStart || undefined}
 									id='registration_start'
 									options={{
-										minDate: mode === 'Add' ? dayjs(new Date()).toDate() : undefined,
 										altInput: true,
 									}}
 									onChange={(dates) => {
 										if (dates.length > 0) {
-											setRegistrationStart(dates[0]);
+											const date = dates[0];
+											if (dayjs(date).isAfter(new Date(), 'days') || dayjs(date).isSame(new Date(), 'day')) {
+												setRegistrationStart(date);
+											} else {
+												setRegistrationStart(null);
+											}
 										}
 									}}
 									className='form-control'
