@@ -568,7 +568,7 @@ const List: FC<Props> = ({ type }) => {
 							<div className='modal-body'>
 								<div className='form-group'>
 									<label htmlFor='payment_status'>Payment Status</label>
-									<select {...registerUser('payment_status')} id='subject_id' className='form-control'>
+									<select {...registerUser('payment_status')} id='payment_status' className='form-control'>
 										<option value='Not Paid'>Not Paid</option>
 										<option value='Partially Paid'>Partially Paid</option>
 										<option value='Fully Paid'>Fully Paid</option>
