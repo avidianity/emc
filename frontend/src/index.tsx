@@ -18,7 +18,7 @@ ReactDOM.render(
 if (DEVELOPMENT) {
 	serviceWorkerRegistration.unregister();
 } else if (PRODUCTION) {
-	serviceWorkerRegistration.register();
+	serviceWorkerRegistration.unregister();
 }
 
 reportWebVitals(console.log);
