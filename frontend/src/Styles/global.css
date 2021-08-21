@@ -6,22 +6,24 @@
 @import '@fontsource/lato';
 @import '@fontsource/roboto';
 
-*::-webkit-scrollbar {
-	width: 6px;
-	height: 6px;
-}
+@media only screen and (max-device-width: 768px) {
+	*::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
+	}
 
-*::-webkit- ::-webkit-scrollbar-track {
-	background: #f1f1f1;
-}
+	*::-webkit- ::-webkit-scrollbar-track {
+		background: #f1f1f1;
+	}
 
-*::-webkit-scrollbar-thumb {
-	background: #888;
-	border-radius: 4px;
-}
+	*::-webkit-scrollbar-thumb {
+		background: #888;
+		border-radius: 4px;
+	}
 
-*::-webkit-scrollbar-thumb:hover {
-	background: #555;
+	*::-webkit-scrollbar-thumb:hover {
+		background: #555;
+	}
 }
 
 .sc-dlMDgC.jMeWFj {
