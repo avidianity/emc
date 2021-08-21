@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import swal from 'sweetalert';
 import { UserContract } from './Contracts/user.contract';
+import React from 'react';
 
 dayjs.extend(relativeTime);
 
@@ -71,8 +72,35 @@ export function validURL(url: string) {
 
 export function ucfirst(string: string) {
 	const array = string.split('');
-	array[0] = array[0].toUpperCase();
+	if (array.length > 0) {
+		array[0] = array[0].toUpperCase();
+	}
 	return array.join('');
+}
+
+export function capitalizeName(setter: any) {
+	return (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { value } = e.target;
+		if (typeof value === 'string') {
+			const name = e.target.getAttribute('id') || '';
+			if (value.length > 0) {
+				const capitalized = value
+					.split(' ')
+					.map((word) => ucfirst(word))
+					.join(' ');
+
+				setter((data: any) => ({
+					...data,
+					[name]: capitalized,
+				}));
+			} else {
+				setter((data: any) => ({
+					...data,
+					[name]: '',
+				}));
+			}
+		}
+	};
 }
 
 export function ucwords(string: string) {

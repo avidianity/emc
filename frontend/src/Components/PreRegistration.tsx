@@ -7,7 +7,7 @@ import { courseService } from '../Services/course.service';
 import Flatpickr from 'react-flatpickr';
 import { useHistory } from 'react-router';
 import { requirementService } from '../Services/requirement.service';
-import { Asker, handleError } from '../helpers';
+import { Asker, capitalizeName, handleError } from '../helpers';
 import { userService } from '../Services/user.service';
 import axios from 'axios';
 import { CourseContract } from '../Contracts/course.contract';
@@ -65,6 +65,11 @@ const PreRegistration: FC<Props> = (props) => {
 	const [number, setNumber] = useState('');
 	const history = useHistory();
 	const { data: year } = useCurrentYear({ onSuccess: (year) => check(year) });
+	const [name, setName] = useState({
+		first_name: '',
+		middle_name: '',
+		last_name: '',
+	});
 
 	const submit = async (data: Inputs) => {
 		if ((course?.majors?.length || 0) > 0 && !majorID) {
@@ -79,6 +84,7 @@ const PreRegistration: FC<Props> = (props) => {
 			data.requirements = requirements?.map((requirement) => requirement.name) || [];
 			data.student.number = number;
 			data.student.birthday = birthday?.toJSON() || '';
+			data.student = { ...data.student, ...name };
 			await axios.post('/admission/pre-registration', data);
 
 			const p = document.createElement('p');
@@ -148,7 +154,14 @@ const PreRegistration: FC<Props> = (props) => {
 					<label htmlFor='first_name' className='required'>
 						First Name
 					</label>
-					<input {...register('student.first_name')} type='text' id='first_name' className='form-control' disabled={processing} />
+					<input
+						type='text'
+						id='first_name'
+						className='form-control'
+						disabled={processing}
+						onChange={capitalizeName(setName)}
+						value={name.first_name}
+					/>
 				</div>
 				<div className='form-group col-12 col-md-6'>
 					<label htmlFor='address' className='required'>
@@ -164,6 +177,8 @@ const PreRegistration: FC<Props> = (props) => {
 						id='middle_name'
 						className='form-control'
 						disabled={processing}
+						onChange={capitalizeName(setName)}
+						value={name.middle_name}
 					/>
 				</div>
 				<div className='form-group col-12 col-md-6'>
@@ -184,7 +199,15 @@ const PreRegistration: FC<Props> = (props) => {
 					<label htmlFor='last_name' className='required'>
 						Last Name
 					</label>
-					<input {...register('student.last_name')} type='text' id='last_name' className='form-control' disabled={processing} />
+					<input
+						{...register('student.last_name')}
+						type='text'
+						id='last_name'
+						className='form-control'
+						disabled={processing}
+						onChange={capitalizeName(setName)}
+						value={name.last_name}
+					/>
 				</div>
 				<div className='form-group col-12 col-md-6'>
 					<label htmlFor='email' className='required'>

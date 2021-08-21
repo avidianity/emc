@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory, useRouteMatch } from 'react-router';
-import { Asker, handleError, setValues } from '../../helpers';
+import { Asker, capitalizeName, handleError, setValues } from '../../helpers';
 import { useCurrentYear, useMode, useNullable } from '../../hooks';
 import { admissionService } from '../../Services/admission.service';
 import Flatpickr from 'react-flatpickr';
@@ -67,6 +67,11 @@ const Form: FC<Props> = (props) => {
 	const [course, setCourse] = useNullable<CourseContract>();
 	const { data: courses } = useQuery('courses', () => courseService.fetch());
 	const { data: year } = useCurrentYear();
+	const [name, setName] = useState({
+		first_name: '',
+		middle_name: '',
+		last_name: '',
+	});
 
 	const fetch = async (id: any) => {
 		try {
@@ -104,6 +109,10 @@ const Form: FC<Props> = (props) => {
 			data.student.number = number;
 			data.student.birthday = birthday?.toJSON();
 			data.year_id = year?.id!;
+			data.student = {
+				...data.student,
+				...name,
+			};
 			await (mode === 'Add' ? admissionService.create(data) : admissionService.update(id, data));
 			toastr.success('Admission has been saved successfully.');
 			setBirthday(null);
@@ -153,11 +162,12 @@ const Form: FC<Props> = (props) => {
 									First Name
 								</label>
 								<input
-									{...register('student.first_name')}
 									type='text'
 									id='first_name'
 									className='form-control'
 									disabled={processing}
+									onChange={capitalizeName(setName)}
+									value={name.first_name}
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
@@ -173,11 +183,12 @@ const Form: FC<Props> = (props) => {
 							<div className='form-group col-12 col-md-6'>
 								<label htmlFor='middle_name'>Middle Name</label>
 								<input
-									{...register('student.middle_name')}
 									type='text'
 									id='middle_name'
 									className='form-control'
 									disabled={processing}
+									onChange={capitalizeName(setName)}
+									value={name.middle_name}
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
@@ -191,11 +202,12 @@ const Form: FC<Props> = (props) => {
 									Last Name
 								</label>
 								<input
-									{...register('student.last_name')}
 									type='text'
 									id='last_name'
 									className='form-control'
 									disabled={processing}
+									onChange={capitalizeName(setName)}
+									value={name.last_name}
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>

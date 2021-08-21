@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useHistory, useRouteMatch } from 'react-router';
-import { Asker, handleError, setValues } from '../../helpers';
+import { Asker, capitalizeName, handleError, setValues } from '../../helpers';
 import { useMode, useNullable } from '../../hooks';
 import { userService } from '../../Services/user.service';
 import Flatpickr from 'react-flatpickr';
@@ -47,6 +47,11 @@ const Form: FC<Props> = (props) => {
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
 	const [number, setNumber] = useState('');
+	const [name, setName] = useState({
+		first_name: '',
+		middle_name: '',
+		last_name: '',
+	});
 
 	const fetch = async (id: any) => {
 		try {
@@ -55,6 +60,11 @@ const Form: FC<Props> = (props) => {
 			setValues(setValue, data);
 			setBirthday(dayjs(data.birthday).toDate());
 			setNumber(data.number);
+			setName({
+				first_name: data.first_name,
+				middle_name: data.middle_name || '',
+				last_name: data.last_name,
+			});
 			setMode('Edit');
 		} catch (error) {
 			handleError(error);
@@ -69,6 +79,10 @@ const Form: FC<Props> = (props) => {
 			data.active = true;
 			data.birthday = birthday?.toJSON();
 			data.number = number;
+			data = {
+				...data,
+				...name,
+			};
 			await (mode === 'Add' ? userService.create(data) : userService.update(id, data));
 			toastr.success('Registrar has been saved successfully.');
 			reset();
@@ -117,11 +131,12 @@ const Form: FC<Props> = (props) => {
 									First Name
 								</label>
 								<input
-									{...register('first_name')}
 									type='text'
 									id='first_name'
 									className='form-control'
 									disabled={processing}
+									onChange={capitalizeName(setName)}
+									value={name.first_name}
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
@@ -135,11 +150,12 @@ const Form: FC<Props> = (props) => {
 									Last Name
 								</label>
 								<input
-									{...register('last_name')}
 									type='text'
 									id='last_name'
 									className='form-control'
 									disabled={processing}
+									onChange={capitalizeName(setName)}
+									value={name.last_name}
 								/>
 							</div>
 							<div className='form-group col-12 col-md-6'>
