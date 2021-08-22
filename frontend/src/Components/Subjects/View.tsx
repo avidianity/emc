@@ -44,8 +44,9 @@ const View: FC<Props> = (props) => {
 			data.student_id = studentID!;
 			data.teacher_id = user?.id!;
 			data.subject_id = subject?.id || id;
-			data.grade = gradeAmount;
-			data.status = gradeAmount >= 75 ? 'Passed' : 'Failed';
+			const grade = Math.round(gradeAmount);
+			data.grade = grade;
+			data.status = grade >= 75 ? 'Passed' : 'Failed';
 			await gradeService.create(data);
 			await refetch();
 			toastr.success('Grade saved succesfully.');
@@ -239,7 +240,7 @@ const View: FC<Props> = (props) => {
 																step='.01'
 																className='form-control form-control-sm'
 																onChange={(e) => {
-																	const grade = Math.round(e.target.value.toNumber());
+																	const grade = e.target.value.toNumber();
 																	if (grade >= 0 && grade <= 100) {
 																		if (grade >= 75) {
 																			setValue('status', 'Passed');
