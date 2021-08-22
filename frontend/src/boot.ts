@@ -1,6 +1,7 @@
 import toastr from 'toastr';
 import axios from 'axios';
 import './shims';
+import '@avidian/extras';
 import $ from 'jquery';
 import 'popper.js';
 import 'bootstrap';

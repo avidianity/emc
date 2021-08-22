@@ -3,6 +3,7 @@
 	"version": "0.1.0",
 	"private": true,
 	"dependencies": {
+		"@avidian/extras": "^1.0.0",
 		"@fontsource/lato": "^4.5.0",
 		"@fontsource/open-sans": "^4.5.0",
 		"@fontsource/overpass": "^4.5.0",

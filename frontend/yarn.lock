@@ -2,6 +2,14 @@
 # yarn lockfile v1
 
 
+"@avidian/extras@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@avidian/extras/-/extras-1.0.0.tgz#99af26d4ab6244b13a9c8cf93243b7eefebc3e9d"
+  integrity sha512-6Np4uNwcEu8YUzI+5ihbWKwGhkqNNhgtJmw8iiFeERo76dtDHEOGOWfZg/Pb+JG3Fh6cC1BbQ525Dvc2lgKa0Q==
+  dependencies:
+    dayjs "^1.10.5"
+    lodash "^4.17.21"
+
 "@babel/code-frame@7.10.4":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.10.4.tgz#168da1a36e90da68ae8d49c0f1b48c7c6249213a"
@@ -4177,7 +4185,7 @@ datatables.net@>=1.10.13:
   dependencies:
     jquery ">=1.7"
 
-dayjs@^1.10.6:
+dayjs@^1.10.5, dayjs@^1.10.6:
   version "1.10.6"
   resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.10.6.tgz#288b2aa82f2d8418a6c9d4df5898c0737ad02a63"
   integrity sha512-AztC/IOW4L1Q41A86phW5Thhcrco3xuAA+YX/BLpLWWjRcTj5TOt/QImBLmCKlrF7u7k47arTnOyL6GnbG8Hvw==
