@@ -477,7 +477,7 @@ class AdmissionController extends Controller
             if (
                 $admissionBuilder->count() > 0
             ) {
-                return response(['message' => 'Data is already existing.'], 409);
+                return response(['message' => 'Data already exists.'], 409);
             }
         }
 

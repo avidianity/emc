@@ -108,6 +108,7 @@ const PreRegistration: FC<Props> = (props) => {
 		} catch (error: any) {
 			if (error.response?.status === 409) {
 				await Asker.okay(error.response?.data?.message);
+				history.goBack();
 			} else {
 				handleError(error);
 			}
