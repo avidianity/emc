@@ -111,7 +111,7 @@ const List: FC<Props> = (props) => {
 	if (user?.role === 'Registrar') {
 		columns.push({
 			title: 'Actions',
-			minWidth: '150px',
+			minWidth: '250px',
 			cell: (admission: AdmissionContract) =>
 				user?.role === 'Registrar' ? (
 					<>

@@ -62,7 +62,7 @@ const Table: FC<TableProps> = ({ columns, title, buttons, loading, onRefresh, it
 							</div>
 						</div>
 					</div>
-					<div className={`card-body table-responsive`}>
+					<div className={`card-body`}>
 						<Datatable
 							columns={columns
 								.map((column) => ({

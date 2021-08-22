@@ -36,14 +36,13 @@ const Sidebar: FC<Props> = (props) => {
 		Student: [routes.GRADES, routes.SCHEDULES, routes.PROFILE, routes.ENROLLMENT],
 	};
 
-	const getAdmission = (student: UserContract) => student.admissions?.find((admission) => admission.year?.current);
-	const getSection = (student: UserContract) => student.sections?.find((section) => section.year?.current);
-
-	const user = temp || fetchedUser;
+	const user = fetchedUser || temp;
 
 	if (!user) {
 		return null;
 	}
+
+	const admission = user.admissions?.find((admission) => admission.year?.current) || user.admissions?.last();
 
 	return (
 		<aside className='sidebar-left border-right bg-white shadow' id='leftSidebar' data-simplebar>
@@ -63,18 +62,16 @@ const Sidebar: FC<Props> = (props) => {
 								S.Y {year.start} - {year.end}
 							</span>
 							<span className='mx-auto d-block'>{year.semester}</span>
-							{user?.role === 'Student' ? (
+							{user?.role === 'Student' && admission && section ? (
 								<>
 									<span className='mx-auto d-block'>
-										{getAdmission(user)?.course?.code}{' '}
-										{`${getAdmission(user)?.major ? `- ${getAdmission(user)?.major?.name}` : ''}`}
+										{admission.course?.code} {`${admission.major ? `- ${admission.major?.name}` : ''}`}
 									</span>
-									<span className='mx-auto d-block'>{getSection(user)?.name}</span>
+									<span className='mx-auto d-block'>{section.name}</span>
 								</>
 							) : null}
 						</>
 					) : null}
-					{user.role === 'Student' ? <span className='mx-auto'>{section?.name}</span> : null}
 				</div>
 				<ul className='navbar-nav flex-fill w-100 mb-2'>
 					<li className='nav-item'>

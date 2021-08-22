@@ -5,7 +5,11 @@
 
 <p>Reference Number: {{ $admission->reference_number }}</p>
 
+@if($admission->major)
+<p>Course: {{ $admission->course->code }} {{ $admission->major->name }} {{ $admission->level }} Year of {{ $admission->term }}.</p>
+@else
 <p>Course: {{ $admission->course->code }} - {{ $admission->level }} Year of {{ $admission->term }}.</p>
+@endif
 
 <br />
 <p>Please use these credentials to login to the system.</p>

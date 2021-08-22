@@ -24,6 +24,12 @@ class Section extends Model
 
     protected static function booted()
     {
+        static::creating(function (self $section) {
+            if (!$section->room_name) {
+                $section->room_name = $section->name;
+            }
+        });
+
         static::updated(function (self $section) {
             if ($section->students_count > $section->limit) {
                 $overhead = $section->students_count - $section->limit;

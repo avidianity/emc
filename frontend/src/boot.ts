@@ -11,6 +11,7 @@ import 'flatpickr/dist/themes/material_blue.css';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import customParseFormat from 'dayjs/plugin/customParseFormat';
+import 'line-awesome/dist/font-awesome-line-awesome/css/all.css';
 
 dayjs.extend(relativeTime);
 dayjs.extend(customParseFormat);

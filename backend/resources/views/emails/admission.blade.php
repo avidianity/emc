@@ -1,7 +1,12 @@
 @component('mail::message')
 # Hi {{ $student->first_name }}.
 
+@if($admission->major)
+<p>You have been admitted to Course: {{ $admission->course->code }} {{ $admission->major->name }} {{ $admission->level }} Year of {{ $admission->term }}.</p>
+@else
 <p>You have been admitted to Course: {{ $admission->course->code }} - {{ $admission->level }} Year of {{ $admission->term }}.</p>
+@endif
+
 
 <b>Here is your user account credentials</b>
 <p>Account No.: {{ $student->uuid }}</p>

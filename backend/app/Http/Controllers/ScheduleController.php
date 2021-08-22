@@ -34,16 +34,8 @@ class ScheduleController extends Controller
         $user = $request->user();
 
         if ($user->role === 'Student') {
-            $sections = $user->sections->map(function (Section $section) {
-                return $section->id;
-            });
-
-            $subjects = $user->subjects->map(function (Subject $subject) {
-                return $subject->id;
-            });
-
             /**
-             * @var \App\Models\Admission
+             * @var \App\Models\Admission|null
              */
             $admission = $user->admissions()->whereHas('year', function (Builder $builder) {
                 return $builder->where('current', true);
@@ -54,9 +46,31 @@ class ScheduleController extends Controller
                     ->where('term', $admission->term);
             }
 
-            $builder = $builder->whereIn('section_id', $sections->toArray())
-                ->whereIn('subject_id', $subjects->toArray());
-        } else if ($user->role === 'Teacher') {
+            if ($user->enrolled) {
+                $subjects = $user->subjects->map(function (Subject $subject) {
+                    return $subject->id;
+                });
+
+                $builder = $builder->whereIn('subject_id', $subjects->toArray());
+            } else {
+                $section = $user->sections()->whereHas('year', function (Builder $builder) {
+                    return $builder->where('current', true);
+                })
+                    ->with([
+                        'schedules.course',
+                        'schedules.teacher',
+                        'schedules.subject',
+                        'schedules.major',
+                        'schedules.section',
+                    ])
+                    ->latest()
+                    ->first();
+
+                if ($section) {
+                    return $section->schedules;
+                }
+            }
+        } elseif ($user->role === 'Teacher') {
             $builder = $builder->where('teacher_id', $user->id);
         }
 
@@ -96,7 +110,7 @@ class ScheduleController extends Controller
 
             $builder = $builder->whereIn('section_id', $sections->toArray())
                 ->whereIn('subject_id', $subjects->toArray());
-        } else if ($user->role === 'Teacher') {
+        } elseif ($user->role === 'Teacher') {
             $builder = $builder->where('teacher_id', $user->id);
         }
 
@@ -106,7 +120,6 @@ class ScheduleController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -155,20 +168,18 @@ class ScheduleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Schedule  $schedule
      * @return \Illuminate\Http\Response
      */
     public function show(Schedule $schedule)
     {
         $schedule->load('course.majors', 'teacher', 'subject', 'major', 'section');
+
         return $schedule;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Schedule  $schedule
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, Schedule $schedule)
@@ -203,7 +214,6 @@ class ScheduleController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Models\Schedule  $schedule
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, Schedule $schedule)

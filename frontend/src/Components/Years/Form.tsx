@@ -24,7 +24,7 @@ const Form: FC<Props> = (props) => {
 	const history = useHistory();
 	const match = useRouteMatch<{ id: string }>();
 	const [startYear, setStartYear] = useState(new Date().getFullYear());
-	const [endYear, setEndYear] = useState(new Date().getFullYear() + 10);
+	const [endYear, setEndYear] = useState(new Date().getFullYear() + 1);
 	const [semesterStart, setSemesterStart] = useNullable<Date>();
 	const [semesterEnd, setSemesterEnd] = useNullable<Date>();
 	const [registrationStart, setRegistrationStart] = useNullable<Date>();
@@ -185,7 +185,7 @@ const Form: FC<Props> = (props) => {
 									onChange={(dates) => {
 										if (dates.length > 0) {
 											const date = dates[0];
-											if (dayjs(date).isAfter(new Date(), 'days') || dayjs(date).isSame(new Date(), 'day')) {
+											if (dayjs(date).isAfter(dayjs(), 'days') || dayjs(date).isSame(dayjs(), 'day')) {
 												setRegistrationStart(date);
 											} else {
 												setRegistrationStart(null);
@@ -214,6 +214,8 @@ const Form: FC<Props> = (props) => {
 											} else {
 												setRegistrationEnd(null);
 											}
+										} else {
+											setRegistrationStart(null);
 										}
 									}}
 									className='form-control'

@@ -84,7 +84,9 @@ const View: FC<Props> = (props) => {
 			<div className='card'>
 				<div className='card-header'>
 					<div className='d-flex'>
-						<h2 className='card-title'>View Subject</h2>
+						<h2 className='card-title'>
+							{user?.last_name}, {user?.first_name}
+						</h2>
 						<button
 							className='btn btn-secondary btn-sm'
 							style={{ position: 'absolute', right: '10px' }}
@@ -97,9 +99,6 @@ const View: FC<Props> = (props) => {
 					</div>
 					<p className='card-text mb-0'>Code: {subject.code}</p>
 					<p className='card-text mb-0'>Description: {subject.description}</p>
-					<p className='card-text mb-0'>
-						Teacher: {user?.last_name}, {user?.first_name}
-					</p>
 					<p className='card-text mb-0'>
 						Course: {`${subject.course?.code}${subject.major ? ` - Major in ${subject.major.name}` : ''}`}
 					</p>
