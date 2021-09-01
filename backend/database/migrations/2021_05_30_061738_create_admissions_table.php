@@ -17,6 +17,7 @@ class CreateAdmissionsTable extends Migration
      */
     public function up()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::create('admissions', function (Blueprint $table) {
             $table->id();
             $table->foreignIdFor(new Course())->constrained();
@@ -32,6 +33,7 @@ class CreateAdmissionsTable extends Migration
             $table->boolean('done')->default(false);
             $table->timestamps();
         });
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
