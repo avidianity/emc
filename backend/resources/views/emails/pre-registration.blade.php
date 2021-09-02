@@ -12,7 +12,6 @@
 @endif
 
 <br />
-<p>Please use these credentials to login to the system.</p>
 
 Thanks,<br />
 {{ config('app.name') }}
