@@ -22,7 +22,6 @@ services:
     depends_on:
       - mysql
       - redis
-      - meilisearch
   mysql:
     image: "mysql:8.0"
     ports:
@@ -69,6 +68,4 @@ volumes:
   emcmysql:
     driver: local
   emcredis:
-    driver: local
-  emcmeilisearch:
     driver: local
